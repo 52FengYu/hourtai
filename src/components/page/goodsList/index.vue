@@ -95,15 +95,15 @@
                     <!-- 搜索 -->
                     <el-button type="primary">搜索</el-button>
                     <!-- 重置 -->
-                    <el-button type="primary">重置</el-button>
+                    <el-button type="primary" @click="clear">重置</el-button>
                     <!-- 导出 -->
                     <el-button type="primary">导出</el-button>
                     <!-- 新增 -->
-                    <el-button type="primary">新增商品</el-button>
+                    <el-button type="primary"><router-link to="newgoods">新增商品</router-link></el-button>
                     <!-- 跨境 -->
-                    <el-button type="success" plain>跨境商品发布</el-button>
+                    <el-button type="success" plain><router-link to="cross">跨境商品发布</router-link></el-button>
                     <!-- 新增套装 -->
-                    <el-button type="success" plain>新增套装</el-button>
+                    <el-button type="success" plain><router-link to="suit">新增套装</router-link></el-button>
                 </div>
             </div>
             <el-table :data="form" border class="table" ref="multipleTable">
@@ -123,7 +123,12 @@
                 <el-table-column prop="salesPrice" label="销售定价" width="90" align="center" ></el-table-column>
                 <el-table-column prop="audit" label="审核状态"  width="90" align="center" ></el-table-column>
                 <el-table-column prop="shelves" label="上架状态" width="100" align="center" ></el-table-column>
-                <el-table-column prop="operation" label="操作" width="200" align="center" ></el-table-column>
+                <el-table-column label="操作" width="180" align="center">
+                    <template slot-scope="scope">
+                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                        <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
             </el-table>
             <div class="pagination">
                  <el-pagination
@@ -173,19 +178,18 @@
             return {
                 url: './vuetable.json',
                 currentPage4: 4,    /* 分页 */
-                tableData: [],
                 cur_page: 1,
-                multipleSelection: [],
-                select_cate: '',
-                select_word: '',
-                del_list: [],
+                // multipleSelection: [],
+                // select_cate: '',
+                // select_word: '',
+                // del_list: [],
                 is_search: false,
                 editVisible: false,
                 delVisible: false,
-                inputCard: '',
-                inputMobile:'',
+                // inputCard: '',
+                // inputMobile:'',
                 productName:'',     /* 商品名称输入框 */
-                productCode:'',     /* 商品名称输入框 */
+                productCode:'',     /* 商品编码输入框 */
                 unifiedCode:'',     /* 集团统一码 */
                 StoreCode:'',       /* 店内码 */
                 trafficCode:'',     /* 物流码 */
@@ -2214,6 +2218,19 @@
                 this.id = row.id;
                 this.delVisible = true;
             },
+            clear(){
+                this.productName="";
+                this.productCode="";
+                this.unifiedCode="";
+                this.StoreCode="";
+                this.trafficCode="";
+                this.value1="";
+                this.value2="";
+                this.value3=""
+            },
+            /* suit(){
+                this.$router.push({path:'@/components/page/goodsList/suit'})
+            } */
         },
         mounted() {
             this.restaurants = this.loadAll();
@@ -2235,6 +2252,25 @@
             margin-bottom: 10px;
             > * {   
                 margin:0 5px;
+            }
+        }
+    }
+    .el-button--success{
+        span{
+            a{
+                color: #67C23A;
+            }
+        }
+        span:hover{
+            a{
+                color:#fff
+            }
+        }
+    }
+    .el-button--primary{
+        span{
+            a{
+                color: #fff;
             }
         }
     }

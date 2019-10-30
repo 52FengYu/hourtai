@@ -56,13 +56,28 @@ export default new Router({
                 },
                 {
                     path: '/goodsList',
-                    component: resolve => require(['../components/page/goodsList.vue'], resolve),
-                    meta: { title: '商品列表' }
+                    component: resolve => require(['../components/page/goodsList/index.vue'], resolve),
+                    meta: { title: '商品列表' },
                 },
                 {
                     path: '/brandManagement',
                     component: resolve => require(['../components/page/brandManagement.vue'], resolve),
                     meta: { title: '品牌管理' }
+                },
+                {
+                    path: '/suit',
+                    component: resolve => require(['../components/page/goodsList/suit.vue'], resolve),
+                    meta: { title: '新增套装' }
+                },
+                {
+                    path: '/cross',
+                    component: resolve => require(['../components/page/goodsList/new_cross_goods.vue'], resolve),
+                    meta: { title: '跨境商品发布' }
+                },
+                {
+                    path: '/newgoods',
+                    component: resolve => require(['../components/page/goodsList/newgoods.vue'], resolve),
+                    meta: { title: '新增商品' }
                 },
                 {
                     path: '/List',
