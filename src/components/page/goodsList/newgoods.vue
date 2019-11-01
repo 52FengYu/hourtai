@@ -20,7 +20,10 @@
                         action="https://jsonplaceholder.typicode.com/posts/"
                         list-type="picture-card"
                         :on-preview="handlePictureCardPreview"
+                        :on-success="handleAvatarSuccess"
+                        :on-error="imgUploadError"
                         accept="image/png, image/jpeg"
+                        :file-list="fileLists1"
                         :on-remove="handleRemove">
                         <i class="el-icon-plus"></i>
                     </el-upload>
@@ -33,11 +36,14 @@
                 <span>商品详情图</span>
                 <el-upload
                     action="https://jsonplaceholder.typicode.com/posts/"
-                    list-type="picture-card"
-                    :on-preview="handlePictureCardPreview"
-                    accept="image/png, image/jpeg"
-                    :on-remove="handleRemove">
-                    <i class="el-icon-plus"></i>
+                        list-type="picture-card"
+                        :on-preview="handlePictureCardPreview"
+                        :on-success="handleAvatarSuccess"
+                        :on-error="imgUploadError"
+                        accept="image/png, image/jpeg"
+                        :file-list="fileLists2"
+                        :on-remove="handleRemove">
+                        <i class="el-icon-plus"></i>
                 </el-upload>
                 <el-dialog :visible.sync="dialogVisible2">
                     <img width="100%" :src="dialogImageUrl2" alt="">
@@ -49,18 +55,19 @@
                     <el-form :inline="true" :model="formInline" class="demo-form-inline">
                         <div class="info1">
                             <el-form-item label="集团统一码">
-                                <el-input v-model="formInline.user" placeholder="集团统一码"></el-input>
+                                <!-- <el-input v-model="uniformCode" placeholder="集团统一码"></el-input> -->
+                                <span style="display:block;width:200px;" v-model="uniformCode">{{uniformCode}}</span>
                             </el-form-item>
                             <el-form-item label="店内码">
-                                &nbsp;&nbsp;&nbsp;<el-input v-model="formInline.user" placeholder="店内码"></el-input>
+                                &nbsp;&nbsp;&nbsp;<el-input v-model="formInline.storeCode" placeholder="店内码"></el-input>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onSubmit">检索</el-button>
+                                <el-button type="primary" @click="getProductInfo">检索</el-button>
                             </el-form-item>
                         </div>
                         <div class="info2">
                             <el-form-item label="商品名称">
-                                &nbsp;&nbsp;&nbsp;<el-input v-model="formInline.user" placeholder="商品名称"></el-input>
+                                &nbsp;&nbsp;&nbsp;<el-input v-model="formInline.productName" placeholder="商品名称"></el-input>
                             </el-form-item>
                             <el-form-item label="计量单位">
                                 <el-select v-model="value" placeholder="请选择">
@@ -75,11 +82,11 @@
                         </div>
                         <div class="info3">
                             <el-form-item label="商品类别">
-                                &nbsp;&nbsp;&nbsp;<el-cascader :options="options" clearable placeholder="请选择类目"></el-cascader>
+                                &nbsp;&nbsp;&nbsp;<el-cascader :options="options" clearable></el-cascader>
                             </el-form-item>
                             <el-form-item label="税率">
                                 <div style="display:flex">
-                                    &nbsp;&nbsp;&nbsp;<el-input v-model="formInline.user" placeholder="税率"></el-input>
+                                    &nbsp;&nbsp;&nbsp;<el-input v-model="formInline.rate" placeholder="税率"></el-input>
                                     <span>%</span>      
                                 </div>
                             </el-form-item>
@@ -87,39 +94,39 @@
                         <div  class="info4">
                              <el-form-item label="品牌">
                                 <div style="display:flex">
-                                    <el-button type="success" plain>选择品牌</el-button>
-                                    <span  style="display:block;margin-left:20px;min-width:20px;width:100px;background:rgb(202,226,234)">123</span>
+                                    <el-button type="success" plain @click="handleEdit">选择品牌</el-button>
+                                    <span  style="display:block;margin-left:20px;min-width:20px;width:100px;background:rgb(202,226,234)">{{brand}}</span>
                                 </div>
                             </el-form-item>
                             <el-form-item label="供应商">
-                                <el-input v-model="formInline.user" placeholder="供应商"></el-input>
+                                <el-input v-model="formInline.supplier" placeholder="供应商"></el-input>
                             </el-form-item>
                         </div>
                         <div class="info5" style="display:flex">
                             <el-form-item label="重量（kg）">
-                                <el-input v-model="formInline.user" placeholder="重量"></el-input>
-                                <el-radio v-model="radio" label="1">称重</el-radio>
-                                <el-radio v-model="radio" label="2">不称重</el-radio>
+                                <el-input v-model="formInline.weight" placeholder="重量"></el-input>
+                                <el-radio v-model="radio1" label="1">称重</el-radio>
+                                <el-radio v-model="radio1" label="2">不称重</el-radio>
                             </el-form-item>
                         </div>
                         <div class="info6" style="display:flex">
                             <el-form-item label="产地">
-                                <el-input v-model="formInline.user" placeholder="产地"></el-input>
+                                <el-input v-model="formInline.originPlace" placeholder="产地"></el-input>
                             </el-form-item>
                         </div>
                         <div class="info7" style="display:flex">
                             <el-form-item label="关键词">
-                                <el-input v-model="formInline.user" placeholder="关键词"></el-input>
+                                <el-input v-model="formInline.keyWord" placeholder="关键词"></el-input>
                             </el-form-item>
                         </div>
                         <div class="info8">
                             <el-form-item label="是否仅自提">
-                                <el-radio v-model="radio" label="1">是</el-radio>
-                                <el-radio v-model="radio" label="2">否</el-radio>
+                                <el-radio v-model="radio2" label="1">是</el-radio>
+                                <el-radio v-model="radio2" label="2">否</el-radio>
                             </el-form-item>
                             <el-form-item label="是否同步线下价格">
-                                <el-radio v-model="radio" label="1">同步</el-radio>
-                                <el-radio v-model="radio" label="2">不同步</el-radio>
+                                <el-radio v-model="radio3" label="1">同步</el-radio>
+                                <el-radio v-model="radio3" label="2">不同步</el-radio>
                             </el-form-item>
                         </div>
                     </el-form>
@@ -127,9 +134,177 @@
             </div>
             <div class="five">
                 <h4>展示参数（选填）</h4>
+                <div>
+                    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+                        <!-- 动态添加的部分 -->
+                        <div class="activeAdd">
+                            <el-form-item v-for="(item,index) in list" :key="index">
+                                <span>{{item.propertyName}}</span>
+                                <span>:</span>
+                                <span>{{item.attributeValues}}</span>
+                                <el-button type="text" @click="del(index)">删除</el-button>
+                            </el-form-item>
+                        </div>
+                        <!-- input框 这是写死的-->
+                        <el-form-item>
+                            <el-input v-model="prop.propertyName" placeholder="属性名"></el-input>
+                        </el-form-item>
+                        <el-form-item >
+                            <el-input v-model="prop.attributeValues" placeholder="属性值"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="text" @click="onSubmit();add()">新增参数</el-button>
+                        </el-form-item>
+                        </el-form>
+                        <!-- 展示参数下面商品规格上边 -->
+                        <el-form>
+                            <el-form-item>
+                                <el-col :span="20">
+                                    <div class="multi-sku">
+                                    <div class="specification">
+                                        <div class="name">*商品规格属性</div>
+                                        <el-checkbox @change="changeSingle" style="margin-left:20px;" v-model="isSingle" >是否单规格</el-checkbox>
+                                    </div>
+                                    <div v-if="!isSingle">
+                                        <el-form-item>
+                                        <div class="display-flex align-items-center mb20 guige-left" v-for="(item, index) in attrList" :key="index">
+                                            <div class="ml20 mr20">
+                                                <el-input placeholder="属性名称" v-model="item.key"></el-input>
+                                            </div>
 
+                                            <div class="mr20">
+                                            <el-tag v-for=" (tag,index) in item.value" :key="index" style="margin-right:10px;" type="success" closable @close="item.value.splice(index,1)">
+                                                {{ tag }}
+                                            </el-tag>
+                                            </div>
+
+                                            <div>
+                                            <el-input placeholder="属性值(回车键确认)" v-model="item.inputValue"  @keyup.enter.native="setInputValue(item)"></el-input>
+                                            </div>
+                                        </div>
+                                        </el-form-item>
+                                        <div>
+                                        <el-button type="primary" @click="saveAttr" v-if="attrList.length">保存</el-button>   
+                                        <el-button @click="attrList.push({ key: '', value: [], inputValue: '' })" type="text">新增规格属性</el-button>
+                                        <span>(您可以手动添加商品规格)</span>
+                                        </div>
+                                    </div>
+
+                                    </div>
+                                </el-col>
+                                </el-form-item>
+                                <el-table :data="descartesTable" border style="width: 100%">
+                                <el-table-column type="" label="主图" width="180">
+                                    <template slot-scope="scope">
+                                    <div>
+                                        <qmx-upload :src.sync="scope.row.mainIcon"></qmx-upload>
+                                    </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="商品名称">
+                                    <template slot-scope="scope">
+                                    <el-input  v-model="scope.row.itemTitle"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="商品副标题">
+                                    <template slot-scope="scope">
+                                    <el-input v-model="scope.row.subTitle"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column type="" label="店内码" width="200">
+                                    <template slot-scope="scope">
+                                    <div class="display-flex">
+                                        <el-input v-model="scope.row.storeProductCode"></el-input>
+                                        <el-button @click="searchCode(scope.row,scope.$index)" style="margin-left:10px;" type="primary" mini>检索</el-button>
+                                    </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column type="" label="物流码">
+                                    <template slot-scope="scope">
+                                    <el-select v-model="scope.row.logisticsCode"  placeholder="请选择">
+                                        <el-option v-for="item in scope.row.logisticsList" :key="item" :label="item" :value="item">
+                                        </el-option>
+                                    </el-select>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column type="" label="UPC">
+                                    <template slot-scope="scope">
+                                    <el-input  v-model="scope.row.upcCode"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <!-- 这里是动态的 -->
+                                <el-table-column :key="index" :label="item.key" v-for="(item,index) in attrList">
+                                    <template slot-scope="scope">
+                                    {{ scope.row.attrJson[index].attrValueName }}
+                                    </template>
+                                </el-table-column>
+                                
+                                <el-table-column type="" label="商品库存">
+                                    <template slot-scope="scope">
+                                    <el-input  v-model="scope.row.stockNum"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column type="" label="销售定价">
+                                    <template slot-scope="scope">
+                                    <div v-if="formData.syncPrice">
+                                        {{ formData.snprc }}
+                                    </div>
+                                    <div v-else>
+                                        <el-input  v-model="scope.row.salePrice"></el-input>
+                                    </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column type="" label="包装含量">
+                                    <template slot-scope="scope">
+                                    <el-input  v-model="scope.row.packageContent"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column type="" label="是否整箱">
+                                    <template slot-scope="scope">
+                                    <el-select  v-model="scope.row.fullPack">
+                                        <el-option label="否" :value="0"></el-option>
+                                        <el-option label="是" :value="1"></el-option>
+                                    </el-select>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="起订量">
+                                    <template slot-scope="scope">
+                                    <el-input v-model="scope.row.initPurchaseCount"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="最大限购量">
+                                    <template slot-scope="scope">
+                                    <el-input v-model="scope.row.maxBuy"></el-input>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                            <el-button @click="submitToAuth" style="margin-top:20px;float:right;" type="primary">提交审核</el-button>
+
+                        </el-form>
+                </div>
             </div>
         </el-card>
+        <!-- 编辑弹出框 -->
+        <el-dialog title="选择品牌" :visible.sync="editVisible" width="30%">
+            <el-input
+                placeholder="请输入内容"
+                v-model="brand"
+                clearable
+                style="width:15vh">
+            </el-input>
+            <el-button type="primary" icon="el-icon-search">搜索</el-button>
+            <el-table ref="singleTable" :data="tableData" highlight-current-row @current-change="handleCurrentChange" @cell-click="handle" style="width: 100%">
+                <el-table-column type="index" width="50"></el-table-column>
+                <el-table-column property="chinese" label="品牌中文名" width="120"></el-table-column>
+                <el-table-column property="english" label="品牌英文名" width="120"></el-table-column>
+                <el-table-column property="address" label="归属地"></el-table-column>
+                <el-table-column property="logo" label="品牌logo"></el-table-column>
+            </el-table>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false;clear()">取 消</el-button>
+                <el-button type="primary" @click="saveEdit">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -141,11 +316,29 @@
                 dialogImageUrl2: '',     /* 详图上传 */
                 dialogVisible1: false,        /* 主图上传 */
                 dialogVisible2: false,        /* 详图上传 */
-                radio: '1',     /* 单选框默认1 */
+                radio1: '1',     /* 称重与否单选框默认1 */
+                radio2: '1',     /* 自提与否单选框默认1 */
+                radio3: '1',     /* 同步线下价格与否单选框默认1 */
+                editVisible:false,      /* 选择品牌弹窗 */
+                brand:'',       /* 品牌 */
+                fileLists1: [],      /* 主图 */
+                fileLists2: [],      /* 详情图 */
                 formInline: {
-                    user: '',
-                    region: ''
+                    storeCode: '',      /* 店内码 */
+                    productName: '',        /* 商品名称 */
+                    rate:'',        /* 税率 */
+                    supplier:'',        /* 供应商 */
+                    weight:'',      /* 重量 */
+                    originPlace:'',     /* 产地 */
+                    keyWord:'',     /* 关键词 */
+                    dealing: false,
                 },
+                 /* 动态添加的数据存放在这里 */
+                prop:{
+                    propertyName:"",        /* 属性名 */
+                    attributeValues:"",     /* 属性值 */
+                },
+                list:[],        /* 展示参数用 */
                 qualit: [{
                     value: '选项1',
                     label: '个'
@@ -331,7 +524,10 @@
                     label: '束'
                     }
                 ],
-                value: '',
+                value: '',      /* 计量单位 */
+                isSingle: false,
+                attrList: [],   /* 底部的保存按钮 会将数据存到这里 */
+                typeValue:'',   /* 选择类目value */
                 options: [       /* 选择类目 */
                     {    
                         value: '生鲜美食',
@@ -2129,9 +2325,44 @@
                         value: '鲜花绿植',
                         label: '鲜花绿植',
                     }],
+                    tableData: [{
+                        chinese: '王小虎',
+                        english: ' ',
+                        address: ' ',
+                        logo:''
+                        }, {
+                        chinese: '柳传志',
+                        english: ' ',
+                        address: ' ',
+                        logo:''
+                        }, {
+                        chinese: '马云',
+                        english: ' ',
+                        address: ' ',
+                        logo:''
+                        }, {
+                        chinese: '雷军',
+                        english: ' ',
+                        address: ' ',
+                        logo:''
+                        }],
+                        currentRow: null
             }
         },
         methods:{
+            clear(){
+                this.brand = ''
+            },
+            handle(row,column,event,cell){
+                console.log(row.chinese)
+                this.brand = row.chinese;
+            },
+            setCurrent(row) {
+                this.$refs.singleTable.setCurrentRow(row);
+            },
+            handleCurrentChange(val) {
+                this.currentRow = val;
+            },
             handleRemove(file, fileList) {
                 console.log(file, fileList);
             },
@@ -2139,9 +2370,197 @@
                 this.dialogImageUrl = file.url;
                 this.dialogVisible = true;
             },
+            handleAvatarSuccess(res, file) {//图片上传成功
+                console.log(res);
+                console.log(file);
+                this.imageUrl = URL.createObjectURL(file.raw);
+            },
+            imgUploadError(err, file, fileList){//图片上传失败调用
+                console.log(err)
+                this.$message.error('上传图片失败!');
+            },
             onSubmit() {
                 console.log('submit!');
-            }
+            },
+            add() {
+                let newObj = {
+                    propertyName: this.prop.propertyName,
+                    attributeValues: this.prop.attributeValues,
+                }
+                this.list.push(newObj);
+                
+            },
+            del(index){
+                this.list.splice(index, 1);
+            },
+            handleEdit(index, row) {
+                this.editVisible = true;
+            },
+            saveEdit() {
+                
+                this.editVisible = false;
+            },
+            setInputValue(item) {
+                if (!item.inputValue) {
+                this.$message.warning('请先填写属性值');
+                return;
+                }
+                if (item.value.filter(sub => {
+                    return sub === item.inputValue
+                }) <= 0) {
+                item.value.push(item.inputValue);
+                item.inputValue = ''
+                }
+            },
+            async saveAttr() {      /* 点击保存 */
+                if (this.attrList.length == 0) {
+                this.$message.error("请先新增规格属性");
+                return;
+                }
+                let attrChecked = true;
+                this.attrList.forEach(item => {
+                console.log('attr-Checked item == ', item);
+                if (!item.key || !item.value.length) {
+                    attrChecked = false;
+                    return;
+                }
+                });
+                if (!attrChecked) {
+                    this.$message({ type: 'warning', message: '请填写完整的规格参数' });
+                    return;
+                }
+                if (this.dealing) {
+                    this.$message.info('正在处理中，请稍等...');
+                    return;
+                }
+                this.dealing = true;
+                    let obj = {}
+                    if (this.spuId) {
+                    obj.spuId = this.spuId
+                }
+                
+                await addAttr({
+                    spuName: '测试spu',
+                    obj,
+                    attrList: JSON.stringify(this.attrList.map(item => {
+                        return {
+                        attrName: item.key,
+                        attrValues: item.value.map(sub => {
+                            return {
+                            attrValueName: sub
+                            }
+                        })
+                        }
+                    }))
+                }).then(res => {
+                let data = res.data;
+                this.formData.spuId = data.spuId;
+                this.descartesTable = data.tableList.map(item => {
+                    return {
+                    ...item,
+                    itemTitle: this.formData.itemTitle,
+                    logisticsList: [],
+                    storeProductCode: this.formData.ucode,
+                    mainIcon: this.mainImg,
+                    salePrice: this.formData.snprc
+                    }
+                });
+                this.$message.success('成功');
+                this.dealing = false;
+                }).catch(err => {
+                    this.dealing = false;
+                })
+            },
+            // 确定为单一规格
+            changeSingle (val) {
+                if (val) {
+                this.descartesTable = [];
+                this.descartesTable.push({
+                    itemTitle: this.formData.itemTitle,
+                    logisticsCode: "",
+                    mainIcon: this.mainImg,
+                    maxBuyNum: "",
+                    minBuyNum: "",
+                    salePrice: this.formData.snprc,
+                    storeProductCode: this.formData.ucode,
+                    upcCode: "",
+                    packageContent: '',
+                    fullPack: 0,
+                    logisticsList: [],
+                    coefficient: this.formData.coefficient,
+                    stockNum: 9999
+                });
+                } else {
+                this.descartesTable = [];
+                }
+            },
+            /* 提交审核 */
+            submitToAuth(){
+                if (!this.uniformCode) {        /* 集团统一码 */
+                    this.$message({ type: 'warning', message: '请先指定商品集团统一码' });
+                    return;
+                }
+                if (!this.formInline.storeCode) {      
+                    this.$message({ type: 'warning', message: '请输入店内码' });
+                    return;
+                }
+                if (!this.formInline.productName) {      
+                    this.$message({ type: 'warning', message: '请输入商品名称' });
+                    return;
+                }
+                if (!this.value) {      
+                    this.$message({ type: 'warning', message: '请选择计量单位' });
+                    return;
+                }
+                if (!this.typeValue) {      
+                    this.$message({ type: 'warning', message: '请选择商品类别' });
+                    return;
+                }
+                if (!this.formInline.rate) {      
+                    this.$message({ type: 'warning', message: '请输入税率' });
+                    return;
+                }
+            },
+            async getProductInfo() {
+                if (this.dealing) {
+                this.$message.info('正在处理中，请稍等...');
+                return;
+                }
+                this.dealing = true;
+                await searchProductInfo({
+                unicode: this.formData.unicode,
+                ucode: this.formData.ucode || ''
+                }).then(res => {
+                let data = res.data;
+                this.formData = {
+                    ...this.formData,
+                    /* category_id1: data.category_id1,
+                    category_id2: data.category_id2,
+                    category_id3: data.category_id3,
+                    category_name1: data.category_name1,
+                    category_name2: data.category_name2,
+                    category_name3: data.category_name3, */
+                    unitName: data.unitName,    /* 计量单位 */
+                    taxRate: data.taxRate,    /* 税率 */
+                    supplierId: data.supplierId,      /* 供应商id */
+                    supplierName: data.supplierName,    /* 供应商 */
+                    originArea: data.originArea,    /* 商品产地 */
+                    brandId: data.brandId,    /* 品牌id */
+                    brandNameCh: data.brandNameCh,    /* 品牌中文名 */
+                    snprc: data.snprc,
+                    itemTitle: data.itemTitle,
+                    coefficient: data.coefficient,
+                    standardType: 0     /* 是否自提 */
+                }
+                this.isSearch = true;
+                this.$message.success('成功');
+                this.dealing = false;
+                }).catch(err => {
+                this.dealing = false;
+                console.log(err);
+                })
+
+            },
         }
     }
 </script>  
@@ -2196,4 +2615,136 @@
             }
         }
     }
+    .five{
+        .el-form{
+            margin-left:5vh;
+            margin-top:2vh;
+            .activeAdd{
+                width:20vh
+            }
+            div{
+                // width:40vh;
+                .el-form-item{
+                    width:10vh
+                }
+            }
+        }
+    }
+    .multi-sku {
+    // margin-left: -20px;
+    padding: 20px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+  }
+  .specification {
+    overflow: hidden;
+    margin-bottom: 20px;
+    line-height: 40px;
+    border-bottom: 1px solid #eee;
+
+    .name {
+      float: left;
+      line-height: 40px;
+    }
+
+    .namevalue {
+      float: left;
+      line-height: 40px;
+    }
+  }
+
+  .goods-img {
+    display: flex;
+    margin-top: 20px;
+
+    .item-title {
+      width: 80px;
+    }
+
+    .item-content {
+      display: inline-block;
+      width: 80%;
+      vertical-align: top;
+    }
+  }
+
+  .goods-info-img {
+    .item-title {
+      display: inline-block;
+    }
+
+    .item-content {
+      display: inline-block;
+      width: 80%;
+      vertical-align: top;
+    }
+  }
+
+  .font-style {
+    // font-size: $formFontSize;
+    // color: $formColor;
+    // font-weight: $formTitleWeight;
+  }
+
+  .new-goods {
+    min-width: 1000px;
+
+    .item-title {
+    //   @extend .font-style;
+    }
+
+    /* .query-input {
+      @include display-flex;
+      @extend .font-style;
+      align-items: center;
+
+      >.query-title {
+        width: $labelWidth;
+      }
+    } */
+
+    .inline-button {
+      margin-left: 10px;
+    }
+    /* 用不到 */
+    /* .item-label {
+      display: inline-block;
+      width: 50vh;
+      text-align: right;
+      margin-right: 20px;
+      font-size: 14px;
+    } */
+
+    .form-row {
+      margin-bottom: 20px;
+
+      .row-left,
+      .row-right {
+        display: inline-block;
+      }
+    }
+
+    .row-item {
+      height: 40px;
+      line-height: 40px;
+      margin-bottom: 10px;
+
+      .row-inline {
+        display: inline-block;
+      }
+    }
+
+    .goods-type {
+      width: 250px;
+      display: inline-block;
+    }
+  }
+  .align-items-center{
+      display:flex;
+      width: 68vh;
+  }
+  .mr20{
+        margin-left: 2vw;
+        margin-right: 1vw;
+  }
 </style>

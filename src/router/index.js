@@ -41,8 +41,13 @@ export default new Router({
                 },
                 {
                     path: '/shopList',
-                    component: resolve => require(['../components/page/shopList.vue'], resolve),
+                    component: resolve => require(['../components/page/shopList/index.vue'], resolve),
                     meta: { title: '门店列表' }
+                },
+                {
+                    path: '/newStore',
+                    component: resolve => require(['../components/page/shopList/newStore.vue'], resolve),
+                    meta: { title: '新增门店' }
                 },
                 {
                     path: '/columnManagement',

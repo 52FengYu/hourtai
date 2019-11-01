@@ -2228,9 +2228,6 @@
                 this.value2="";
                 this.value3=""
             },
-            /* suit(){
-                this.$router.push({path:'@/components/page/goodsList/suit'})
-            } */
         },
         mounted() {
             this.restaurants = this.loadAll();
