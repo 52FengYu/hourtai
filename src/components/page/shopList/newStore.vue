@@ -125,7 +125,7 @@
                 <el-form-item label="线下营业时间">
                      <el-time-select
                         placeholder="起始时间"
-                        v-model="startTime"
+                        v-model="form.startTime"
                         :picker-options="{
                         start: '00:30',
                         end: '23:30'
@@ -134,18 +134,18 @@
                     &nbsp;&nbsp;-&nbsp;&nbsp;
                     <el-time-select
                         placeholder="结束时间"
-                        v-model="endTime"
+                        v-model="form.endTime"
                         :picker-options="{
                         start: '00:30',
                         end: '23:30',
-                        minTime: startTime
+                        minTime: form.startTime
                         }">
                     </el-time-select>
                 </el-form-item>
                 <el-form-item label="门店电话">
                     <el-input
                         placeholder="门店电话"
-                        v-model="input"
+                        v-model="form.storePhone"
                         clearable>
                     </el-input>
                 </el-form-item>
@@ -167,7 +167,7 @@
                 <el-form-item label="起止配送时间">
                      <el-time-select
                         placeholder="起始时间"
-                        v-model="startTime2"
+                        v-model="form.startTime2"
                         :picker-options="{
                         start: '08:30',
                         step: '00:15',
@@ -177,12 +177,12 @@
                     &nbsp;&nbsp;-&nbsp;&nbsp;
                     <el-time-select
                         placeholder="结束时间"
-                        v-model="endTime2"
+                        v-model="form.endTime2"
                         :picker-options="{
                         start: '08:30',
                         step: '00:15',
                         end: '23:30',
-                        minTime: startTime2
+                        minTime: form.startTime2
                         }">
                     </el-time-select>
                 </el-form-item>
@@ -196,7 +196,7 @@
                         <i class="el-icon-plus"></i>
                     </el-upload>
                     <el-dialog :visible.sync="dialogVisible">
-                        <img width="100%" :src="dialogImageUrl" alt="">
+                        <img width="100%" :src="form.dialogImageUrl" alt="">
                     </el-dialog>
                 </el-form-item>
                 <el-form-item label="配送信息">
@@ -212,7 +212,7 @@
                     <el-input
                         type="textarea"
                         :rows="4"
-                        v-model="textarea3">
+                        v-model="form.textarea3">
                     </el-input>
                 </el-form-item>
                 <el-form-item>
@@ -246,6 +246,7 @@
                     deliveryTimeInterval2:'',        /* 配送时间间隔 */
                     startTime: '',      /* 开始时间 */
                     endTime: '',         /* 结束时间 */
+                    storePhone:'',         /* 门店电话 */
                     paymentMethod: ['在线','货到付款（金卡）'],       /* 支付方式 */
                     distribution:['送货上门','门店自提'],        /* 配送方式 */
                     address:'',         /* 自提地址 */

@@ -7,7 +7,6 @@
         </div>
         <div class="container">
             <el-card class="box-card">
-                <!-- <div> -->
                     <div class="display-flex">
                         <div class="preview large">
                             <div class="head">
@@ -18,7 +17,7 @@
                                 </template>
                             </div>
                             <div class="content">
-                                <el-scrollbar style="height:100%">
+                                <el-scrollbar>
                                     <div class="block active">
                                         Banner轮播
                                         <div class="block-hover">
@@ -84,63 +83,79 @@
                                         </div>
                                     </div>
                                 </el-scrollbar>
-                                <el-row>
-                                    <el-button>+</el-button>
-                                </el-row>
+                                <el-popover
+                                    placement="top"
+                                    width="800"
+                                    trigger="click">
+                                        <el-card class="box-card" :data="gridData">
+                                            <div slot="header" class="clearfix">
+                                                <span>选择模板类型</span>
+                                            </div>
+                                            <el-form :inline="true" class="demo-form-inline">       <!-- 动态 -->
+                                                <el-form-item>
+                                                    <div>
+                                                        <p>banner轮播</p>
+                                                        <img src="" alt="">
+                                                    </div>
+                                                </el-form-item>
+                                            </el-form>
+                                        </el-card>
+                                    <el-button slot="reference">+</el-button>
+                                    </el-popover>
                             </div>
                         </div>
                         <div class="style-sdit large">
                             <el-card class="box-card">
                                 <div slot="header" class="clearfix">
-                                    <span>已选栏目：Banner轮播 &nbsp;&nbsp;  尺寸：750*448</span>
+                                    <span>已选栏目：Banner轮播 &nbsp;&nbsp;   </span>
                                     <el-button style="float: right; padding: 3px 0" type="text">删除栏目</el-button>
                                 </div>
+                                <el-card>
+                                    <div slot="header" class="clearfix">
+                                        <span>填写信息</span>
+                                        <el-button style="float: right; padding: 3px 0" type="text">删除</el-button>
+                                        <el-button style="float: right; padding: 3px 0" type="text">下移</el-button>
+                                    </div>
+                                    <div>
+                                        <el-form ref="form" label-width="80px">         <!-- 动态 -->
+                                            <el-form-item label="banner图">
+                                                <img src="" alt="">
+                                            </el-form-item>
+                                            <el-form-item label="活动链接">
+                                                <el-input v-model="form.activeLink" placeholder="请输入活动链接"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="活动名称">
+                                                <el-input v-model="form.activeName" placeholder="请输入活动名称"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="背景底色">
+                                                <el-input v-model="form.background" placeholder="请填写背景底色"></el-input>
+                                            </el-form-item>
+                                        </el-form>
+                                    </div>
+                                </el-card>
                             </el-card>
                         </div>
                     </div>
-                <!-- </div> -->
             </el-card>
-
+            <div class="button">
+                <el-button type="primary" @click="onSubmit">确认提交</el-button>
+                <el-button type="primary" @click="">预览</el-button>
+            </div>
         </div>
-        
-        <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="50px">
-                <el-form-item label="日期">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="form.date" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
-                </el-form-item>
-                <el-form-item label="姓名">
-                    <el-input v-model="form.name"></el-input>
-                </el-form-item>
-                <el-form-item label="地址">
-                    <el-input v-model="form.address"></el-input>
-                </el-form-item>
-
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
-            </span>
-        </el-dialog>
-
-        <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
-            <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="delVisible = false">取 消</el-button>
-                <el-button type="primary" @click="deleteRow">确 定</el-button>
-            </span>
-        </el-dialog>
     </div>
 </template>
 <style lang="scss" scoped>
+    .content .el-scrollbar .el-scrollbar__wrap{
+        overflow: scroll;
+        overflow-x: hidden!important; 
+    }
     .el-scrollbar {
         height: 550px!important;
-        padding-bottom:100px;
+        padding-bottom:10px;
         .el-scrollbar__wrap{
+            overflow: hidden!important;
             overflow-y: scroll;
             height: 100%;
-            overflow-x: hidden!important;
         }
     }
     .el-tabs__header {
@@ -185,8 +200,7 @@
                 display:flex;
                 justify-content: space-between;
                 .preview{
-                    width: 22rem;
-                    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+                    width: 20vw;
                     .head{
 
                     }
@@ -232,152 +246,76 @@
                             }
                         }
                     }
+                    .el-popover__reference{
+                        width:100%
+                    }
                 }
                 .style-sdit{
-                    width:85rem;
+                    width:70vw;
+                    border:0;
+                    box-shadow: none;
+                    .el-card,.box-card{
+                        box-shadow: none!important;
+                        -webkit-box-shadow:none!important;
+                    }
+                    .is-always-shadow{
+                        box-shadow: none!important;
+                        -webkit-box-shadow:none!important;
+                    }
+                    .el-card.is-always-shadow, .el-card.is-hover-shadow:focus, .el-card.is-hover-shadow:hover {
+                        -webkit-box-shadow: none ; 
+                        box-shadow: none ; 
+                    }
                 }
                 .large{
                     
                 }
             }
         }
+        .button{
+            text-align: center;
+            margin:1.5vh 0;
+        }
     }
 </style>
 
 <script>
     export default {
-        name: 'basetable',
         data() {
             return {
-                url: './vuetable.json',
-                activeName: 'first',
-                tableData: [],
-                cur_page: 1,
-                multipleSelection: [],
-                select_cate: '',
-                select_word: '',
-                del_list: [],
-                is_search: false,
-                editVisible: false,
-                delVisible: false,
-                form: {
-                    name: '',
-                    date: '',
-                    address: ''
+                form:{
+                    activeLink:'',      /* 活动链接 */
+                    activeName:"",      /* 活动名称 */
+                    background:'',      /* 活动底色 */
                 },
-                idx: -1,
-                id: -1
+                gridData: [{
+                    date: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                    date: '2016-05-04',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                    date: '2016-05-01',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                    date: '2016-05-03',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                    }]
             }
         },
         created() {
-            this.getData();
+             
         },
         computed: {
-            data() {
-                return this.tableData.filter((d) => {
-                    let is_del = false;
-                    for (let i = 0; i < this.del_list.length; i++) {
-                        if (d.name === this.del_list[i].name) {
-                            is_del = true;
-                            break;
-                        }
-                    }
-                    if (!is_del) {
-                        if (d.address.indexOf(this.select_cate) > -1 &&
-                            (d.name.indexOf(this.select_word) > -1 ||
-                                d.address.indexOf(this.select_word) > -1)
-                        ) {
-                            return d;
-                        }
-                    }
-                })
-            }
+
         },
         methods: {
-            // 分页导航
-            handleCurrentChange(val) {
-                this.cur_page = val;
-                this.getData();
-            },
-            // 获取 easy-mock 的模拟数据
-            getData() {
-                // 开发环境使用 easy-mock 数据，正式环境使用 json 文件
-                if (process.env.NODE_ENV === 'development') {
-                    this.url = '/ms/table/list';
-                };
-                this.$axios.post(this.url, {
-                    page: this.cur_page
-                }).then((res) => {
-                    this.tableData = res.data.list;
-                })
-            },
-            search() {
-                this.is_search = true;
-            },
-            formatter(row, column) {
-                return row.address;
-            },
-            filterTag(value, row) {
-                return row.tag === value;
-            },
-            handleEdit(index, row) {
-                this.idx = index;
-                this.id = row.id;
-                this.form = {
-                    id: row.id,
-                    name: row.name,
-                    date: row.date,
-                    address: row.address
-                }
-                this.editVisible = true;
-            },
-            handleDelete(index, row) {
-                this.idx = index;
-                this.id = row.id;
-                this.delVisible = true;
-            },
-            delAll() {
-                const length = this.multipleSelection.length;
-                let str = '';
-                this.del_list = this.del_list.concat(this.multipleSelection);
-                for (let i = 0; i < length; i++) {
-                    str += this.multipleSelection[i].name + ' ';
-                }
-                this.$message.error('删除了' + str);
-                this.multipleSelection = [];
-            },
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-            // 保存编辑
-            saveEdit() {
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx+1} 行成功`);
-                if(this.tableData[this.idx].id === this.id){
-                    this.$set(this.tableData, this.idx, this.form);
-                }else{
-                    for(let i = 0; i < this.tableData.length; i++){
-                        if(this.tableData[i].id === this.id){
-                            this.$set(this.tableData, i, this.form);
-                            return ;
-                        }
-                    }
-                }
-            },
-            // 确定删除
-            deleteRow(){
-                this.$message.success('删除成功');
-                this.delVisible = false;
-                if(this.tableData[this.idx].id === this.id){
-                    this.tableData.splice(this.idx, 1);
-                }else{
-                    for(let i = 0; i < this.tableData.length; i++){
-                        if(this.tableData[i].id === this.id){
-                            this.tableData.splice(i, 1);
-                            return ;
-                        }
-                    }
-                }
+            onSubmit(){
+                alert('提交成功')
             }
         }
     }

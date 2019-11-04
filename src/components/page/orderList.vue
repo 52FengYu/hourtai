@@ -130,6 +130,42 @@
                         <el-checkbox v-for="city in cities" :label="city" :key="city">{{city}}</el-checkbox>
                     </el-checkbox-group>
                 </div>
+                <el-table :data="formInline" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+                    <el-table-column prop="orderNumber" label="订单号"  width="80" align=center></el-table-column>
+                    <el-table-column prop="type" label="类型" width="120" align=center></el-table-column>
+                    <el-table-column prop="activityType" label="活动类型" :formatter="formatter" align=center></el-table-column>
+                    <el-table-column prop="orderStatus" label="订单状态"  width="150" align=center></el-table-column>
+                    <el-table-column prop="storeCode" label="门店/编码" width="120" align=center></el-table-column>
+                    <el-table-column prop="buyerPhone" label="购买人/手机号" width="150" align=center></el-table-column>
+                    <el-table-column prop="orderTime" label="下单时间"  width="150" align=center></el-table-column>
+                    <el-table-column prop="email" label="邮箱" width="180" align=center></el-table-column>
+                    <el-table-column prop="recipient" label="收件人" :formatter="formatter" align=center></el-table-column>
+                    <el-table-column prop="recPhone" label="收件人手机号"  width="150" align=center></el-table-column>
+                    <el-table-column prop="distribution" label="配送方式" width="120" align=center></el-table-column>
+                    <el-table-column prop="paymentMethod" label="支付方式" :formatter="formatter" align=center></el-table-column>
+                    <el-table-column prop="amountPayable" label="应付金额"  width="150" align=center></el-table-column>
+                    <el-table-column prop="shippingFee" label="配送费" width="120" align=center></el-table-column>
+                    <el-table-column prop="pocketChange" label="零钱包扣款" :formatter="formatter" align=center></el-table-column>
+                    <el-table-column prop="giftCardPayment" label="礼品卡支付"  width="150" align=center></el-table-column>
+                    <el-table-column prop="integralPay" label="积分支付" width="180" align=center></el-table-column>
+                    <el-table-column prop="paidAmount" label="实收金额" :formatter="formatter" align=center></el-table-column>
+                    <el-table-column label="操作" width="180" align="center" fixed="right">
+                        <template slot-scope="scope">
+                            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">打印</el-button>
+                            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage4"
+                    :page-sizes="[100, 200, 300, 400]"
+                    :page-size="100"
+                    style="text-align:right"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="400">
+                </el-pagination>
             </el-card>
         </div>
     </div>
@@ -142,7 +178,8 @@
     export default{
         data(){
             return{
-                orderNum:'',
+                currentPage4: 4,            /* 分页用 */
+                orderNum:'',            /* 订单号 */
                 state1: '',
                 buyerName:"",        /* 购买人姓名 */
                 buyerMobile:'',     /* 购买人手机号 */
@@ -330,6 +367,43 @@
                     }], 
                 },
                 paymentTime: '',     /* 时间选择器（支付时间）的value */
+                tableData: [{
+                    date: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                    date: '2016-05-04',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1517 弄'
+                    }, {
+                    date: '2016-05-01',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1519 弄'
+                    }, {
+                    date: '2016-05-03',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1516 弄'
+                    }],
+                formInline:[{
+                    orderNumber:'1321',     /* 订单号 */
+                    type:'A',        /* 类型 */
+                    activityType:'A',        /* 活动类型 */
+                    orderStatus:"Y",     /* 订单状态 */
+                    storeCode:'651465345',       /* 门店/编码 */
+                    buyerPhone:'15533154687',      /* 购买人/手机号 */
+                    orderTime:'',       /* 下单时间 */
+                    email:'',       /* 邮箱 */
+                    recipient:'',       /* 收件人 */
+                    recPhone:'',        /* 收件人手机号 */
+                    distribution:'',        /* 配送方式 */
+                    paymentMethod:'',       /* 支付方式 */
+                    amountPayable:'',       /* 应付金额 */
+                    shippingFee:'',         /* 配送费 */
+                    pocketChange:'',        /* 零钱包扣款 */
+                    giftCardPayment:'',     /* 礼品卡支付 */
+                    integralPay:'',         /* 积分支付 */
+                    paidAmount:'',          /* 实收金额 */
+                }]
             }
         },
         methods:{
@@ -372,6 +446,12 @@
                     this.dealing = false;
                 })
             },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+            }
         },
         mounted() {
             this.restaurants = this.loadAll();
