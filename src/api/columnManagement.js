@@ -1,3 +1,4 @@
+import axios from "axios"
 /* 获取用户可添加的页面类型 */
 export function getAddItemType(params) {
     return request({
@@ -35,11 +36,11 @@ export function changeItemInfo(params) {
   }
 
    /* 页面列表获取 */
-   export function getPageList(params) {
-    return request({
+   export function getPageList(obj) {
+    return axios({
       url: '/api/Page/PageListGet',
       method: 'post',
-      data: params
+      params: obj
     })
   }
 

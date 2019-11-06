@@ -223,6 +223,7 @@
     </div>
 </template>    
 <script>
+import '@/utils/city.js'
     export default{
         data(){
             return{

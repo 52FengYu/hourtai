@@ -2,7 +2,8 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import axios from 'axios';
-import VueAxios from 'vue-axios';
+// import VueAxios from 'vue-axios';
+import VueResource from 'vue-resource';
 import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
 import { messages } from './components/common/i18n';
@@ -11,14 +12,19 @@ import './assets/css/icon.css';
 import './components/common/directives';
 import "babel-polyfill";
 
-Vue.prototype.$http = axios
+Vue.prototype.$http=axios;
+axios.defaults.baseURL = 'https://o2o.liqunshop.com';//配置你的接口请求地址
 Vue.config.productionTip = false
+
 Vue.use(VueI18n);
-Vue.use(VueAxios,axios);
+Vue.use(VueResource);
+Vue.use(axios)
+// Vue.use(VueAxios);
 Vue.use(ElementUI, {
     size: 'small'
 });
 Vue.prototype.$axios = axios;
+// Vue.prototype.$http = axios;
 
 const i18n = new VueI18n({
     locale: 'zh',

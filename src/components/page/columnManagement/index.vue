@@ -66,15 +66,21 @@ import {getPageList} from "@/api/columnManagement"
         },
         methods:{
             getPageList(){
-                var that = this;
-                this.$axios({
-                    method:'POST',
-                    url:'https://o2o.liqunshop.com/api/Page/PageListGet'
+                // var that = this;
+                /* this.$axios.post('api/Page/PageListGet',{
                 }).then(function(response){
-                    console.log(JSON.stringify(response.data))
+                    console.log(JSON.stringify(response.data));
+                    this.list = JSON.stringify(response.data)
                 }),function(error){
                     alert("出错了")
-                }
+                } */
+                this.$http.post('/api/Page/PageListGet',{
+                    
+                }).then(function(res){
+                    console.log(123213)
+                }).catch(function(e){
+                    console.log(e)
+                })
             }
         },
         mounted(){

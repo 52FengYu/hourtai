@@ -111,12 +111,12 @@ export default new Router({
                 },
                 {
                     path: '/couponList',
-                    component: resolve => require(['../components/page/couponList.vue'], resolve),
+                    component: resolve => require(['../components/page/couponList/index.vue'], resolve),
                     meta: { title: '优惠券列表' }
                 },
                 {
                     path: '/giftList',
-                    component: resolve => require(['../components/page/giftList.vue'], resolve),
+                    component: resolve => require(['../components/page/giftList/index.vue'], resolve),
                     meta: { title: '礼品卡列表' }
                 },
                 {
