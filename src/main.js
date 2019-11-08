@@ -13,7 +13,7 @@ import './components/common/directives';
 import "babel-polyfill";
 
 Vue.prototype.$http=axios;
-axios.defaults.baseURL = 'https://o2o.liqunshop.com';//配置你的接口请求地址
+axios.defaults.baseURL = 'http://128.192.80.135';//配置你的接口请求地址
 Vue.config.productionTip = false
 
 Vue.use(VueI18n);

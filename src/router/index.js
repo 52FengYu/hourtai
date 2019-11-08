@@ -71,8 +71,13 @@ export default new Router({
                 },
                 {
                     path: '/brandManagement',
-                    component: resolve => require(['../components/page/brandManagement.vue'], resolve),
+                    component: resolve => require(['../components/page/brandManagement/index.vue'], resolve),
                     meta: { title: '品牌管理' }
+                },
+                {
+                    path: '/addBrand',
+                    component: resolve => require(['../components/page/brandManagement/addBrand.vue'], resolve),
+                    meta: { title: '新增品牌' }
                 },
                 {
                     path: '/suit',

@@ -1,10 +1,11 @@
 module.exports = {
     baseUrl: './',
     productionSourceMap: false,
+    changeOrigin:true,
     devServer: {
         proxy: {
             '/api':{
-                target:'https://o2o.liqunshop.com',
+                target:'http://128.192.80.135',
                 changeOrigin:true,
                 pathRewrite:{
                     '/api':''

@@ -30,7 +30,7 @@
                 <el-table-column prop="name" label="名称" width="300" align="center"></el-table-column>
                 <el-table-column prop="type" label="所属类型" width="300" align="center"></el-table-column>
                 <el-table-column label="操作" align="center" fixed="right" min-width="150">
-                    <template slot-scope="scope">
+                    <template>
                         <el-button type="primary" icon="el-icon-edit">修改</el-button>
                         <el-button type="primary" icon="el-icon-s-tools">修改栏目</el-button>
                         <el-button type="primary" icon="el-icon-caret-top">上移</el-button>
@@ -42,7 +42,7 @@
     </div>
 </template>    
 <script>
-import {getPageList} from "@/api/columnManagement"
+// import {getPageList} from "@/api/columnManagement"
 
     export default{
         data(){
@@ -74,10 +74,18 @@ import {getPageList} from "@/api/columnManagement"
                 }),function(error){
                     alert("出错了")
                 } */
-                this.$http.post('/api/Page/PageListGet',{
-                    
+                this.$http.post('http://128.192.80.135/api/Page/PageListGet',{
+                    dataType:'json',
+                    async:true,
+                    data:{
+                        PageIndex:1
+                    },
+                    headers:{
+                        tokenID:'jq'
+                    }
                 }).then(function(res){
                     console.log(123213)
+                    console.log(res.data)
                 }).catch(function(e){
                     console.log(e)
                 })
