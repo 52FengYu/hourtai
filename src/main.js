@@ -12,8 +12,9 @@ import './assets/css/icon.css';
 import './components/common/directives';
 import "babel-polyfill";
 
-Vue.prototype.$http=axios;
-axios.defaults.baseURL = 'http://128.192.80.135';//配置你的接口请求地址
+// Vue.prototype.$http=axios;
+Vue.prototype.ajax = axios;
+// axios.defaults.baseURL = 'http://128.192.80.135';//配置你的接口请求地址
 Vue.config.productionTip = false
 
 Vue.use(VueI18n);

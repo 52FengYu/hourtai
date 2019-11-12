@@ -1,9 +1,14 @@
 import axios from "axios"
+import request from '../utils/request'; 
 /* 获取用户可添加的页面类型 */
 export function getAddItemType(params) {
     return request({
       url: '/api/Page/PageTypeListGetByUser',
       method: 'post',
+      headers:{
+        'Content-Type':' application/x-www-form-urlencoded ',
+        TokenID : sessionStorage.TokenID
+      },
       data: params
     })
   }
@@ -22,6 +27,9 @@ export function addPage(params) {
     return request({
       url: '/api/Page/PageAdd',
       method: 'post',
+      headers:{
+        'Content-Type':' application/x-www-form-urlencoded '
+      },
       data: params
     })
   }
@@ -31,6 +39,11 @@ export function changeItemInfo(params) {
     return request({
       url: '/api/Page/PageUpdate',
       method: 'post',
+      asyn:true,
+      headers:{
+        'Content-Type':' application/x-www-form-urlencoded ',
+        TokenID : sessionStorage.TokenID
+      },
       data: params
     })
   }
@@ -39,9 +52,22 @@ export function changeItemInfo(params) {
    export function getPageList(obj) {
     return axios({
       url: '/api/Page/PageListGet',
-      method: 'post',
-      params: obj
+      method: 'POST',
+      headers:{
+        'Content-Type':' application/x-www-form-urlencoded '
+      },
+      data: obj
     })
   }
 
-  
+   /* 页面上下移动 */
+   export function move(obj) {
+    return axios({
+      url: '/api/Page/PageContentOrderIDMove',
+      method: 'POST',
+      headers:{
+        'Content-Type':' application/x-www-form-urlencoded '
+      },
+      data: obj
+    })
+  }
