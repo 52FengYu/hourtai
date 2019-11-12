@@ -21,7 +21,7 @@
                 <el-form-item>
                     <el-button type="primary" @click="search">搜索</el-button>
                     <el-button type="primary" @click="clear">重置</el-button>
-                    <el-button type="primary">添加</el-button>
+                    <el-button type="primary" @click="AddPage">添加</el-button>
                 </el-form-item>
             </el-form>
             <el-table 
@@ -38,12 +38,21 @@
                 <el-table-column label="操作" align="center" fixed="right" min-width="150">
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" plain @click="handleEdit(scope.$index,scope.row)">修改</el-button>
-                        <el-button type="primary" icon="el-icon-s-tools">修改栏目</el-button>
+                        <el-button type="primary" icon="el-icon-s-tools" @click="changeColu(scope.$index,scope.row);goPage()">修改栏目</el-button>
                         <!-- <el-button type="primary" icon="el-icon-caret-top" plain @click="moveUp(scope.$index,scope.row)">上移</el-button>
                         <el-button type="primary" icon="el-icon-caret-top" @click="moveDown">下移</el-button> -->
                     </template>
                 </el-table-column>
             </el-table>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page.sync="currentPage1"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total"
+                style="text-align:right">
+            </el-pagination>
         </div>
          <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
@@ -63,10 +72,28 @@
                 <el-button type="primary" @click="changeItemInfo">确 定</el-button>
             </span>
         </el-dialog>
+         <!-- 新增页面弹出框 -->
+        <el-dialog title="编辑" :visible.sync="editVisible2" width="50%">
+            <el-form ref="form" :model="addPage" label-width="70px">
+                <el-form-item label="页面名称（必填）">
+                    <el-input v-model="addPage.PageName"></el-input>
+                </el-form-item>
+                <el-form-item label="页面类型编号（必填）">
+                    <el-input v-model="addPage.PageTypeID"></el-input>
+                </el-form-item>
+                <el-form-item label="背景颜色">
+                    <el-input v-model="addPage.BackguoundColor"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible2 = false">取 消</el-button>
+                <el-button type="primary" @click="save">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>    
 <script>
-import {getPageList,getAddItemType,changeItemInfo,move} from "@/api/columnManagement"
+import {getPageList,getAddItemType,changeItemInfo,move,addPage} from "@/api/columnManagement"
 import qs from 'qs';
     export default{
         data(){
@@ -80,6 +107,7 @@ import qs from 'qs';
                 },  
                 resData:'',   
                 editVisible: false,
+                editVisible2: false,
                 form:{
                     backgroundColor:'',
                     pageName:"",
@@ -87,12 +115,20 @@ import qs from 'qs';
                 changeOk:false,
                 idx:-1,
                 forms:{},
+                addPage:{
+                    PageName:'',        /* 新增页面-页面名称 */
+                    PageTypeID:'',      /* 新增页面-页面类型编号 */
+                    BackguoundColor:'',      /* 新增页面-页面颜色 */
+                },
+                total:"",            /* 总页数 */
+                currentPage1: 1,
+                ID:'',                 /* 修改栏目用的id */
             }
         },
         methods:{
             getPageLists(){          /* 列表获取 */
                 let params = {
-                    PageIndex:1
+                    PageIndex:this.currentPage1
                 }
                 getPageList(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
@@ -100,7 +136,7 @@ import qs from 'qs';
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
                         this.resData = JSON.parse(res.data.Result)
-                        
+                        this.total = this.resData.TotalCount
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
@@ -161,6 +197,7 @@ import qs from 'qs';
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
                         this.resData = JSON.parse(res.data.Result)
+                        this.total = this.resData.TotalCount
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
@@ -181,7 +218,6 @@ import qs from 'qs';
             handleEdit(index, row) {
                 this.idx = index;
                 this.forms = row;
-                console.log(this.idx)
                 this.editVisible = true;
             },
             changeItemInfo(){       /* 点击确定 修改页面信息 */
@@ -214,27 +250,29 @@ import qs from 'qs';
                     console.log('出错了')
                 })
             },
-/*             moveUp(index, row){
-                this.forms = row;
-                console.log(row.ID)
+            AddPage(){
+                this.editVisible2 = true;
+            },
+            save(){
                 let params = {
-                    ID:this.forms.ID,
-                    MoveType:'UP' 
+                    PageName:this.addPage.PageName,
+                    PageTypeID:this.addPage.PageTypeID,
+                    BackguoundColor:this.addPage.BackguoundColor
                 }
-                move(qs.stringify(params)).then((res)=>{
+                addPage(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
-                        this.$message('向上移动设置成功');
+                        this.$message('数据添加成功');
+                        this.editVisible2 = false
                     }
                     if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
                         console.log(res.data.Result)
                     }
                     if(res.data.Success == -999){
                         console.log("用户未登录")
                         console.log(res.data)
-                        this.$message('修改失败');
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
@@ -244,10 +282,24 @@ import qs from 'qs';
                     console.log('出错了')
                 })
             },
-            moveDown(index, row){
-
+            handleSizeChange(val) {
+            },
+            handleCurrentChange(val) {
+                this.currentPage1 = val;
+                this.getPageLists()
+            },
+            changeColu(index, row){       /* 修改栏目 */
+                this.ID = row.ID;
+            },
+            goPage(id){
+                this.$router.push({
+                    path:'/columnManagement',
+                    query:{
+                        ID:this.ID
+                    }
+                })
             }
- */        },
+         },
         mounted(){
             this.getPageLists();
             this.getPageType();
@@ -255,5 +307,7 @@ import qs from 'qs';
     }
 </script>  
 <style lang="scss" scoped>
-
+    a{
+        color:#fff
+    }
 </style>
