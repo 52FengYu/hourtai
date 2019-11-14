@@ -39,8 +39,6 @@
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" plain @click="handleEdit(scope.$index,scope.row)">修改</el-button>
                         <el-button type="primary" icon="el-icon-s-tools" @click="changeColu(scope.$index,scope.row);goPage()">修改栏目</el-button>
-                        <!-- <el-button type="primary" icon="el-icon-caret-top" plain @click="moveUp(scope.$index,scope.row)">上移</el-button>
-                        <el-button type="primary" icon="el-icon-caret-top" @click="moveDown">下移</el-button> -->
                     </template>
                 </el-table-column>
             </el-table>

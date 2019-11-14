@@ -19,7 +19,7 @@
                             </el-input>
                         </el-form-item>
                         <!-- 选择门店 -->
-                        <el-form-item >
+                        <!-- <el-form-item >
                             <el-row class="demo-autocomplete">
                                 <el-col :span="12" style="width:100%">
                                     <el-autocomplete
@@ -32,17 +32,39 @@
                                     ></el-autocomplete>
                                 </el-col>
                             </el-row>
-                        </el-form-item>
+                        </el-form-item> -->
                         <!-- 活动类型 -->
                         <el-form-item>
-                            <el-select v-model="activeTypeValue" clearable placeholder="活动类型">
+                            <!-- <el-select v-model="activeTypeValue" clearable placeholder="活动类型">
                                 <el-option
                                 v-for="item in activeType"
                                 :key="item.value"
                                 :label="item.label"
                                 :value="item.value">
                                 </el-option>
-                            </el-select>
+                            </el-select> -->
+                            <!-- 会员号 -->
+                            <el-input
+                                placeholder="会员号"
+                                v-model="memberID"
+                                clearable>
+                            </el-input>
+                        </el-form-item>
+                        <!-- 主供应商号 -->
+                        <el-form-item>
+                            <el-input
+                                placeholder="主供应商号"
+                                v-model="MainSupplierID"
+                                clearable>
+                            </el-input>
+                        </el-form-item>
+                        <!-- 供应商号 -->
+                        <el-form-item>
+                            <el-input
+                                placeholder="供应商号"
+                                v-model="SupplierID"
+                                clearable>
+                            </el-input>
                         </el-form-item>
                         <!-- 购买人姓名 -->
                         <el-form-item style="width:15vh">
@@ -91,27 +113,32 @@
                     <el-form-item>
                         <span>下单时间：</span>
                         <el-date-picker
-                            v-model="time"
-                            type="datetimerange"
-                            :picker-options="pickerOptions"
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            align="right">
+                            v-model="timeBegin"
+                            type="date"
+                            placeholder="开始时间">
+                        </el-date-picker>至
+                        <el-date-picker
+                            v-model="timeEnd"
+                            type="date"
+                            placeholder="结束时间">
                         </el-date-picker>
                     </el-form-item>
                         <!-- 支付时间 -->
                     <el-form-item>
                         <span>支付时间：</span>
                         <el-date-picker
-                            v-model="paymentTime"
-                            type="datetimerange"
-                            :picker-options="paymentTime"
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            align="right">
-                        </el-date-picker>
+                                v-model="paymentTimeBegin"
+                                type="date"
+                                placeholder="开始时间">
+                            </el-date-picker>至
+                            <el-date-picker
+                                v-model="paymentTimeEnd"
+                                type="date"
+                                placeholder="结束时间">
+                            </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="即时配送">
+                        <el-switch v-model="delivery"></el-switch>
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="getDataBtn">搜索</el-button>
@@ -174,6 +201,8 @@
 
 </style>
 <script>
+import { getOrderList,orderDetail,changePayMethod,changePayNum } from "@/api/orderList"
+import qs from 'qs';
     const cityOptions = ['待支付', '待分单', '待分配', '待集货','待分拣','待复核','待配送','待自提','取件中','配送中','已收货','已完成','已取消'];
     export default{
         data(){
@@ -181,11 +210,14 @@
                 currentPage4: 4,            /* 分页用 */
                 orderNum:'',            /* 订单号 */
                 state1: '',
+                MainSupplierID:'',      /* 主供应商号 */
+                // SupplierID:'',          /* 供应商号 */
                 buyerName:"",        /* 购买人姓名 */
                 buyerMobile:'',     /* 购买人手机号 */
                 recipientName:"",       /* 收件人姓名 */
                 recipientMobile:'',     /* 收件人手机号 */
-                checkAll: false,
+                delivery:false,         /* 是否废单 */
+                checkAll: false,        /* 复选框 */
                 checkedCities: ['待支付', '待分单', '待分配', '待集货','待分拣','待复核','待配送','待自提','取件中','配送中','已收货','已完成','已取消'],        /* 复选框相关 */
                 cities: cityOptions,        /* 复选框相关 */
                 isIndeterminate: true,      /* 复选框相关 */
@@ -291,7 +323,7 @@
                         { "value": "利群鲜花"},
                     ];
                 }, 
-                 activeType: [{
+                /*  activeType: [{
                      value: '选项1',
                      label: '普通'
                      }, {
@@ -300,9 +332,10 @@
                      }, {
                      value: '选项3',
                      label: '预售'
-                     }],
-                 activeTypeValue: '活动类型',    /* 活动类型的value，不能动哦 */
-                 distribution:[{
+                     }], */
+                //  activeTypeValue: '活动类型',    /* 活动类型的value，不能动哦 */
+                memberID:'',
+                distribution:[{
                      value:'选项1',
                      label:'送货上门',
                  },{
@@ -310,87 +343,18 @@
                      label:'门店自提'
                  }],
                 distributionValue:'配送方式',      /* 配送方式的value，也不能动哦 */
-                pickerOptions: {        /* 下单时间 */
-                    shortcuts: [{
-                        text: '最近一周',
-                        onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                        picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近一个月',
-                        onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                        picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近三个月',
-                        onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                        picker.$emit('pick', [start, end]);
-                        }
-                    }], 
-                },
-                time: '',     /* 时间选择器（下单时间）的value */
+                timeBegin: '',     /* 时间选择器（下单开始时间）的value */
+                timeEnd: '',     /* 时间选择器（下单开结束时间）的value */
                 /* 支付时间 */
-                paymentTime: {        /* 下单时间 */
-                    shortcuts: [{
-                        text: '最近一周',
-                        onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                        picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近一个月',
-                        onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                        picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近三个月',
-                        onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                        picker.$emit('pick', [start, end]);
-                        }
-                    }], 
-                },
-                paymentTime: '',     /* 时间选择器（支付时间）的value */
-                tableData: [{
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1518 弄'
-                    }, {
-                    date: '2016-05-04',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1517 弄'
-                    }, {
-                    date: '2016-05-01',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1519 弄'
-                    }, {
-                    date: '2016-05-03',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1516 弄'
-                    }],
+                paymentTimeBegin: '',     /* 时间选择器（支付开始时间）的value */
+                paymentTimeEnd: '',     /* 时间选择器（支付截止时间）的value */
                 formInline:[{
-                    orderNumber:'1321',     /* 订单号 */
-                    type:'A',        /* 类型 */
-                    activityType:'A',        /* 活动类型 */
-                    orderStatus:"Y",     /* 订单状态 */
-                    storeCode:'651465345',       /* 门店/编码 */
-                    buyerPhone:'15533154687',      /* 购买人/手机号 */
+                    orderNumber:'',     /* 订单号 */
+                    type:'',        /* 类型 */
+                    activityType:'',        /* 活动类型 */
+                    orderStatus:"",     /* 订单状态 */
+                    storeCode:'',       /* 门店/编码 */
+                    buyerPhone:'',      /* 购买人/手机号 */
                     orderTime:'',       /* 下单时间 */
                     email:'',       /* 邮箱 */
                     recipient:'',       /* 收件人 */
@@ -407,6 +371,7 @@
             }
         },
         methods:{
+            // 选择门店相关
             querySearch(queryString, cb) {
                 var restaurants = this.restaurants;
                 var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
@@ -431,19 +396,46 @@
             },
             // 订单列表 获取
             getTableData () {
-                if (this.loading) {
-                    this.$message.info('正在处理中，请稍等...');
-                    return;
+                let params = {
+                    ID:this.orderNum,
+                    MemberID:this.memberID,
+                    MainSupplierID:this.MainSupplierID,
+                    SupplierID:this.SupplierID,
+                    CreateTime:this.timeBegin,
+                    EndTime:this.timeEnd,
+                    PayBeginTime:this.paymentTimeBegin,
+                    PayEndTIme:this.paymentTimeEnd,
+                    ReceiveMobile:this.recipientMobile,
+                    ReceiveMan:this.recipient,
+                    ReceiveType:this.distributionValue,
+                    DelFLag:this.delivery == true ? "Y" :"N",
+                   /*  OrderState:this,
+                    DeliveryType:this,
+                    PageIndex:this,
+                    PageSizev:this, */
                 }
-                this.loading = true;
-                let queryParams = filterSpaceData(this.queryData);
-                getOrderList({...{ pageNo: this.pageIndex, pageSize: this.pageSize },...queryParams})
-                .then(response => {
-                    this.loading = false;
-                    this.tableData = response.data.list;
-                    this.total = response.data.totalNum;
-                }).catch(err => {
-                    this.dealing = false;
+                getOrderList(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        console.log(JSON.parse(res.data.Result))
+                        this.$message('向下移动设置成功');
+                        this.reload()
+                    }
+                    if(res.data.Success == 0){
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                        this.$message('修改失败');
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
                 })
             },
             handleSizeChange(val) {

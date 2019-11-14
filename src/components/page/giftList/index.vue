@@ -19,13 +19,14 @@
                     </el-form-item>
                     <el-form-item>
                         <el-date-picker
-                            v-model="formInline.time"
-                            type="datetimerange"
-                            :picker-options="pickerOptions"
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            align="right">
+                            v-model="formInline.timeStart"
+                            type="date"
+                            placeholder="开始时间">
+                        </el-date-picker>至
+                        <el-date-picker
+                            v-model="formInline.timeEnd"
+                            type="date"
+                            placeholder="结束时间">
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item>
@@ -71,6 +72,8 @@
 
 </style>
 <script>
+import { getGiftList,changeGiftList,GiftListDetail } from '@/api/giftList';
+import qs from 'qs';
     export default{
         data(){
             return{
@@ -79,35 +82,9 @@
                     giftCardTypeNum:'',         /* 礼品卡类型编号 */
                     giftCardID:'',              /* 礼品卡编号 */
                     phone:"",                   /* 请输入用户手机号或名称 */
-                    time:'',                    /* 时间选择器 */
+                    timeStart:'',                    /* 时间选择器开始 */
+                    timeEnd:'',                     /* 时间选择器结束 */
                 },
-                pickerOptions: {
-                shortcuts: [{
-                    text: '最近一周',
-                    onClick(picker) {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                    picker.$emit('pick', [start, end]);
-                    }
-                }, {
-                    text: '最近一个月',
-                    onClick(picker) {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                    picker.$emit('pick', [start, end]);
-                    }
-                }, {
-                    text: '最近三个月',
-                    onClick(picker) {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                    picker.$emit('pick', [start, end]);
-                    }
-                }]
-            },
             value2: '',
             tableData:[{
                     giftCardNum:'3213',             /* 礼品卡编号 */
@@ -123,6 +100,9 @@
                 }]
             }
         },
+        created(){
+            this.getData()
+        },
         methods:{
             handleClick(row) {
                 console.log(row);
@@ -132,6 +112,34 @@
             },
             handleCurrentChange(val) {
                 console.log(`当前页: ${val}`);
+            },
+            getData(){
+                let params = {
+                    PageNo:1,
+                }
+                getGiftList(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        console.log(JSON.parse(res.data.Result))
+                        /* this.tableData = JSON.parse(res.data.Result)
+                        console.log(this.tableData) */
+                    }
+                    if(res.data.Success == 0){
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                        this.$message('修改失败');
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
             }
         }
     }

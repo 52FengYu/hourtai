@@ -31,7 +31,6 @@
                                     </div>
                                 </el-scrollbar>
                                  <el-dialog title="新增" :visible.sync="editVisible" width="50%">
-                                        <el-card class="box-card" :data="gridData">
                                             <div slot="header" class="clearfix">
                                                 <span>选择模板类型</span>
                                             </div>
@@ -51,24 +50,27 @@
                                                 <el-form-item label="页面编号（必填）">
                                                     <el-input v-model="newPage.PageID"></el-input>
                                                 </el-form-item>
+                                                <el-form-item label="序号(必填)">
+                                                    <el-input v-model="newPage.OrderID"></el-input>
+                                                </el-form-item>
                                             </el-form>
                                             <span slot="footer" class="dialog-footer">
                                                 <el-button @click="editVisible = false">取 消</el-button>
                                                 <el-button type="primary" @click="addPageContent">确 定</el-button>
                                             </span>
-                                        </el-card>
                                 </el-dialog>
                                 <el-button slot="reference" @click="editVisible=true">+</el-button>
                             </div>
                         </div>
                         <div class="style-sdit large">
                             <el-card class="box-card">
-                                    <div v-for="item in this.content">
+                                    <div v-for="item in this.content" :key="item.ID">
                                         <div slot="header" class="clearfix">
                                             <span>填写信息</span>
                                             <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="deleteInfo($event)">删除</el-button>
                                             <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="infoMoveDown($event)">下移</el-button>
                                             <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="infoMoveUp($event)">上移</el-button>
+                                            <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="InfoEdit($event)">编辑</el-button>
                                         </div>
                                         <div>
                                             <el-form ref="form" label-width="80px">         <!-- 动态 -->
@@ -76,18 +78,39 @@
                                                     <img :src="item.BackgroundImageURL" alt="没有添加banner图">
                                                 </el-form-item>
                                                 <el-form-item label="活动链接">
-                                                    <el-input v-model="item.LinkURL" placeholder="请输入活动链接"></el-input>
+                                                    <el-input v-model="item.LinkURL" :disabled="true" placeholder="请输入活动链接"></el-input>
                                                 </el-form-item>
                                                 <el-form-item label="活动名称">
-                                                    <el-input v-model="item.Title" placeholder="请输入活动名称"></el-input>
+                                                    <el-input v-model="item.Title" :disabled="true" placeholder="请输入活动名称"></el-input>
                                                 </el-form-item>
                                                 <el-form-item label="背景底色">
-                                                    <el-input v-model="item.BackgroundColor" placeholder="请填写背景底色"></el-input>
+                                                    <el-input v-model="item.BackgroundColor" :disabled="true" placeholder="请填写背景底色"></el-input>
                                                 </el-form-item>
                                                 <el-form-item label="序号">
-                                                    <el-input v-model="item.OrderID" placeholder="请填写序号"></el-input>
+                                                    <el-input v-model="item.OrderID" :disabled="true" placeholder="请填写序号"></el-input>
                                                 </el-form-item>
                                             </el-form>
+                                            <!-- 右侧修改弹出框 -->
+                                            <el-dialog title="编辑" :visible.sync="editVisible2" width="50%">
+                                                <el-form ref="form" :model="InfoForm"  label-width="80px">
+                                                    <el-form-item label="banner图">
+                                                        <el-input v-model="InfoForm.BackGroundImageURL" placeholder="请输入活动链接"></el-input>
+                                                    </el-form-item>
+                                                    <el-form-item label="活动链接">
+                                                        <el-input v-model="InfoForm.LinkURL" placeholder="请输入活动链接"></el-input>
+                                                    </el-form-item>
+                                                    <el-form-item label="活动名称">
+                                                        <el-input v-model="InfoForm.Title" placeholder="请输入活动名称"></el-input>
+                                                    </el-form-item>
+                                                    <el-form-item label="背景底色">
+                                                        <el-input v-model="InfoForm.BackGroundColor" placeholder="请填写背景底色"></el-input>
+                                                    </el-form-item>
+                                                </el-form>
+                                                <span slot="footer" class="dialog-footer">
+                                                    <el-button @click="editVisible2 = false">取 消</el-button>
+                                                    <el-button type="primary" :id="item.ID"  @click="addSave($event)">确 定</el-button>
+                                                </span>
+                                            </el-dialog>
                                         </div>
                                     </div>
                             </el-card>
@@ -96,7 +119,7 @@
             </el-card>
             <div class="button">
                 <el-button type="primary" @click="onSubmit">确认提交</el-button>
-                <el-button type="primary" @click="">预览</el-button>
+                <el-button type="primary" @click="temp">预览</el-button>
             </div>
         </div>
     </div>
@@ -158,8 +181,8 @@
                 justify-content: space-between;
                 .preview{
                     width: 20vw;
-                    .head{
-
+                    .content>.el-button{
+                        width:100%
                     }
                     .content{
                         .el-scrollbar{
@@ -204,9 +227,6 @@
                                 color: #fff;
                                 .displayFlex{
                                     padding:0;
-                                    span{
-                                        // display:block;
-                                    }
                                 } 
                             }
                         }
@@ -234,9 +254,6 @@
                         box-shadow: none ; 
                     }
                 }
-                .large{
-                    
-                }
             }
         }
         .button{
@@ -247,20 +264,28 @@
 </style>
 
 <script>
-import { getItemInfo,move,getItemContentInfo,changeItemContentInfo,moveItemContentInfo,deleteItemContentInfo } from "@/api/columnManagement"
+import { getItemInfo,move,getItemContentInfo,changeItemContentInfo,moveItemContentInfo,deleteItemContentInfo,addItemInfo,getPageJS } from "@/api/columnManagement"
 import qs from 'qs';
-    export default {
+export default {
+    inject:['reload'],
         data() {
             return {
                 newPage:{
-                    ContentTypeID:'1313',       /* 新增 */
+                    ContentTypeID:'',       /* 新增 */
                     IsNewMemberSee:false,
                     BackGroundColor:"",
                     BackGroundImageURL:"",
                     PageID:'',
                     OrderID:'',
                 },
+                InfoForm:{
+                    BackgroundImageURL:'',
+                    LinkURL:"",
+                    Title:'',
+                    BackgroundColor:'',
+                },
                 editVisible:false,
+                editVisible2:false,
                 ID:'',                  /* 上一个页面传过来的id */
                 Features:'',            /* 功能首页的value */
                 content:'',             /* 右侧内容value */
@@ -280,9 +305,36 @@ import qs from 'qs';
             
         },
         methods: {
-            onSubmit(){
-                alert('提交成功')
+            // 预览
+            temp(){     
+                let params = {
+                    PageID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    CreateType:'TEMP',
+                }
+                getPageJS(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        // console.log(JSON.parse(res.data.Result))
+                        this.$message('预览成功');
+                    }
+                    if(res.data.Success == 0){
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                        this.$message('修改失败');
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
             },
+            // 刚开始的数据请求
             feature(){
                 let params = {
                     PageID:decodeURI(location.href).split('?')[1].split('=')[1],
@@ -311,6 +363,35 @@ import qs from 'qs';
                     console.log('出错了')
                 })
             },
+            // 提交
+            onSubmit(){
+                let params = {
+                    PageID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    CreateType:'USED ',
+                }
+                getPageJS(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.$message('提交成功');
+                    }
+                    if(res.data.Success == 0){
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                        this.$message('修改失败');
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            // 左边的上移
             moveUp(e){
                 let params = {
                     ID:e.currentTarget.id,
@@ -322,6 +403,7 @@ import qs from 'qs';
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
                         this.$message('向上移动设置成功');
+                        this.reload()
                     }
                     if(res.data.Success == 0){
                         console.log(res.data.Result)
@@ -350,6 +432,7 @@ import qs from 'qs';
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
                         this.$message('向下移动设置成功');
+                        this.reload()
                     }
                     if(res.data.Success == 0){
                         console.log(res.data.Result)
@@ -438,6 +521,7 @@ import qs from 'qs';
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
                         this.$message('向上移动设置成功');
+                        this.reload()
                     }
                     if(res.data.Success == 0){
                         console.log(res.data.Result)
@@ -467,6 +551,7 @@ import qs from 'qs';
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
                         this.$message('向下移动设置成功');
+                        this.reload()
                     }
                     if(res.data.Success == 0){
                         console.log(res.data.Result)
@@ -495,6 +580,7 @@ import qs from 'qs';
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
                         this.$message('删除成功');
+                        this.reload()
                     }
                     if(res.data.Success == 0){
                         console.log(res.data.Result)
@@ -513,20 +599,61 @@ import qs from 'qs';
                 })
             },
             addPageContent(){
-                console.log(e.currentTarget.id)
                 let params = {
                     ContentTypeID:this.newPage.ContentTypeID,
-                    IsNewMemberSee:this.newPage.IsNewMemberSee,
+                    IsNewMemberSee:this.newPage.IsNewMemberSee == true ? "Y" :"N",
                     BackGroundColor:this.newPage.BackGroundColor,
                     BackGroundImageURL:this.newPage.BackGroundImageURL,
                     PageID:this.newPage.PageID,
+                    OrderID:this.newPage.OrderID,
                 }
-                deleteItemContentInfo(qs.stringify(params)).then((res)=>{
+                addItemInfo(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
-                        this.$message('删除成功');
+                        this.$message('添加成功');
+                        this.reload()
+                    }
+                    if(res.data.Success == 0){
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                        this.$message('修改失败');
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            InfoEdit(e){
+                this.editVisible2 = true;
+            },
+            addSave(e){      /* 右侧弹出框修改 */
+                let params = {
+                    BackGroundColor:this.InfoForm.BackGroundColor,
+                    BackGroundImageURL:this.InfoForm.BackGroundImageURL,
+                    Title:this.InfoForm.Title,
+                    LinkURL:this.InfoForm.LinkURL,
+                    ID:e.currentTarget.id
+                }
+                changeItemContentInfo(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        console.log(JSON.parse(res.data.Result))
+                        this.$message('添加成功');
+                        this.editVisible2 = false
+                        this.InfoForm.BackgroundImageURL = ""
+                        this.InfoForm.LinkURL = ''
+                        this.InfoForm.Title = ''
+                        this.InfoForm.BackgroundColor = ''
+                        this.reload()
                     }
                     if(res.data.Success == 0){
                         console.log(res.data.Result)

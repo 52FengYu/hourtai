@@ -107,7 +107,6 @@
                 </div>
             </div>
             <el-table :data="form" border class="table" ref="multipleTable">
-                <el-table-columnwidth="0" align="center"></el-table-column>
                 <el-table-column prop="commodityType" label="商品类型"  width="80" align="center" ></el-table-column>
                 <el-table-column prop="uniformCode" label="集团统一码" width="120" align="center" ></el-table-column>
                 <el-table-column prop="storeCode" label="店内码" width="120" align="center" ></el-table-column>
@@ -173,21 +172,17 @@
     </div>
 </template>
 <script>
+import { getProductList } from "@/api/goodsList"
+import qs from 'qs';
     export default{
         data() {
             return {
                 url: './vuetable.json',
                 currentPage4: 4,    /* 分页 */
                 cur_page: 1,
-                // multipleSelection: [],
-                // select_cate: '',
-                // select_word: '',
-                // del_list: [],
                 is_search: false,
                 editVisible: false,
                 delVisible: false,
-                // inputCard: '',
-                // inputMobile:'',
                 productName:'',     /* 商品名称输入框 */
                 productCode:'',     /* 商品编码输入框 */
                 unifiedCode:'',     /* 集团统一码 */
@@ -2057,7 +2052,6 @@
             querySearch(queryString, cb) {
                 var restaurants = this.restaurants;
                 var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
-                // 调用 callback 返回建议列表的数据
                 cb(results);
             },
             createFilter(queryString) {
@@ -2181,16 +2175,34 @@
                 this.cur_page = val;
                 this.getData();
             },
-            // 获取 easy-mock 的模拟数据
+            //获取数据
             getData() {
-                // 开发环境使用 easy-mock 数据,正式环境使用 json 文件
-                if (process.env.NODE_ENV === 'development') {
-                    this.url = '/ms/table/list';
-                };
-                this.$axios.post(this.url, {
-                    page: this.cur_page
-                }).then((res) => {
-                    this.tableData = res.data.list;
+               let params = {
+                    PageIndex:1,
+                    PageSize:10
+                }
+                getProductList(qs.stringify(params)).then((res)=>{
+                    console.log(res.data.Result)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        console.log(JSON.parse(res.data.Result))
+                        // this.resData = JSON.parse(res.data.Result)
+                        // this.total = this.resData.TotalCount
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
                 })
             },
             search() {
@@ -2231,6 +2243,9 @@
         },
         mounted() {
             this.restaurants = this.loadAll();
+        },
+        created(){
+            this.getData()
         }
     }
 </script>  
