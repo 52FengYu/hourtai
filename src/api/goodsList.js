@@ -266,3 +266,17 @@ export function changeProduct(obj) {
       data: obj
     })
   }
+   
+
+  /* 全部分类ID和分类名获取 */
+  export function getIDclass(obj) {
+    return request({
+      url: '/api/Base/BaseClassAllListGet',
+      method: 'POST',
+      headers:{
+        TokenID:'jd',
+        'Content-Type':' application/x-www-form-urlencoded '
+      },
+      data: obj
+    })
+  }

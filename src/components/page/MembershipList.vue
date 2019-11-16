@@ -9,10 +9,10 @@
             <div class="head">
                 <el-form :inline="true" :model="formInline" class="demo-form-inline">
                     <el-form-item label="会员卡号">
-                        <el-input v-model="formInline.inputCard" placeholder="会员卡号" style="width:15rem;margin-right:2rem"></el-input>
+                        <el-input v-model="formInline.inputCard" placeholder="会员卡号(必填)" style="width:15rem;margin-right:2rem"></el-input>
                     </el-form-item>
                     <el-form-item label="手机号">
-                        <el-input v-model="formInline.inputMobile" placeholder="手机号" style="width:15rem;margin-right:2rem"></el-input>
+                        <el-input v-model="formInline.inputMobile" placeholder="手机号(必填)" style="width:15rem;margin-right:2rem"></el-input>
                     </el-form-item>
                     <el-form-item label="开始时间">
                         <div class="block">
@@ -41,13 +41,12 @@
                     </el-form-item>
                 </el-form>
             </div>
-                 
             <el-table :data="tableData.ModelList" border class="table" ref="multipleTable">
                 <el-table-column prop="ID" label="会员卡号"  width="180" align="center" ></el-table-column>
                 <el-table-column prop="Mobile" label="手机号"  width="180" align="center" ></el-table-column>
-                <el-table-column prop="MemberType" label="注册类型" width="120" align="center" >{{this.tableData.ModelList.MemberType != 'c'? '普通会员':"内部会员" }}</el-table-column>
-                <el-table-column prop="Source" label="注册会员来源" width="180" align="center" >{{this.tableData.ModelList.Source != 'W'? 'wap':"app" }}</el-table-column>
-                <el-table-column prop="CreateTime" label="注册时间"  width="150" align="center" ></el-table-column>
+                <el-table-column prop="MemberType" label="会员类型(C:普会;N:内会)" width="80" align="center" ></el-table-column>
+                <el-table-column prop="Source" label="注册会员来源(W:wap:A:安卓APP;I:苹果APP)" width="110" align="center" ></el-table-column>
+                <el-table-column prop="CreateTime" label="注册时间"  width="190" align="center" ></el-table-column>
                 <el-table-column prop="DelFlag" label="是否废弃" width="180" align="center" ></el-table-column>
                 <el-table-column prop="MemberCode" label="CRM系统会员号" width="120" align="center" ></el-table-column>
                 <el-table-column prop="Balance" label="零钱包金额" :formatter="formatter" align="center" ></el-table-column>
@@ -320,7 +319,7 @@ import qs from 'qs';
             width:15rem
         }
         .table{
-            margin-top:3rem;
+            margin-top:1rem;
             width:96%
         }
         .el-pagination{

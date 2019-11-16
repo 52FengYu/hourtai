@@ -18,6 +18,18 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="主供应商号">
+                    <el-input v-model="formInline.MainSupplierID" placeholder="非必填"></el-input>
+                </el-form-item>
+                <el-form-item label="供应商号">
+                    <el-input v-model="formInline.SupplierID" placeholder="非必填"></el-input>
+                </el-form-item>
+                <el-form-item label="页面类型编号">
+                    <el-input v-model="formInline.PageTypeID" placeholder="非必填"></el-input>
+                </el-form-item>
+                <el-form-item label="页面名称">
+                    <el-input v-model="formInline.PageName" placeholder="非必填"></el-input>
+                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="search">搜索</el-button>
                     <el-button type="primary" @click="clear">重置</el-button>
@@ -82,6 +94,12 @@
                 <el-form-item label="背景颜色">
                     <el-input v-model="addPage.BackguoundColor"></el-input>
                 </el-form-item>
+                <el-form-item label="主供应商号">
+                    <el-input v-model="addPage.MainSupplierID"></el-input>
+                </el-form-item>
+                <el-form-item label="供应商号">
+                    <el-input v-model="addPage.SupplierID"></el-input>
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible2 = false">取 消</el-button>
@@ -102,6 +120,10 @@ import qs from 'qs';
                     type:'全部',        /* 类型 */
                     ID:'',              /* ID */
                     options:[],        /* 备选项 */
+                    MainSupplierID:"",      /* 主供应商号 */
+                    SupplierID:"",          /* 供应商号 */
+                    PageTypeID:'',          /* 页面类型编号 */
+                    PageName:'',            /* 页面名称 */
                 },  
                 resData:'',   
                 editVisible: false,
@@ -117,6 +139,8 @@ import qs from 'qs';
                     PageName:'',        /* 新增页面-页面名称 */
                     PageTypeID:'',      /* 新增页面-页面类型编号 */
                     BackguoundColor:'',      /* 新增页面-页面颜色 */
+                    MainSupplierID:'',          /* 主供应商号 */
+                    SupplierID:'',              /* 供应商号 */
                 },
                 total:"",            /* 总页数 */
                 currentPage1: 1,
@@ -126,7 +150,7 @@ import qs from 'qs';
         methods:{
             getPageLists(){          /* 列表获取 */
                 let params = {
-                    PageIndex:this.currentPage1
+                    PageIndex:this.currentPage1,
                 }
                 getPageList(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
@@ -187,7 +211,11 @@ import qs from 'qs';
                 console.log(this.formInline.ID)
                 let params = {
                     PageIndex:1,
-                    PageTypeID:this.formInline.ID
+                    PageTypeID:this.formInline.ID,
+                    MainSupplierID:this.formInline.MainSupplierID,
+                    SupplierID:this.formInline.SupplierID,
+                    PageTypeID:this.formInline.PageTypeID,
+                    PageName:this.formInline.PageName,
                 }
                 getPageList(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
@@ -255,7 +283,9 @@ import qs from 'qs';
                 let params = {
                     PageName:this.addPage.PageName,
                     PageTypeID:this.addPage.PageTypeID,
-                    BackguoundColor:this.addPage.BackguoundColor
+                    BackguoundColor:this.addPage.BackguoundColor,
+                    MainSupplierID:this.addPage.MainSupplierID,
+                    SupplierID:this.addPage.SupplierID,
                 }
                 addPage(qs.stringify(params)).then((res)=>{
                     console.log(res.data)

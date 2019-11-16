@@ -75,7 +75,7 @@
                                         <div>
                                             <el-form ref="form" label-width="80px">         <!-- 动态 -->
                                                 <el-form-item label="banner图">
-                                                    <img :src="item.BackgroundImageURL" alt="没有添加banner图">
+                                                    <img :src="item.BackgroundImageURL" alt="">
                                                 </el-form-item>
                                                 <el-form-item label="活动链接">
                                                     <el-input v-model="item.LinkURL" :disabled="true" placeholder="请输入活动链接"></el-input>
@@ -94,16 +94,22 @@
                                             <el-dialog title="编辑" :visible.sync="editVisible2" width="50%">
                                                 <el-form ref="form" :model="InfoForm"  label-width="80px">
                                                     <el-form-item label="banner图">
-                                                        <el-input v-model="InfoForm.BackGroundImageURL" placeholder="请输入活动链接"></el-input>
+                                                        <el-input v-model="InfoForm.BackGroundImageURL" placeholder="请输入banner图（非必填）"></el-input>
                                                     </el-form-item>
                                                     <el-form-item label="活动链接">
-                                                        <el-input v-model="InfoForm.LinkURL" placeholder="请输入活动链接"></el-input>
+                                                        <el-input v-model="InfoForm.LinkURL" placeholder="请输入活动链接（非必填）"></el-input>
                                                     </el-form-item>
-                                                    <el-form-item label="活动名称">
-                                                        <el-input v-model="InfoForm.Title" placeholder="请输入活动名称"></el-input>
+                                                    <el-form-item label="标题">
+                                                        <el-input v-model="InfoForm.Title" placeholder="请输入标题（非必填）"></el-input>
                                                     </el-form-item>
-                                                    <el-form-item label="背景底色">
-                                                        <el-input v-model="InfoForm.BackGroundColor" placeholder="请填写背景底色"></el-input>
+                                                    <el-form-item label="背景色">
+                                                        <el-input v-model="InfoForm.BackGroundColor" placeholder="请填写背景色"></el-input>
+                                                    </el-form-item>
+                                                    <el-form-item label="商品编码">
+                                                        <el-input v-model="InfoForm.ProductID" placeholder="请填写商品编码（非必填）"></el-input>
+                                                    </el-form-item>
+                                                    <el-form-item label="活动号">
+                                                        <el-input v-model="InfoForm.PromotionID" placeholder="请填写活动号（非必填）"></el-input>
                                                     </el-form-item>
                                                 </el-form>
                                                 <span slot="footer" class="dialog-footer">
@@ -279,10 +285,12 @@ export default {
                     OrderID:'',
                 },
                 InfoForm:{
-                    BackgroundImageURL:'',
+                    BackGroundImageURL:'',
                     LinkURL:"",
                     Title:'',
-                    BackgroundColor:'',
+                    BackGroundColor:'',
+                    PromotionID:'',
+                    ProductID:'',
                 },
                 editVisible:false,
                 editVisible2:false,
@@ -315,11 +323,12 @@ export default {
                     console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
-                        // console.log(JSON.parse(res.data.Result))
-                        this.$message('预览成功');
+                        console.log(res.data.Result)
+                        window.open(`https://o2o.liqunshop.com/view/page/index.html?pageid=${res.data.Result} `)
                     }
                     if(res.data.Success == 0){
                         console.log(res.data.Result)
+                        this.$message('生成页面信息失败');
                     }
                     if(res.data.Success == -999){
                         console.log("用户未登录")
@@ -373,10 +382,11 @@ export default {
                     console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
-                        this.$message('提交成功');
+                        window.open(`https://o2o.liqunshop.com/view/page/index.html?pageid=${res.data.Result} `)
                     }
                     if(res.data.Success == 0){
                         console.log(res.data.Result)
+                        this.$message('生成页面信息失败');
                     }
                     if(res.data.Success == -999){
                         console.log("用户未登录")
@@ -415,6 +425,7 @@ export default {
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
+                        this.$message('目前已经是第一个');
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -444,6 +455,7 @@ export default {
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
+                        this.$message('目前已经是最后一个');
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -533,6 +545,7 @@ export default {
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
+                        this.$message('目前已经是第一个');
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -563,6 +576,7 @@ export default {
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
+                        this.$message('目前已经是最后一个');
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -640,7 +654,9 @@ export default {
                     BackGroundImageURL:this.InfoForm.BackGroundImageURL,
                     Title:this.InfoForm.Title,
                     LinkURL:this.InfoForm.LinkURL,
-                    ID:e.currentTarget.id
+                    ID:e.currentTarget.id,
+                    ProductID:this.InfoForm.ProductID,
+                    PromotionID:this.InfoForm.PromotionID,
                 }
                 changeItemContentInfo(qs.stringify(params)).then((res)=>{
                     console.log(res.data)

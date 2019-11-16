@@ -131,8 +131,13 @@ const router = new Router({
                 },
                 {
                     path: '/orderList',
-                    component: resolve => require(['../components/page/orderList.vue'], resolve),
+                    component: resolve => require(['../components/page/orderList/index.vue'], resolve),
                     meta: { title: '订单列表' }
+                },
+                {
+                    path: '/orderDetail',
+                    component: resolve => require(['../components/page/orderList/orderDetail.vue'], resolve),
+                    meta: { title: '订单详情' }
                 },
                 {
                     path: '/404',

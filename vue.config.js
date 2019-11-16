@@ -1,10 +1,10 @@
 module.exports = {
     // 基本路径
-    publicPath: '/',
+    publicPath: './',
     // 输出文件目录
     outputDir: 'dist',
     // eslint-loader 是否在保存的时候检查
-    //lintOnSave: true,
+    lintOnSave: true,
     // webpack配置
     // see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
     chainWebpack: () => { },
