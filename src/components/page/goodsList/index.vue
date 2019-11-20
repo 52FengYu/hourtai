@@ -8,35 +8,24 @@
         <div class="container">
             <div class="head">
                 <div class="top">
-                        <!-- 选择店铺名称 -->
-                    <!-- <el-row class="demo-autocomplete">
-                        <el-col :span="12" style="width:100%">
-                            <el-autocomplete
-                            class="inline-input"
-                            v-model="state1"
-                            :fetch-suggestions="querySearch"
-                            placeholder="请选择门店"
-                            @select="handleSelect"
-                            style="width:100%"
-                            ></el-autocomplete>
-                        </el-col>
-                    </el-row> -->
-                    <!-- 主供应商号 -->
-                    <el-input
-                        placeholder="主供应商号"
-                        v-model="MainSupplierID"
-                        clearable
-                        style="width:180px"
-                    >
-                    </el-input>
-                    <!-- 供应商号 -->
-                     <el-input
-                        placeholder="主供应商号"
-                        v-model="SupplierID"
-                        clearable
-                        style="width:180px"
-                    >
-                    </el-input>
+                        <!-- 主供应商 -->
+                    <el-select v-model="MainSupplierID" placeholder="主供应商">
+                        <el-option
+                        v-for="item in option1"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <!-- 供应商 -->
+                    <el-select v-model="SupplierID" placeholder="供应商">
+                        <el-option
+                        v-for="item in option2"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
                     <!-- 商品名称 -->
                     <el-input
                         placeholder="商品名称"
@@ -80,17 +69,9 @@
                         :value="item.value3">
                         </el-option>
                     </el-select>
-                    <!-- 集团统一码 -->
-                   <!--  <el-input
-                        placeholder="集团统一码"
-                        v-model="unifiedCode"
-                        clearable
-                        style="width:200px"
-                    >
-                    </el-input> -->
-                    <!-- 店内码 -->
+                    <!-- 门店码 -->
                     <el-input
-                        placeholder="店内码"
+                        placeholder="门店码"
                         v-model="StoreCode"
                         clearable
                         style="width:200px"
@@ -120,7 +101,11 @@
             </div>
             <el-table :data="resData.List" border class="table" ref="multipleTable">
                 <el-table-column prop="ID" label="商品编号"  width="80" align="center" ></el-table-column>
-                <el-table-column prop="ProductName" label="商品名称" align="center" ></el-table-column>
+                <el-table-column label="商品名称" align="center" >
+                    <template slot-scope="scope">
+                        <a @click="jump(scope.$index, scope.row)">{{scope.row.ProductName}}</a>
+                    </template>
+                </el-table-column>
                 <el-table-column label="商品图片"  width="100" align="center" >
                     <template slot-scope="scope">
                         <el-image
@@ -131,23 +116,41 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="UnitName" label="单位" width="60" align="center" ></el-table-column>
-                <el-table-column prop="Stock" label="库存" width="120" align="center" >
-                        <el-button type="text" icon="el-icon-edit" circle></el-button>
+                <el-table-column label="库存" width="120" align="center" >
+                    <template slot-scope="scope">
+                        {{scope.row.Stock}}
+                        <el-button type="text" icon="el-icon-edit" circle @click="saveEdit(scope.$index, scope.row)"></el-button>
+                    </template>
                 </el-table-column>
-                <el-table-column prop="MemberPrice" label="价格"  width="90" align="center" ><el-button type="text" icon="el-icon-edit" circle></el-button></el-table-column>
+                <el-table-column label="价格"  width="90" align="center" >
+                    <template slot-scope="scope">
+                        {{scope.row.MemberPrice}}
+                        <el-button type="text" icon="el-icon-edit" circle @click="PriceEdit(scope.$index, scope.row)"></el-button>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="MainSupplierName" label="主供应商名" width="140" align="center" ></el-table-column>
                 <el-table-column prop="SupplierName" label="供应商名" width="100" align="center" ></el-table-column>
                 <el-table-column prop="MainSupplierID" label="主供应商号" width="100" align="center" ></el-table-column>
                 <el-table-column prop="SupplierID" label="供应商号"  width="100" align="center" ></el-table-column>
-                <el-table-column prop="ProductState" label="商品状态" width="90" align="center" ></el-table-column>
-                <el-table-column prop="IsSell" label="是否上架" width="90" align="center" ></el-table-column>
+                <el-table-column label="商品状态" width="90" align="center" >
+                    <template slot-scope="scope">  
+                        {{scope.row.ProductState === 'N' ? '待审核' : (scope.row.ProductState === 'O' ? '审核通过' : '驳回')}}
+                    </template>
+                </el-table-column>
+                <el-table-column label="是否上架" width="90" align="center" >
+                    <template slot-scope="scope">
+                        {{scope.row.IsSell === 'Y' ? '已上架' : '未上架'}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="ShopCode" label="门店码"  width="90" align="center" ></el-table-column>
                 <el-table-column prop="UniCode" label="统一编码" width="100" align="center" ></el-table-column>
-                <el-table-column prop="FxxCode" label="物流码" width="100" align="center" ></el-table-column> -->
+                <el-table-column prop="FxxCode" label="物流码" width="100" align="center" ></el-table-column> 
                 <el-table-column label="操作" width="180" align="center">
-                    <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                        <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    <template slot-scope="scope" >        <!-- 未审核/驳回 -->
+                        <el-button type="warning" icon="el-icon-star-off" @click="handleEdit(scope.$index, scope.row)" v-if="scope.row.ProductState != 'O'">审核</el-button>
+                        <el-button type="primary" icon="el-icon-star-off" @click="down(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'Y'">下架</el-button>
+                        <el-button type="primary" plain icon="el-icon-edit" class="red" @click="handleDelete(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'Y'">修改</el-button>
+                        <el-button type="primary" icon="el-icon-star-off" @click="up(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'N'">上架</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -162,47 +165,86 @@
                 </el-pagination>
             </div>
         </div>    
-            <!-- 编辑弹出框 -->
-            <!-- <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+            <!-- 库存编辑弹出框 -->
+            <el-dialog title="修改库存" :visible.sync="editVisible2" width="40%">
                 <el-form ref="form" :model="form" label-width="50px">
-                    <el-form-item label="日期">
-                        <el-date-picker type="date" placeholder="选择日期" v-model="form.date" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
+                    <el-form-item label="商品名称">
+                        <el-input v-model="form.ProductName" :disabled="true"></el-input>
                     </el-form-item>
-                    <el-form-item label="姓名">
-                        <el-input v-model="form.name"></el-input>
-                    </el-form-item>
-                    <el-form-item label="地址">
-                        <el-input v-model="form.address"></el-input>
+                    <el-form-item label="商品库存">
+                        <el-input v-model="form.Stock"></el-input>
                     </el-form-item>
                 </el-form>
                 <span slot="footer" class="dialog-footer">
-                    <el-button @click="editVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="saveEdit">确 定</el-button>
-                </span>
-            </el-dialog> -->
-            
-            <!-- 删除提示框 -->
-            <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
-                <div class="del-dialog-cnt">删除不可恢复,是否确定删除？</div>
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="delVisible = false">取 消</el-button>
-                    <el-button type="primary" >确 定</el-button>
+                    <el-button @click="editVisible2 = false">取 消</el-button>
+                    <el-button type="primary" @click="changeStock">确 定</el-button>
                 </span>
             </el-dialog>
-        
+
+            <!-- 价格编辑弹出框 -->
+            <el-dialog title="修改价格" :visible.sync="editVisible3" width="40%">
+                <el-form ref="form" :model="form" label-width="100px">
+                    <el-form-item label="调价商品名称">
+                        <el-input v-model="form.ProductName" :disabled="true"></el-input>
+                    </el-form-item>
+                    <el-form-item label="商品价格">
+                        <el-input v-model="form.price"></el-input>
+                    </el-form-item>
+                    <el-form-item label="调价类型">
+                        <el-radio-group v-model="form.radio">
+                            <el-radio :label="1">永久</el-radio>
+                            <el-radio :label="2">区间调价</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <template v-if="this.form.radio == 2">
+                        <el-form-item label="调价开始时间">
+                            <el-date-picker
+                                v-model="form.changeTimeStart"
+                                type="date"
+                                format="yyyy-MM-dd"
+                                value-format="yyyy-MM-dd"
+                                placeholder="开始时间"
+                                @change="updateDateStart">
+                            </el-date-picker>
+                        </el-form-item>
+                        <el-form-item label="调价结束时间">
+                            <el-date-picker
+                                v-model="form.changeTimeEnd"
+                                type="date"
+                                format="yyyy-MM-dd"
+                                value-format="yyyy-MM-dd"
+                                placeholder="结束时间"
+                                @change="updateDateEnd">
+                            </el-date-picker>
+                        </el-form-item>
+                    </template>
+                    <el-form-item label="备注">
+                        <el-input v-model="form.reMark"></el-input>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="editVisible3 = false">取 消</el-button>
+                    <el-button type="primary" @click="changePrice">确 定</el-button>
+                </span>
+            </el-dialog>
+            
+         
     </div>
 </template>
 <script>
-import { getProductList,getIDclass } from "@/api/goodsList"
+import { getProductList,getIDclass,changeProductStock,ProductPriceAdjustment,ProductPriceChange,ProductState,SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs';
     export default{
         data() {
             return {
                 currentPage4: 1,    /* 分页 */
+                option1:[],                 /* 主供应商选择器的备选 */
+                option2:[],                 /* 次供应商选择器的备选 */
                 PageSize: 10,
                 is_search: false,
                 editVisible: false,
-                delVisible: false,
+                editVisible2: false,
+                editVisible3: false,
                 productName:'',     /* 商品名称输入框 */
                 MainSupplierID:'',  /* 主供应商号 */
                 SupplierID:'',      /* 供应商号 */
@@ -255,7 +297,18 @@ import qs from 'qs';
                 productOptions:[],      /* 商品备选  后端返回的数据放在这 */
                 productValue:'',        /* 商品备选的value */
                 resData:[],
-                total:''
+                total:'',
+                form:{
+                    ProductName:'',             /* 商品名称 */
+                    ID:'',                      /* 商品编码 */
+                    Stock:'',                   /* 商品库存 */
+                    reMark:'',                  /* 备注 */
+                    radio: 1,                      /* 调价类型 */
+                    changeTimeStart:'',             /* 调价开始时间 */
+                    changeTimeEnd:'',             /* 调价结束时间 */
+                    price:'',                       /* 商品价格 */
+                },
+                productID:'',
             }
         },
         methods: {
@@ -282,6 +335,16 @@ import qs from 'qs';
             handleSelect(item) {
                 console.log(item);
             },
+            updateDateStart(val) {
+                console.log("val:" + val)
+                this.form.changeTimeStart = val + " 00:00:00"
+                console.log("this.value1:" + this.value1)
+            },
+            updateDateEnd(val) {
+                console.log("val:" + val)
+                this.form.changeTimeEnd = val + " 00:00:00"
+                console.log("this.value1:" + this.value1)
+            },
             //获取数据
             getData() {
                let params = {
@@ -295,7 +358,8 @@ import qs from 'qs';
                     AuditState:this.value3,
                     IsGroupProduct:this.value2,
                     Fxxcode:this.trafficCode,
-
+                    ShopCode:this.StoreCode,
+                    ClassID:this.productValue
                 }
                 getProductList(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
@@ -344,9 +408,10 @@ import qs from 'qs';
             handleDelete(index, row) {
                 this.idx = index;
                 this.id = row.id;
-                this.delVisible = true;
             },
             clear(){
+                this.SupplierID="",
+                this.MainSupplierID="",
                 this.productName="";
                 this.productCode="";
                 this.unifiedCode="";
@@ -361,7 +426,7 @@ import qs from 'qs';
                     
                 }
                 getIDclass(qs.stringify(params)).then((res)=>{
-                    // console.log(res.data.Result)
+                    console.log(res.data.Result)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         this.productOptions = JSON.parse(res.data.Result)
@@ -382,14 +447,238 @@ import qs from 'qs';
                     console.log(e)
                     console.log('出错了')
                 })
+            },
+            handleChange(value){         /* 商品选择的方法 */
+                console.log(value)
+            },
+            changeStock(){              /* 修改库存 */
+                let params = {
+                    ProductID:this.form.ID,
+                    Stock:this.form.Stock
+                }
+                changeProductStock(qs.stringify(params)).then((res)=>{
+                    console.log(res.data.Result)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.editVisible2 = false;
+                        this.$message({
+                            message: '修改成功',
+                            type: 'success'
+                        });
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            saveEdit(value, row){         /* 修改库存 */
+                this.editVisible2 = true;
+                this.form.ProductName = row.ProductName;
+                this.form.ID = row.ID;
+                this.form.Stock = row.Stock
+            },
+            PriceEdit(value, row){      /* 调整价格 */
+                this.editVisible3 = true;
+                console.log(row)
+                this.form.ProductName = row.ProductName;
+                this.form.ID = row.ID;
+                this.form.price = row.MemberPrice
+            },
+            changePrice(){              /* 调整价格 */
+                let params = {
+                    ProductID:this.form.ID,
+                    NewPrice:this.form.price,
+                    ChangeType:this.form.radio == 1 ? 'Y' : 'Q',
+                    BeginTime:this.form.changeTimeStart,
+                    EndTime:this.form.changeTimeEnd,
+                    Remark:this.form.reMark,
+                }
+                ProductPriceAdjustment(qs.stringify(params)).then((res)=>{
+                    console.log(res.data.Result)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.editVisible3 = false;
+                        this.$message({
+                            message: '修改成功',
+                            type: 'success'
+                        });
+                        this.form.ID = '',
+                        this.form.price = '',
+                        this.form.changeTimeStart = '',
+                        this.form.changeTimeEnd = '',
+                        this.form.reMark = '',
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            down(value, row){
+                console.log(row)
+                let params = {
+                    MainSupplierID:row.MainSupplierID,
+                    ID:row.ID,
+                    SallType:'DOWN',
+                }
+                ProductState(qs.stringify(params)).then((res)=>{
+                    console.log(res.data.Result)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.editVisible3 = false;
+                        this.$message({
+                            message: '商品下架成功',
+                            type: 'success'
+                        });
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            jump(value, row){
+                this.productID = row.id;
+                this.$router.push({
+                    path:'/productDetail',
+                    query:{
+                        ID: row.ID,
+                        MainSupplierID:row.MainSupplierID
+                    }
+                })
+            },
+            down(value, row){
+                let params = {
+                    MainSupplierID:row.MainSupplierID,
+                    ID:row.ID,
+                    SallType:'UP',
+                }
+                ProductState(qs.stringify(params)).then((res)=>{
+                    console.log(res.data.Result)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.editVisible3 = false;
+                        this.$message({
+                            message: '商品下架成功',
+                            type: 'success'
+                        });
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            getMainSupplier(){
+                let params = {
+                    Level:1
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.option1 = JSON.parse(res.data.Result)
+                        console.log(this.option1)
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            getSupplier(){
+                let params = {
+                    Level:2
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.option2 = JSON.parse(res.data.Result)
+                        console.log(this.option2)
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
             }
-        },
-        handleChange(value){         /* 商品选择的方法 */
-            console.log(value)
         },
         created(){
             this.productData()
-        }
+            this.getMainSupplier()
+            this.getSupplier()
+        },
+
     }
 </script>  
 <style lang="scss" scoped>

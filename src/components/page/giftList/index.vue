@@ -14,43 +14,52 @@
                     <el-form-item>
                         <el-input v-model="formInline.giftCardID" placeholder="礼品卡编号"></el-input>
                     </el-form-item>
-                    <el-form-item>
+                    <!-- <el-form-item>
                         <el-input v-model="formInline.giftCardTypeNum" placeholder="礼品卡类型编号"></el-input>
-                    </el-form-item>
+                    </el-form-item> -->
                     <el-form-item>
                         <el-date-picker
                             v-model="formInline.timeStart"
                             type="date"
-                            placeholder="开始时间">
+                            format="yyyy-MM-dd"
+                            value-format="yyyy-MM-dd"
+                            placeholder="开始时间"
+                            @change="updateDateStart">
                         </el-date-picker>至
                         <el-date-picker
                             v-model="formInline.timeEnd"
                             type="date"
-                            placeholder="结束时间">
+                            format="yyyy-MM-dd"
+                            value-format="yyyy-MM-dd"
+                            placeholder="结束时间"
+                            @change="updateDateEnd">
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="onSubmit">搜索</el-button>
-                        <el-button type="success" @click="onSubmit">导入</el-button>
+                        <el-button type="primary" @click="getData">搜索</el-button>
                     </el-form-item>
                 </el-form>
             </div>
             <div>
-                <el-table :data="tableData" border style="width: 100%"> 
-                    <el-table-column prop="giftCardNum" label="礼品卡编号" width="150" align="center"> </el-table-column> 
-                    <el-table-column prop="giftCardTypeNum" label="礼品卡类型编号" width="120" align="center"> </el-table-column> 
-                    <el-table-column prop="giftCardTypeName" label="礼品卡类型名称" width="120" align="center"> </el-table-column> 
-                    <el-table-column prop="Denomination" label="面额" width="120" align="center"> </el-table-column> 
-                    <el-table-column prop="amount" label="剩余金额" width="300" align="center"> </el-table-column> 
-                    <el-table-column prop="name" label="用户姓名" width="120" align="center"> </el-table-column> 
-                    <el-table-column prop="phone" label="手机号" width="120" align="center"> </el-table-column> 
-                    <el-table-column prop="createTime" label="创建时间" width="120" align="center"> </el-table-column> 
-                    <el-table-column prop="expirationDate" label="过期时间" width="300" align="center"> </el-table-column> 
-                    <el-table-column prop="state" label="状态" width="120" align="center"> </el-table-column> 
-                    <el-table-column fixed="right" label="操作" width="150" align="center"> 
+                <el-table :data="tableData.ModelList" border style="width: 100%"> 
+                    <el-table-column prop="ID" label="礼品卡id" width="150" align="center"> </el-table-column> 
+                    <el-table-column prop="GiftCardName" label="礼品卡名称" width="120" align="center"> </el-table-column> 
+                    <el-table-column prop="Amount" label="礼品卡金额" width="120" align="center"> </el-table-column> 
+                    <el-table-column prop="Balance" label="礼品卡余额" width="120" align="center"> </el-table-column> 
+                    <el-table-column prop="GiftMemberName" label="用户名字" width="200" align="center"> </el-table-column> 
+                    <el-table-column prop="GiftMobile" label="用户手机号" width="120" align="center"> </el-table-column> 
+                    <el-table-column prop="CreateTime" label="创建时间" align="center"> </el-table-column> 
+                    <el-table-column prop="BeginTime" label="结束时间" align="center"> </el-table-column> 
+                    <el-table-column label="是否已废弃" align="center">
                         <template slot-scope="scope">
-                            <el-button @click="handleClick(scope.row)" type="success">查看使用记录</el-button>
-                            <el-button type="danger" size="small">禁用</el-button>
+                            {{scope.row.DelFlag === 'N' ? '未废弃' : '已废弃'}}
+                        </template>
+                    </el-table-column> 
+                    <el-table-column fixed="right" label="操作" width="150" > 
+                        <template slot-scope="scope">
+                            <el-button @click="handleClick(scope.row)" type="primary">查看使用记录</el-button>
+                            <el-button type="danger" size="small" v-if="scope.row.DelFlag=='N'" @click="DelFlag(scope.row)">禁用</el-button>
+                            <el-button type="success" size="small" v-if="scope.row.DelFlag=='Y'" @click="DelFlag(scope.row)">启用</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -59,10 +68,9 @@
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
                     :current-page="currentPage4"
-                    :page-sizes="[100, 200, 300, 400]"
-                    :page-size="100"
+                    :page-size = this.PageSize
                     layout="total, sizes, prev, pager, next, jumper"
-                    :total="400">
+                    :total = this.tableData.length>
                 </el-pagination>
             </div>
         </div>
@@ -77,27 +85,17 @@ import qs from 'qs';
     export default{
         data(){
             return{
-                currentPage4: 4,                /* 分页器 */
+                currentPage4: 1,                /* 分页器 */
                 formInline:{
                     giftCardTypeNum:'',         /* 礼品卡类型编号 */
                     giftCardID:'',              /* 礼品卡编号 */
                     phone:"",                   /* 请输入用户手机号或名称 */
                     timeStart:'',                    /* 时间选择器开始 */
                     timeEnd:'',                     /* 时间选择器结束 */
-                },
-            value2: '',
-            tableData:[{
-                    giftCardNum:'3213',             /* 礼品卡编号 */
-                    giftCardTypeNum:'5346',         /* 礼品卡类型编号 */
-                    giftCardTypeName:'685476',        /* 礼品卡类型名称 */
-                    Denomination:'3534',            /* 面额 */
-                    amount:"35463",                  /* 剩余金额 */
-                    name:'86576',                    /* 用户姓名 */
-                    phone:'65456',                   /* 手机号 */
-                    createTime:'635463',              /* 创建时间 */
-                    expirationDate:'77777',          /* 过期时间 */
-                    state:'6',                   /* 状态 */
-                }]
+                    },
+                value2: '',
+                tableData:[],
+                PageSize:10,
             }
         },
         created(){
@@ -106,24 +104,77 @@ import qs from 'qs';
         methods:{
             handleClick(row) {
                 console.log(row);
+                this.$router.push({
+                    path:'/giftDetail',
+                    query:{
+                        ID: row.ID,
+                    }
+                })
             },
-            handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
+            handleSizeChange(size) {
+                console.log(`每页 ${size} 条`);
+                this.PageSize = size
             },
-            handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+            handleCurrentChange(index) {
+                console.log(`当前页: ${index}`);
+                this.currentPage4 = index
             },
             getData(){
                 let params = {
-                    PageNo:1,
+                    PageNo:this.currentPage4,
+                    PageSize:this.PageSize,
+                    MemberName:this.formInline.phone,
+                    Mobile:this.formInline.phone,
+                    BeginTime:this.formInline.timeStart,
+                    EndTime:this.formInline.timeEnd,
+                    ID:this.formInline.giftCardID
                 }
                 getGiftList(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
-                        /* this.tableData = JSON.parse(res.data.Result)
-                        console.log(this.tableData) */
+                        this.tableData = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                        this.$message('修改失败');
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            updateDateStart(val) {
+                console.log("val:" + val)
+                this.formInline.timeStart = val + " 00:00:00"
+                console.log("this.value1:" + this.value1)
+            },
+            updateDateEnd(val) {
+                console.log("val:" + val)
+                this.formInline.timeEnd =val + " 00:00:00"
+                console.log("this.value1:" + this.value1)
+            },
+            DelFlag(row){
+                let params = {
+                    ID:row.ID,
+                    DelFlag:row.DelFlag == "N" ? 'Y' : 'N'
+                }
+                changeGiftList(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        console.log(JSON.parse(res.data.Result))
+                        // this.tableData = JSON.parse(res.data.Result)
+                        this.$message('修改成功')
+                        this.getData()
                     }
                     if(res.data.Success == 0){
                         console.log(res.data.Result)

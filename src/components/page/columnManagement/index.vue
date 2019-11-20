@@ -214,7 +214,7 @@ import qs from 'qs';
                     PageTypeID:this.formInline.ID,
                     MainSupplierID:this.formInline.MainSupplierID,
                     SupplierID:this.formInline.SupplierID,
-                    PageTypeID:this.formInline.PageTypeID,
+                    // PageTypeID:this.formInline.PageTypeID,
                     PageName:this.formInline.PageName,
                 }
                 getPageList(qs.stringify(params)).then((res)=>{
@@ -292,7 +292,12 @@ import qs from 'qs';
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         this.$message('数据添加成功');
-                        this.editVisible2 = false
+                        this.editVisible2 = false;
+                        this.addPage.PageName = '',
+                        this.addPage.PageTypeID = '',
+                        this.addPage.BackguoundColor  = '',
+                        this.addPage.MainSupplierID = '',
+                        this.addPage.SupplierID = ''
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")

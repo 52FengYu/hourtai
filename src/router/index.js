@@ -95,6 +95,11 @@ const router = new Router({
                     meta: { title: '新增商品' }
                 },
                 {
+                    path: '/productDetail',
+                    component: resolve => require(['../components/page/goodsList/productDetail.vue'], resolve),
+                    meta: { title: '商品详情' }
+                },
+                {
                     path: '/List',
                     component: resolve => require(['../components/page/List.vue'], resolve),
                     meta: { title: '类目列表' }
@@ -123,6 +128,11 @@ const router = new Router({
                     path: '/giftList',
                     component: resolve => require(['../components/page/giftList/index.vue'], resolve),
                     meta: { title: '礼品卡列表' }
+                },
+                {
+                    path: '/giftDetail',
+                    component: resolve => require(['../components/page/giftList/giftDetail.vue'], resolve),
+                    meta: { title: '礼品卡明细' }
                 },
                 {
                     path: '/activeList',

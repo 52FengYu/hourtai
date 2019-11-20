@@ -5,12 +5,12 @@
                 <span>搜索</span>
                 <div>
                     <el-input
-                        placeholder="集团统一码"
-                        v-model="uniformCode"
+                        placeholder="统一编码"
+                        v-model="formInline.uniformCode"
                         clearable
                         style="width:30vh">
                     </el-input>
-                    <el-button type="primary">查询</el-button>
+                    <el-button type="primary" @click="found">查询</el-button>
                 </div>
             </div>
             <div class="second">
@@ -55,11 +55,10 @@
                     <el-form :inline="true" :model="formInline" class="demo-form-inline">
                         <div class="info1">
                             <el-form-item label="集团统一码">
-                                <!-- <el-input v-model="uniformCode" placeholder="集团统一码"></el-input> -->
-                                <span style="display:block;width:200px;" v-model="uniformCode">{{uniformCode}}</span>
+                                <el-input style="display:block;width:200px;" v-model="formInline.uniformCode" disabled></el-input>
                             </el-form-item>
                             <el-form-item label="店内码">
-                                &nbsp;&nbsp;&nbsp;<el-input v-model="formInline.storeCode" placeholder="店内码"></el-input>
+                               <el-input v-model="formInline.storeCode" placeholder="店内码"></el-input>
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="getProductInfo">检索</el-button>
@@ -67,7 +66,7 @@
                         </div>
                         <div class="info2">
                             <el-form-item label="商品名称">
-                                &nbsp;&nbsp;&nbsp;<el-input v-model="formInline.productName" placeholder="商品名称"></el-input>
+                               <el-input v-model="formInline.productName" placeholder="商品名称"></el-input>
                             </el-form-item>
                             <el-form-item label="计量单位">
                                 <el-select v-model="value" placeholder="请选择">
@@ -308,10 +307,11 @@
     </div>
 </template>
 <script>
+import { getProductInfo,getProductDetail,getPicInfo } from "@/api/goodsList"
+import qs from 'qs';    
     export default{
         data(){
             return{
-                uniformCode:'',     /* 集团统一码搜索 */
                 dialogImageUrl1: '',     /* 主图上传 */
                 dialogImageUrl2: '',     /* 详图上传 */
                 dialogVisible1: false,        /* 主图上传 */
@@ -325,6 +325,7 @@
                 fileLists2: [],      /* 详情图 */
                 formInline: {
                     storeCode: '',      /* 店内码 */
+                    uniformCode:'',     /* 集团统一码搜索 */
                     productName: '',        /* 商品名称 */
                     rate:'',        /* 税率 */
                     supplier:'',        /* 供应商 */
@@ -2534,12 +2535,6 @@
                 let data = res.data;
                 this.formData = {
                     ...this.formData,
-                    /* category_id1: data.category_id1,
-                    category_id2: data.category_id2,
-                    category_id3: data.category_id3,
-                    category_name1: data.category_name1,
-                    category_name2: data.category_name2,
-                    category_name3: data.category_name3, */
                     unitName: data.unitName,    /* 计量单位 */
                     taxRate: data.taxRate,    /* 税率 */
                     supplierId: data.supplierId,      /* 供应商id */
@@ -2559,8 +2554,34 @@
                 this.dealing = false;
                 console.log(err);
                 })
-
             },
+            found(){    
+                let params = {
+                    Unicode:this.formInline.uniformCode             /* 003567647 */
+                }
+                getPicInfo(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        console.log(JSON.parse(res.data.Result))
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            }
         }
     }
 </script>  
@@ -2587,7 +2608,7 @@
             margin-left: 5vh;
         }
     }
-    .four{
+    /* .four{
         .el-form{
             margin-left:5vh;
             .info1 .el-form-item:nth-child(2){
@@ -2614,7 +2635,7 @@
                 
             }
         }
-    }
+    } */
     .five{
         .el-form{
             margin-left:5vh;
@@ -2680,18 +2701,10 @@
     }
   }
 
-  .font-style {
-    // font-size: $formFontSize;
-    // color: $formColor;
-    // font-weight: $formTitleWeight;
-  }
 
   .new-goods {
     min-width: 1000px;
 
-    .item-title {
-    //   @extend .font-style;
-    }
 
     /* .query-input {
       @include display-flex;

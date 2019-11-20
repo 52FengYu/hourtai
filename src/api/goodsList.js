@@ -280,3 +280,32 @@ export function changeProduct(obj) {
       data: obj
     })
   }
+
+
+  /* 调价列表 */
+  export function changePriceList(obj) {
+    return request({
+      url: '/api/Product/ProductChangePriceListGet',
+      method: 'POST',
+      headers:{
+        TokenID:'jd',
+        'Content-Type':' application/x-www-form-urlencoded '
+      },
+      data: obj
+    })
+  }
+
+  
+
+  /* 供应商 */
+  export function SupplierListGetByLevel(obj) {
+    return request({
+      url: '/api/Supplier/SupplierListGetByLevel',
+      method: 'POST',
+      headers:{
+        TokenID:'jd',
+        'Content-Type':' application/x-www-form-urlencoded '
+      },
+      data: obj
+    })
+  }

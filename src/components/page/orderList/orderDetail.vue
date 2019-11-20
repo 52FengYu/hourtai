@@ -89,6 +89,11 @@
                             <el-table-column prop="MemberPrice" label="会员价" width="80"></el-table-column>
                             <el-table-column prop="Amount" label="金额小计" width="80"></el-table-column>
                             <el-table-column prop="UnitName" label="单位" width="80"></el-table-column>
+                            <el-table-column label="操作">
+                                <template slot-scope="scope">
+                                    <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
+                                </template>
+                            </el-table-column>
                         </el-table>
                     </el-form-item>
                 </el-form>
@@ -99,7 +104,7 @@
         <el-dialog title="打印预览" :visible.sync="editVisible" width="75%">
             <div ref="print" class="recordImg" id="printRecord">
                 <p style="font-size:18px;text-align:center;font-weight:900">利群网商购物送货单</p>
-                <el-form ref="form" :model="form" label-width="90px" class="demo-form-inline" :inline="true" style="width:100%;text-align:left">
+                <el-form ref="form" :model="form" label-width="90px" class="demo-form-inline" :inline="true" style="width:100%;text-align:left" id="form">
                     <el-form-item label="订单号">
                         <span>{{this.listData.ID}}</span>
                     </el-form-item>
@@ -134,7 +139,7 @@
                         </el-form-item>
                     </template>
                 </el-form>
-                <el-table ref="singleTable" :data="this.listData.Detail" highlight-current-row @current-change="handleCurrentChange" style="max-width: 750px">
+                <el-table ref="singleTable" :data="this.listData.Detail" highlight-current-row @current-change="handleCurrentChange" style="max-width: 850px">
                     <el-table-column type="index"></el-table-column>
                     <el-table-column property="ProductID" label="商品编码"></el-table-column>
                     <el-table-column property="ShopCode" label="门店码" width="100px"></el-table-column>
@@ -168,21 +173,49 @@
                 <el-button type="primary" @click="PrintRow">确 定</el-button>
             </span>
         </el-dialog>
+
+        <!-- 修改弹出框 -->
+            <el-dialog title="修改" :visible.sync="editVisible2" width="30%">
+                <el-form ref="form" :model="form" label-width="50px">
+                    <el-form-item label="订单号">
+                        <el-input v-model="this.listData.ID" :disabled="true">></el-input>
+                    </el-form-item>
+                    <el-form-item label="商品编码">
+                        <el-input v-model="this.ProductID" :disabled="true">></el-input>
+                    </el-form-item>
+                    <el-form-item label="数量">
+                        <el-input v-model="form.Qty"></el-input>
+                    </el-form-item>
+                    <el-form-item label="价格">
+                        <el-input v-model="form.MemberPrice"></el-input>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="editVisible2 = false">取 消</el-button>
+                    <el-button type="primary" @click="saveEdit">确 定</el-button>
+                </span>
+            </el-dialog>
     </div>
 </template>
 <script>
 import { getOrderList,orderDetail,changePayMethod,changePayNum } from "@/api/orderList"
 import qs from 'qs';
-import JsBarcode from 'jsbarcode'
+import JsBarcode from 'jsbarcode';
+inject:['reload'];
     export default{
         data(){
             return{
                 listData:'',       /* 获取到的数据放在这 */
-                form:'',
+                form:{
+                    Qty:'',             /* 修改用数量 */
+                    MemberPrice:'',
+                },
                 editVisible:false,
+                editVisible2:false,      /* 修改 */
                 timestamp:'',       /* 当前时间戳 */
                 time:'',            /* 转换完成后的时间 */
                 ID:decodeURI(location.href).split('?')[1].split('=')[1],
+                ProductID:'',
             }
         },
         methods:{
@@ -193,20 +226,9 @@ import JsBarcode from 'jsbarcode'
                 orderDetail(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
+                        console.log("超级管理员")
                         this.listData = JSON.parse(res.data.Result)
                         console.log(this.listData)
-                    }
-                    if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
-                    if(res.data.Success == -998){
-                        console.log("请求错误")
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -238,6 +260,51 @@ import JsBarcode from 'jsbarcode'
             PrintRow(index, row){
                 this.$print(this.$refs.print) // 使用
             },
+            handleEdit(index, row){
+                console.log(row);
+                this.ProductID = row.ProductID;
+                this.editVisible2 = true;
+                this.form.Qty = row.Qty;
+                this.form.ID = row.ProductID
+                this.form.MemberPrice   =   row.MemberPrice
+            },
+            saveEdit(){
+                let params = {
+                    OrderID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    DetailList:{
+                        // ID : this.ProductID,
+                        ID:1126,
+                        Qty : this.form.Qty,
+                        MemberPrice : this.form.MemberPrice
+                    }
+                }
+                changePayNum(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.$message('提交成功')
+                        // this.listData = JSON.parse(res.data.Result)
+                        // console.log(this.listData)
+                        this.reload()
+                        this.editVisible2 = false
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            }
         },
         mounted(){
             this.getData()
@@ -255,7 +322,7 @@ body{
                             .el-dialog{
                                 .el-dialog__body{
                                     border: 1px lightgreen dashed!important;
-                                    .el-form{
+                                    #el-form{
                                         border-bottom:1px dashed black;
                                         .el-form-item{
                                             margin:0!important;

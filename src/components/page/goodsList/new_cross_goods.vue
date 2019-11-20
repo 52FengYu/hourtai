@@ -159,7 +159,6 @@
             <el-button type="primary">保存</el-button>
             <div class="last">
                 <el-table :data="form" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
-                    <el-table-columnwidth="50" align="center"></el-table-column>
                     <el-table-column prop="commodityType" label="*主图"  width="160" align="center" ></el-table-column>
                     <el-table-column prop="uniformCode" label="*商品名称" width="160" align="center" ></el-table-column>
                     <el-table-column prop="storeCode" label="商品副标题" width="130" align="center" ></el-table-column>

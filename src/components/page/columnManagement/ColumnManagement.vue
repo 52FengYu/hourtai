@@ -25,7 +25,7 @@
                                             <div class="displayFlex">
                                                 <el-button type="text" @click="moveUp($event);" :id="item.ID" >上移</el-button>
                                                 <el-button type="text" @click="moveDown($event)" :id="item.ID">下移</el-button>
-                                                <el-button type="text" @click="edit($event);IsActive(k)" :id="item.ID">编辑</el-button>
+                                                <el-button type="text" @click="edit($event)" :id="item.ID">编辑</el-button>
                                             </div>
                                         </div>
                                     </div>
@@ -471,6 +471,7 @@ export default {
                     console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
+                        console.log(e.currentTarget.id)
                         console.log(JSON.parse(res.data.Result))
                         this.content = JSON.parse(res.data.Result)
                     }
@@ -647,6 +648,7 @@ export default {
             },
             InfoEdit(e){
                 this.editVisible2 = true;
+                this.editID = e.currentTarget.id
             },
             addSave(e){      /* 右侧弹出框修改 */
                 let params = {
@@ -654,12 +656,13 @@ export default {
                     BackGroundImageURL:this.InfoForm.BackGroundImageURL,
                     Title:this.InfoForm.Title,
                     LinkURL:this.InfoForm.LinkURL,
-                    ID:e.currentTarget.id,
+                    ID:this.editID,
                     ProductID:this.InfoForm.ProductID,
                     PromotionID:this.InfoForm.PromotionID,
                 }
                 changeItemContentInfo(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
+                    // console.log(e.currentTarget.id)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))

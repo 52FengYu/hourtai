@@ -7,7 +7,7 @@ export function getAddItemType(params) {
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : sessionStorage.TokenID
+        TokenID : 'jd'
       },
       data: params
     })
@@ -29,7 +29,7 @@ export function addPage(params) {
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : sessionStorage.TokenID
+        TokenID : 'jd'
       },
       data: params
     })
@@ -43,7 +43,7 @@ export function changeItemInfo(params) {
       asyn:true,
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : sessionStorage.TokenID
+        TokenID : 'jd'
       },
       data: params
     })
@@ -55,7 +55,8 @@ export function changeItemInfo(params) {
       url: '/api/Page/PageListGet',
       method: 'POST',
       headers:{
-        'Content-Type':' application/x-www-form-urlencoded '
+        'Content-Type':' application/x-www-form-urlencoded ',
+        TokenID : 'jd'
       },
       data: obj
     })
@@ -68,7 +69,8 @@ export function changeItemInfo(params) {
         url: '/api/Page/PageContentListGetFromPageID',
         method: 'POST',
         headers:{
-          'Content-Type':' application/x-www-form-urlencoded '
+          'Content-Type':' application/x-www-form-urlencoded ',
+          TokenID : 'jd'
         },
         data: obj
       })
@@ -81,7 +83,8 @@ export function changeItemInfo(params) {
         url: '/api/Page/PageContentAdd',
         method: 'POST',
         headers:{
-          'Content-Type':' application/x-www-form-urlencoded '
+          'Content-Type':' application/x-www-form-urlencoded ',
+          TokenID : 'jd'
         },
         data: obj
       })
@@ -93,7 +96,8 @@ export function changeItemInfo(params) {
         url: '/api/Page/PageContentUpdated',
         method: 'POST',
         headers:{
-          'Content-Type':' application/x-www-form-urlencoded '
+          'Content-Type':' application/x-www-form-urlencoded ',
+          TokenID : 'jd'
         },
         data: obj
       })
@@ -106,7 +110,8 @@ export function changeItemInfo(params) {
       url: '/api/Page/PageContentOrderIDMove',
       method: 'POST',
       headers:{
-        'Content-Type':' application/x-www-form-urlencoded '
+        'Content-Type':' application/x-www-form-urlencoded ',
+        TokenID : 'jd'
       },
       data: obj
     })
@@ -119,7 +124,8 @@ export function changeItemInfo(params) {
       url: '/api/Page/PageContentDelete',
       method: 'POST',
       headers:{
-        'Content-Type':' application/x-www-form-urlencoded '
+        'Content-Type':' application/x-www-form-urlencoded ',
+        TokenID : 'jd'
       },
       data: obj
     })
@@ -132,7 +138,8 @@ export function changeItemInfo(params) {
       url: '/api/Page/PageContentDetailListGetFromPageContentID',
       method: 'POST',
       headers:{
-        'Content-Type':' application/x-www-form-urlencoded '
+        'Content-Type':' application/x-www-form-urlencoded ',
+        TokenID : 'jd'
       },
       data: obj
     })
@@ -145,7 +152,8 @@ export function changeItemInfo(params) {
      url: '/api/Page/PageContentDetailAdd',
      method: 'POST',
      headers:{
-       'Content-Type':' application/x-www-form-urlencoded '
+       'Content-Type':' application/x-www-form-urlencoded ',
+       TokenID : 'jd'
      },
      data: obj
    })
@@ -158,7 +166,8 @@ export function changeItemInfo(params) {
      url: '/api/Page/PageContentDetailUpdate',
      method: 'POST',
      headers:{
-       'Content-Type':' application/x-www-form-urlencoded '
+       'Content-Type':' application/x-www-form-urlencoded ',
+       TokenID : 'jd'
      },
      data: obj
    })
@@ -171,7 +180,8 @@ export function changeItemInfo(params) {
       url: '/api/Page/PageContentDetailOrderIDMove',
       method: 'POST',
       headers:{
-        'Content-Type':' application/x-www-form-urlencoded '
+        'Content-Type':' application/x-www-form-urlencoded ',
+        TokenID : 'jd'
       },
       data: obj
     })
@@ -184,7 +194,8 @@ export function changeItemInfo(params) {
       url: '/api/Page/PageContentDetailDelete',
       method: 'POST',
       headers:{
-        'Content-Type':' application/x-www-form-urlencoded '
+        'Content-Type':' application/x-www-form-urlencoded ',
+        TokenID : 'jd'
       },
       data: obj
     })
@@ -197,7 +208,8 @@ export function changeItemInfo(params) {
       url: '/api/Page/PageJsCreate',
       method: 'POST',
       headers:{
-        'Content-Type':' application/x-www-form-urlencoded '
+        TokenID : 'jd',
+        'Content-Type':' application/x-www-form-urlencoded ',
       },
       data: obj
     })
