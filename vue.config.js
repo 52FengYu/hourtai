@@ -35,6 +35,7 @@ module.exports = {
         proxy: {
             '/api':{
                 target:'http://128.192.80.135/api',
+                // target:'http://images.liqunshop.com/',
                 changeOrigin:true,
                 pathRewrite:{
                     '/api':''

@@ -93,8 +93,8 @@
         <el-dialog title="调价审核" :visible.sync="editVisible" width="40%">
             <el-form ref="form" :model="form" label-width="70px">
                 <el-form-item label="审核状态">
-                    <el-radio v-model="radio" label="1">通过</el-radio>
-                    <el-radio v-model="radio" label="2">不通过</el-radio>
+                    <el-radio v-model="form.radio" label="1">通过</el-radio>
+                    <el-radio v-model="form.radio" label="2">不通过</el-radio>
                 </el-form-item>
                 <el-form-item label="审核备注">
                     <el-input v-model="form.AuditRemark"></el-input>
@@ -174,13 +174,13 @@ import qs from 'qs'
         },
         form: {
           AuditRemark: "",               /* 审核备注 */
-          radio:'',
+          radio:'1',
           ProductID:'',
           NewPrice:'',
           changeTimeStart:'',
           changeTimeEnd:'',
           Remark:'',
-          radio:'1',
+          radio:'',
           ProductName:'',
         },
         tableData: [],

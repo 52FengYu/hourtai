@@ -80,16 +80,6 @@ const router = new Router({
                     meta: { title: '新增品牌' }
                 },
                 {
-                    path: '/suit',
-                    component: resolve => require(['../components/page/goodsList/suit.vue'], resolve),
-                    meta: { title: '新增套装' }
-                },
-                {
-                    path: '/cross',
-                    component: resolve => require(['../components/page/goodsList/new_cross_goods.vue'], resolve),
-                    meta: { title: '跨境商品发布' }
-                },
-                {
                     path: '/newgoods',
                     component: resolve => require(['../components/page/goodsList/newgoods.vue'], resolve),
                     meta: { title: '新增商品' }
@@ -98,6 +88,11 @@ const router = new Router({
                     path: '/productDetail',
                     component: resolve => require(['../components/page/goodsList/productDetail.vue'], resolve),
                     meta: { title: '商品详情' }
+                },
+                {
+                    path: '/changeProductDetail',
+                    component: resolve => require(['../components/page/goodsList/changeProductDetail.vue'], resolve),
+                    meta: { title: '修改商品' }
                 },
                 {
                     path: '/List',
@@ -123,6 +118,21 @@ const router = new Router({
                     path: '/couponList',
                     component: resolve => require(['../components/page/couponList/index.vue'], resolve),
                     meta: { title: '优惠券列表' }
+                },
+                {
+                    path: '/addCouponActivity',
+                    component: resolve => require(['../components/page/couponList/addCouponActivity.vue'], resolve),
+                    meta: { title: '领券活动主表添加' }
+                },
+                {
+                    path: '/changeCouponActivity',
+                    component: resolve => require(['../components/page/couponList/changeCouponActivity.vue'], resolve),
+                    meta: { title: '领券活动主表修改' }
+                },
+                {
+                    path: '/MemberGiftTokenGiveOutDetailListGetFromGiftTokenGiveOutMasterID',
+                    component: resolve => require(['../components/page/couponList/MemberGiftTokenGiveOutDetailListGetFromGiftTokenGiveOutMasterID.vue'], resolve),
+                    meta: { title: '领券活动明细' }
                 },
                 {
                     path: '/giftList',

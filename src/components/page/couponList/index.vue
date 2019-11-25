@@ -66,15 +66,15 @@
                         <el-button type="primary" icon="el-icon-search">搜索</el-button>   
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="success" icon="el-icon-plus">新建活动列表</el-button>   
+                        <el-button type="success" icon="el-icon-plus" @click="addCouponActivity">新建活动列表</el-button>   
                     </el-form-item>
                 </el-form>
             </div>
             <el-table :data="tableData.ModelList" border class="tableData" ref="multipleTable">
                 <el-table-column prop="GiftTokenGiveOutName" label="领券活动名称" align="center" ></el-table-column>
-                <el-table-column label="审核状态" align="center" >
+                <el-table-column prop="Audit" label="审核状态" align="center" >
                     <template slot-scope="scope">
-                    {{scope.row.Audit === 'N' ? '新建' : ( scope.row.Audit === 'O' ? '审核通过' : '驳回')}}
+                    {{scope.row.Audit === 'N' ? '新建' : ( scope.row.Audit === 'O' ? '审核通过' : ( scope.row.Audit === 'T' ? '停止' : '驳回'))}}
                   </template>
                 </el-table-column>
                 <el-table-column prop="AuditMan" label="审核人" align="center" ></el-table-column>
@@ -84,8 +84,8 @@
                 <el-table-column prop="CreateTime" label="创建时间"  align="center" ></el-table-column>
                 <el-table-column prop="DayGiveOutNum" label="当日已领数量"  align="center" ></el-table-column>
                 <el-table-column prop="DayMaxNum" label="每天最大领取数量" align="center" ></el-table-column>
-                <el-table-column label="废弃标志"  align="center" >
-                    {{tableData.ModelList.DelFlag == 'Y' ? '是' : '否'}}
+                <el-table-column prop="DelFlag" label="废弃标志"  align="center" >
+                    <!-- {{tableData.ModelList.DelFlag == 'Y' ? '是' : '否'}} -->
                 </el-table-column>
                 <el-table-column prop="GiveBeginTime" label="开始领券时间"  align="center" ></el-table-column>
                 <el-table-column prop="GiveEndTime" label="结束领券时间" align="center" ></el-table-column>
@@ -107,13 +107,13 @@
                 <el-table-column prop="MemberMaxNum" label="每个会员最大领取数量"  align="center" ></el-table-column>
                 <el-table-column prop="Remark" label="备注"  align="center" ></el-table-column>
                 <el-table-column prop="SupplierID" label="供应商号(为空表示不限)" align="center" ></el-table-column>
-                <el-table-column label="操作" width="350">
+                <el-table-column label="操作" width="100vw" fixed="right">
                     <template slot-scope="scope">
-                        <el-button size="mini" type="danger" @click="choose(scope.$index, scope.row)">通过</el-button>
-                        <el-button size="mini" type="success" @click="choose(scope.$index, scope.row)">驳回</el-button>
-                        <el-button size="mini" type="primary" plain @click="stop(scope.$index, scope.row)">停止</el-button>
-                        <el-button size="mini" type="primary" round @click="discard(scope.$index, scope.row)">废弃</el-button>
-                        <el-button size="mini" type="danger" @click="detail(scope.$index, scope.row)">详情</el-button>
+                        <el-button size="mini" type="success" @click="choose(scope.row)" v-if="scope.row.Audit == 'N'">审核</el-button>
+                        <el-button type="primary" icon="el-icon-zoom-in" @click="edit(scope.row)" v-if="scope.row.Audit == 'N' || scope.row.Audit == 'B'" >修改</el-button>
+                        <el-button size="mini" type="primary" plain @click="stop(scope.row)" v-if="scope.row.Audit == 'O'">停止</el-button>
+                        <el-button size="mini" type="primary" round @click="discard(scope.row)" v-if="(scope.row.Audit == 'N' || scope.row.Audit == 'B') && scope.row.DelFlag == 'N'">废弃</el-button>
+                        <el-button size="mini" type="danger" @click="detail(scope.row)">详情</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -128,18 +128,37 @@
                 </el-pagination>
             </div>
         </div>
+        <!-- 编辑弹出框 -->
+        <el-dialog title="调价审核" :visible.sync="editVisible" width="40%">
+            <el-form ref="form" :model="form" label-width="70px">
+                <el-form-item label="审核状态">
+                    <el-radio v-model="form.radio" label="1">通过</el-radio>
+                    <el-radio v-model="form.radio" label="2">不通过</el-radio>
+                </el-form-item>
+                <el-form-item label="审核备注">
+                    <el-input v-model="form.AuditRemark"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveEdit">确 定</el-button>
+            </span>
+        </el-dialog>
+
     </div>
 </template>
 <style lang="scss">
 
 </style>
 <script>
-import { MemberGiftTokenGiveOutMasterListGet } from '@/api/coupon';
+import { MemberGiftTokenGiveOutMasterListGet,MemberGiftTokenGiveOutMasterAudit,MemberGiftTokenGiveOutMasterDelete,MemberGiftTokenGiveOutMasterStop } from '@/api/coupon';
 import { SupplierListGetByLevel } from '@/api/goodsList';
 import qs from 'qs'
     export default{
         data(){
             return{
+                radio:'',
+                editVisible:false,
                 currentPage4: 1,           /* 分页 */
                 PageSize:10,
                 formInline:{
@@ -162,7 +181,12 @@ import qs from 'qs'
                         label: '驳回'}
                     ]
                 },
-                tableData:[]
+                form:{
+                    radio:'',           /* 通过还是不通过 */
+                    AuditRemark:'',         /* 审核备注 */
+                },
+                tableData:[],
+                ID:'',              /* 这里的id是机动的 */
             }
         },
         methods:{
@@ -277,6 +301,163 @@ import qs from 'qs'
                 this.form.changeTimeEnd = val + " 00:00:00"
                 console.log("this.value1:" + this.value1)
             },
+            choose(row){
+                console.log(row.ID)
+                this.editVisible = true,
+                this.ID = row.ID
+            },
+            saveEdit(){
+                let params = {
+                    ID:this.ID,            /* 调价单号 */
+                    Audit:this.form.radio === '1' ? 'O' : 'B',             /* 审核状态 */
+                    AuditRemark:this.form.AuditRemark,       /* 审核备注 */
+                }
+                MemberGiftTokenGiveOutMasterAudit(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                    this.editVisible = false
+                        this.$message({
+                        message: '修改成功',
+                        type: 'success'
+                        });
+                        this.ID = '',
+                        this.form.radio = '',
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                        this.$message('修改失败');
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                        this.$message(res.data)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            addCouponActivity(){
+                this.$router.push({
+                    path:'/addCouponActivity',
+                })
+            },
+            edit(row){
+                this.$router.push({
+                    path:'/changeCouponActivity',
+                    query:{
+                        ID:row.ID,
+                    }
+                })
+            },
+            discard(row){
+                this.ID = row.ID
+                console.log(this.ID)
+                this.$confirm('此操作将不可逆, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                    }).then(() => {
+                        this.delete()
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });          
+                });
+            },
+            delete(){                       /* 废弃 */
+                let params = {
+                    ID:this.ID,            /* 调价单号 */
+                }
+                MemberGiftTokenGiveOutMasterDelete(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                    this.editVisible = false
+                        this.$message({
+                        message: '废弃成功',
+                        type: 'success'
+                        });
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                        this.$message('修改失败');
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                        this.$message(res.data)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            stop(row){                                  /* MemberGiftTokenGiveOutMasterStop */
+                this.ID = row.ID;
+                console.log(this.ID)
+                this.$confirm('此操作将不可逆, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                    }).then(() => {
+                        this.suspend()
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });          
+                });
+            },
+            suspend(){
+                let params = {
+                    ID:this.ID,            /* 调价单号 */
+                }
+                MemberGiftTokenGiveOutMasterStop(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                    this.editVisible = false
+                        this.$message({
+                        message: '停止成功',
+                        type: 'success'
+                        });
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                        this.$message('修改失败');
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                        this.$message(res.data)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            detail(row,ID){
+                console.log(row.ID)
+                this.$router.push({
+                    path:'/MemberGiftTokenGiveOutDetailListGetFromGiftTokenGiveOutMasterID',
+                    query:{
+                        ID:row.ID,
+                        Audit:row.Audit
+                    }
+                })
+            }
         },
         created(){
             this.getMainSupplier()

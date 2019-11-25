@@ -103,6 +103,26 @@
                 <span >{{this.products.Product.MainSupplierID}}</span>
             </el-form-item>
         </el-form>
+        根据门店码获取商品信息
+        <el-table :data="ByshopCode" border style="width: 100%" class="first">
+            <el-table-column label="门店码">
+                <template>  
+                    <el-input placeholder="请输入内容" v-model="products" clearable></el-input>
+                    <el-button type="primary">搜索</el-button>
+                </template>
+            </el-table-column>
+            <el-table-column prop="FNAME" label="商品名称"></el-table-column>
+            <el-table-column prop="UNIT" label="单位" ></el-table-column>
+            <el-table-column prop="ORIGIN" label="产地"></el-table-column>
+            <el-table-column prop="UNICODE" label="统一编码"></el-table-column>
+            <el-table-column prop="UNITYPE" label="统一分类" ></el-table-column>
+            <el-table-column prop="UNIBRAND" label="统一品牌"></el-table-column>
+            <el-table-column prop="TAXRATE" label="税率"></el-table-column>
+            <el-table-column prop="SNPRC" label="售价"></el-table-column>
+            <el-table-column prop="Fxxcodes" label="物流码列表" ></el-table-column>
+            <el-table-column prop="Barcodes" label="条码列表"></el-table-column>
+        </el-table>
+        商品详情
             <el-table :data="tableData" border style="width:100%">
                 <el-table-column prop="ProductName" label="商品名称" width="180"></el-table-column>
                 <el-table-column prop="TitleInfo" label="副标题" width="180"></el-table-column>
@@ -121,13 +141,15 @@
     </div>
 </template>
 <script>
-import { getProductDetail } from '@/api/goodsList';
+import { getProductDetail,getProductInfo } from '@/api/goodsList';
 import qs from 'qs';
     export default{
         data(){
             return{
                 products:[],             /* 商品信息都放在这里 */
-                tableData:[]
+                tableData:[],
+                shopCode:"",
+                ByshopCode:[]               /* 通过门店码获取到的商品信息 */
             }
         },
         methods:{
@@ -141,13 +163,44 @@ import qs from 'qs';
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         this.products = JSON.parse(res.data.Result)
+                        this.shopCode = this.products.LQInfo.ShopCode
                         console.log(this.products)
+                        console.log(this.shopCode)
                         var tableData = []
                         for (let i in this.products) {
                             tableData.push(this.products[i]); //属性
                         }
                         this.tableData = tableData
                         console.log(tableData);
+                        this.getDetailByShopCode()
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            getDetailByShopCode(){
+                let params = {
+                    ShopCode:this.products.LQInfo.ShopCode
+                }
+                getProductInfo(qs.stringify(params)).then((res)=>{
+                    console.log(res.data.Result)
+                    this.$message(res.data.Result)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        console.log(JSON.parse(res.data.Result))
+                        this.ByshopCode = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
@@ -177,5 +230,8 @@ import qs from 'qs';
         .el-form-item{
             width:45%
         }
+    }
+    .first{
+        margin-bottom: 2vh!important
     }
 </style>

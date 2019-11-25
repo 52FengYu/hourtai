@@ -99,7 +99,7 @@
                     <el-button type="primary"><router-link to="newgoods">新增商品</router-link></el-button>
                 </div>
             </div>
-            <el-table :data="resData.List" border class="table" ref="multipleTable">
+            <el-table :data="resData.List" border class="table" ref="multipleTable" v-loading="loading">
                 <el-table-column prop="ID" label="商品编号"  width="80" align="center" ></el-table-column>
                 <el-table-column label="商品名称" align="center" >
                     <template slot-scope="scope">
@@ -149,7 +149,7 @@
                     <template slot-scope="scope" >        <!-- 未审核/驳回 -->
                         <el-button type="warning" icon="el-icon-star-off" @click="handleEdit(scope.$index, scope.row)" v-if="scope.row.ProductState != 'O'">审核</el-button>
                         <el-button type="primary" icon="el-icon-star-off" @click="down(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'Y'">下架</el-button>
-                        <el-button type="primary" plain icon="el-icon-edit" class="red" @click="handleDelete(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'Y'">修改</el-button>
+                        <el-button type="primary" plain icon="el-icon-edit" class="red" @click="productChange(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'Y'">修改</el-button>
                         <el-button type="primary" icon="el-icon-star-off" @click="up(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'N'">上架</el-button>
                     </template>
                 </el-table-column>
@@ -165,6 +165,24 @@
                 </el-pagination>
             </div>
         </div>    
+
+            <!-- 审核 -->
+            <el-dialog title="修改库存" :visible.sync="editVisible" width="40%">
+               <el-form ref="form" :model="form" label-width="70px">
+                <el-form-item label="审核状态">
+                    <el-radio v-model="form.AuditType" label="O">通过</el-radio>
+                    <el-radio v-model="form.AuditType" label="B">驳回</el-radio>
+                </el-form-item>
+                <el-form-item label="审核备注">
+                    <el-input v-model="form.AuditRemark"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="Save">确 定</el-button>
+            </span>
+            </el-dialog>
+
             <!-- 库存编辑弹出框 -->
             <el-dialog title="修改库存" :visible.sync="editVisible2" width="40%">
                 <el-form ref="form" :model="form" label-width="50px">
@@ -227,16 +245,15 @@
                     <el-button type="primary" @click="changePrice">确 定</el-button>
                 </span>
             </el-dialog>
-            
-         
     </div>
 </template>
 <script>
-import { getProductList,getIDclass,changeProductStock,ProductPriceAdjustment,ProductPriceChange,ProductState,SupplierListGetByLevel } from "@/api/goodsList"
+import { getProductList,getIDclass,changeProductStock,ProductPriceAdjustment,ProductPriceChange,ProductState,SupplierListGetByLevel,ProductReview } from "@/api/goodsList"
 import qs from 'qs';
     export default{
         data() {
             return {
+                loading: false,          /* 加载 */
                 currentPage4: 1,    /* 分页 */
                 option1:[],                 /* 主供应商选择器的备选 */
                 option2:[],                 /* 次供应商选择器的备选 */
@@ -249,7 +266,6 @@ import qs from 'qs';
                 MainSupplierID:'',  /* 主供应商号 */
                 SupplierID:'',      /* 供应商号 */
                 productCode:'',     /* 统一编码输入框 */
-                // unifiedCode:'',     /* 集团统一码 */
                 StoreCode:'',       /* 店内码 */
                 trafficCode:'',     /* 物流码 */
                 stateOptions: [
@@ -289,9 +305,7 @@ import qs from 'qs';
                 value1: '',     /* 上下架状态 */
                 value2:'',      /* 全部商品类型 */
                 value3:'',      /* 全部审核状态 */
-                idx: -1,
-                id: -1,
-                restaurants: [],
+                restaurants: [],        /* 存放审核时的参数 */
                 state1: '',
                 state2: '',
                 productOptions:[],      /* 商品备选  后端返回的数据放在这 */
@@ -304,6 +318,8 @@ import qs from 'qs';
                     Stock:'',                   /* 商品库存 */
                     reMark:'',                  /* 备注 */
                     radio: 1,                      /* 调价类型 */
+                    AuditType:'',                   /* 审核状态 */
+                    AuditRemark:'',                 /* 审核备注 */
                     changeTimeStart:'',             /* 调价开始时间 */
                     changeTimeEnd:'',             /* 调价结束时间 */
                     price:'',                       /* 商品价格 */
@@ -312,16 +328,6 @@ import qs from 'qs';
             }
         },
         methods: {
-            querySearch(queryString, cb) {
-                var restaurants = this.restaurants;
-                var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
-                cb(results);
-            },
-            createFilter(queryString) {
-                return (restaurant) => {
-                return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-                };
-            },
             handleSizeChange(size) {
                 this.PageSize = size
                 console.log(`每页 ${size} 条`);
@@ -347,6 +353,7 @@ import qs from 'qs';
             },
             //获取数据
             getData() {
+                this.loading = true
                let params = {
                     PageIndex:this.currentPage4,
                     PageSize:this.PageSize,
@@ -363,6 +370,7 @@ import qs from 'qs';
                 }
                 getProductList(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
+                    this.loading = false
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
@@ -395,19 +403,50 @@ import qs from 'qs';
                 return row.tag === value;
             },
             handleEdit(index, row) {
-                this.idx = index;
                 this.id = row.id;
-                this.form = {
-                    id: row.id,
-                    name: row.name,
-                    date: row.date,
-                    address: row.address
-                }
                 this.editVisible = true;
+                console.log(row)
+                this.restaurants = row
             },
-            handleDelete(index, row) {
-                this.idx = index;
-                this.id = row.id;
+            Save(){
+                let params = {
+                    MainSupplierID:this.restaurants.MainSupplierID,
+                    ID:this.restaurants.ID,
+                    AuditType:this.form.AuditType,
+                    AuditRemark:this.form.AuditRemark
+                }
+                ProductReview(qs.stringify(params)).then((res)=>{
+                    console.log(res.data.Result)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.$message.success('审核成功')
+                        this.editVisible = false
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            productChange(index, row) {
+                this.$router.push({
+                    path:'/changeProductDetail',
+                    query:{
+                        ID: row.ID,
+                        MainSupplierID:row.MainSupplierID
+                    }
+                })
             },
             clear(){
                 this.SupplierID="",
@@ -539,23 +578,23 @@ import qs from 'qs';
                     console.log('出错了')
                 })
             },
-            down(value, row){
+            up(value, row){
                 console.log(row)
                 let params = {
                     MainSupplierID:row.MainSupplierID,
                     ID:row.ID,
-                    SallType:'DOWN',
+                    SallType:'UP',
                 }
                 ProductState(qs.stringify(params)).then((res)=>{
                     console.log(res.data.Result)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         this.editVisible3 = false;
+                        this.getData()
                         this.$message({
-                            message: '商品下架成功',
+                            message: '商品上架成功',
                             type: 'success'
                         });
-                        this.getData()
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
@@ -588,18 +627,18 @@ import qs from 'qs';
                 let params = {
                     MainSupplierID:row.MainSupplierID,
                     ID:row.ID,
-                    SallType:'UP',
+                    SallType:'DOWN',
                 }
                 ProductState(qs.stringify(params)).then((res)=>{
                     console.log(res.data.Result)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         this.editVisible3 = false;
+                        this.getData()
                         this.$message({
                             message: '商品下架成功',
                             type: 'success'
                         });
-                        this.getData()
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")

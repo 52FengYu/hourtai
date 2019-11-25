@@ -47,6 +47,7 @@
                         this.$router.push('/');
                     } else {
                         console.log('error submit!!');
+                        this.$message('error submit!!')
                         return false;
                     }
                 });

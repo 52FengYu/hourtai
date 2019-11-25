@@ -6,9 +6,9 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-            <el-form :inline="true" :model="formInline" class="demo-form-inline">
+            <el-form :inline="true" :model="formInline" class="demo-form-inline" >
                 <el-form-item label="类型">
-                    <el-select v-model="formInline.ID" placeholder="请选择类型">
+                    <el-select v-model="formInline.ID" placeholder="请选择类型" clearable>
                         <el-option
                             v-for="item in formInline.options"
                             :key="item.ID"
@@ -19,10 +19,24 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="主供应商号">
-                    <el-input v-model="formInline.MainSupplierID" placeholder="非必填"></el-input>
+                    <el-select v-model="formInline.MainSupplierID" placeholder="主供应商" clearable >
+                        <el-option
+                        v-for="item in option1"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="供应商号">
-                    <el-input v-model="formInline.SupplierID" placeholder="非必填"></el-input>
+                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable >
+                        <el-option
+                        v-for="item in option2"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="页面类型编号">
                     <el-input v-model="formInline.PageTypeID" placeholder="非必填"></el-input>
@@ -110,6 +124,7 @@
 </template>    
 <script>
 import {getPageList,getAddItemType,changeItemInfo,move,addPage} from "@/api/columnManagement"
+import { SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs';
     export default{
         data(){
@@ -145,6 +160,8 @@ import qs from 'qs';
                 total:"",            /* 总页数 */
                 currentPage1: 1,
                 ID:'',                 /* 修改栏目用的id */
+                option1:[],
+                option2:[]
             }
         },
         methods:{
@@ -227,7 +244,7 @@ import qs from 'qs';
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -999){
                         console.log("用户未登录")
@@ -235,6 +252,7 @@ import qs from 'qs';
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -331,11 +349,67 @@ import qs from 'qs';
                         ID:this.ID
                     }
                 })
+            },
+            getMainSupplier(){
+                let params = {
+                    Level:1
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.option1 = JSON.parse(res.data.Result)
+                        console.log(this.option1)
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            getSupplier(){
+                let params = {
+                    Level:2
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.option2 = JSON.parse(res.data.Result)
+                        console.log(this.option2)
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
             }
          },
         mounted(){
             this.getPageLists();
             this.getPageType();
+            this.getMainSupplier()
+            this.getSupplier()
         },
     }
 </script>  
