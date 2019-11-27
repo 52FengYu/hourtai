@@ -23,7 +23,7 @@ module.exports = {
         modules: false
     },
     // use thread-loader for babel & TS in production build
-    // enabled by default if the machine has more than 1 cores
+    // enabled by default if the machine has more than 1 cores+
     parallel: require('os').cpus().length > 1,
     // webpack-dev-server 相关配置
     devServer: {
@@ -34,8 +34,8 @@ module.exports = {
         hotOnly: false,
         proxy: {
             '/api':{
-                target:'http://128.192.80.135/api',
-                // target:'http://images.liqunshop.com/',
+                target:'http://128.192.80.135/api',                 /* http://128.192.80.135:8030 */
+                // target:'http://128.192.80.135:8030',
                 changeOrigin:true,
                 pathRewrite:{
                     '/api':''

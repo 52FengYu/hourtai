@@ -13,8 +13,9 @@ import './components/common/directives';
 import "babel-polyfill";
 import md5 from 'js-md5';
 import Print from '@/utils/print.js'
+import './utils/request';
 
-Vue.prototype.ajax = axios;
+Vue.prototype.$ajax = axios;
 // axios.defaults.baseURL = 'http://128.192.80.135';//配置你的接口请求地址
 Vue.config.productionTip = false
 
@@ -38,7 +39,15 @@ const i18n = new VueI18n({
 
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
-    const role = localStorage.getItem('ms_username');
+    /* const role = localStorage.getItem('role');
+    console.log(localStorage.getItem('role'))
+    if (!role && to.path !== '/login') {
+        next('/login');
+    } else {
+        next();
+        this.$message('执行了')
+    } */
+    const role = localStorage.getItem('role');
     if (!role && to.path !== '/login') {
         next('/login');
     } else if (to.meta.permission) {

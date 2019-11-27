@@ -4,17 +4,21 @@
             <div class="ms-title">后台管理系统</div>
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
-                    <el-input v-model="ruleForm.username" placeholder="username">
+                    <el-input v-model="ruleForm.username" placeholder="请输入用户名">
                         <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                    <el-input type="password" placeholder="password" v-model="ruleForm.password" @keyup.enter.native="submitForm('ruleForm')">
+                    <el-input type="password" placeholder="请输入密码" v-model="ruleForm.password">
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
                 </el-form-item>
+                <el-form-item>
+                    <el-input class="picture" v-model="ruleForm.picture" @keyup.enter.native="submitForm"></el-input>
+                    <el-image :src="ruleForm.pictures" @click="getdata"></el-image>
+                </el-form-item>
                 <div class="login-btn">
-                    <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+                    <el-button type="primary" @click="submitForm">登录</el-button>
                 </div>
             </el-form>
         </div>
@@ -22,12 +26,16 @@
 </template>
 
 <script>
+import { GetValidateCode,UserLogin,getTokenID } from "@/api/login"
+import qs from 'qs';    
     export default {
         data: function(){
             return {
                 ruleForm: {
-                    username: 'admin',
-                    password: '123123'
+                    username: '',
+                    password: '',
+                    picture:'',
+                    pictures:'',
                 },
                 rules: {
                     username: [
@@ -35,28 +43,71 @@
                     ],
                     password: [
                         { required: true, message: '请输入密码', trigger: 'blur' }
+                    ],
+                    picture: [
+                        { required: true, message: '请输入验证码', trigger: 'blur' }
                     ]
                 }
             }
         },
         methods: {
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        localStorage.setItem('ms_username',this.ruleForm.username);
+            getdata(){              /* 获取验证码 */
+                let params = {}
+                GetValidateCode(qs.stringify(params)).then((res)=>{
+                    let imgUrl = 'data:image/png;base64,' + btoa(new Uint8Array(res.data).reduce((data, byte) => data + String.fromCharCode(byte), ''))
+                    this.ruleForm.pictures = imgUrl
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            submitForm() {          //登录
+                let params = {
+                    UserID:this.ruleForm.username,
+                    UserPwd:this.ruleForm.password,
+                    VerifyCode:this.ruleForm.picture
+                }
+                UserLogin(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.$message.success('欢迎' + res.data.Result + '，回来!')
+                        window.localStorage.setItem('role',res.data.Result)
                         this.$router.push('/');
-                    } else {
-                        console.log('error submit!!');
-                        this.$message('error submit!!')
-                        return false;
                     }
-                });
+                    if(res.data.Success == 0){
+                       this.$message(res.data.Result)
+                       this.getdata()
+                       this.ruleForm.password = ''
+                       this.ruleForm.picture = ''
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                }) 
+             },
+            getTokenID(){
+                let params = {}
+                console.log(321)
+                getTokenID(qs.stringify(params)).then((res)=>{
+                     if(res.data.Success == 1){
+                       console.log( 'TokenID:'  + res.data.Result)
+                       sessionStorage.setItem('TokenID', res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                       this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
             }
+        },
+        created(){
+            this.getdata()
+            this.getTokenID()
         }
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .login-wrap{
         position: relative;
         width:100%;
@@ -97,5 +148,23 @@
         font-size:12px;
         line-height:30px;
         color:#fff;
+    }
+    /* .el-form-item__content{
+        display: flex!important;
+        flex-direction: unset!important;
+    }
+    .el-input__inner{
+        width:20vw!important
+    } */
+    .el-form{
+        .el-form-item{
+            .el-form-item__content{
+                display: flex!important;
+                flex-direction: unset!important;
+                .picture{
+                    width:60%!important
+                }
+            }
+        }
     }
 </style>

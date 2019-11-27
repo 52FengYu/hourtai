@@ -47,13 +47,13 @@
             return {
                 collapse: false,
                 fullscreen: false,
-                name: 'linxin',
+                name: '',
                 message: 2
             }
         },
         computed:{
             username(){
-                let username = localStorage.getItem('ms_username');
+                let username = localStorage.getItem('role');
                 return username ? username : this.name;
             }
         },

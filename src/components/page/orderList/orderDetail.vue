@@ -283,8 +283,6 @@ inject:['reload'];
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         this.$message('提交成功')
-                        // this.listData = JSON.parse(res.data.Result)
-                        // console.log(this.listData)
                         this.reload()
                         this.editVisible2 = false
                     }

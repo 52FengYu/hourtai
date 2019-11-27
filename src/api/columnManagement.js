@@ -1,13 +1,11 @@
 import axios from "axios"
-import request from '../utils/request'; 
 /* 获取用户可添加的页面类型 */
 export function getAddItemType(params) {
-    return request({
+    return axios({
       url: '/api/Page/PageTypeListGetByUser',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -15,7 +13,7 @@ export function getAddItemType(params) {
 
   /* 根据页面类型获取页面内容类型 */
 export function getItemType(params) {
-    return request({
+    return axios({
       url: '/api/Page/PageContentTypeListGetByPageTypeID',
       method: 'post',
       data: params
@@ -24,12 +22,11 @@ export function getItemType(params) {
 
    /* 增加页面 */
 export function addPage(params) {
-    return request({
+    return axios({
       url: '/api/Page/PageAdd',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -37,13 +34,12 @@ export function addPage(params) {
 
    /* 修改页面信息 */
 export function changeItemInfo(params) {
-    return request({
+    return axios({
       url: '/api/Page/PageUpdate',
       method: 'post',
       asyn:true,
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -56,7 +52,6 @@ export function changeItemInfo(params) {
       method: 'POST',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: obj
     })
@@ -70,8 +65,7 @@ export function changeItemInfo(params) {
         method: 'POST',
         headers:{
           'Content-Type':' application/x-www-form-urlencoded ',
-          TokenID : 'jd'
-        },
+          },
         data: obj
       })
     }
@@ -84,8 +78,7 @@ export function changeItemInfo(params) {
         method: 'POST',
         headers:{
           'Content-Type':' application/x-www-form-urlencoded ',
-          TokenID : 'jd'
-        },
+          },
         data: obj
       })
     }
@@ -97,8 +90,7 @@ export function changeItemInfo(params) {
         method: 'POST',
         headers:{
           'Content-Type':' application/x-www-form-urlencoded ',
-          TokenID : 'jd'
-        },
+          },
         data: obj
       })
     }
@@ -111,7 +103,6 @@ export function changeItemInfo(params) {
       method: 'POST',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: obj
     })
@@ -125,7 +116,6 @@ export function changeItemInfo(params) {
       method: 'POST',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: obj
     })
@@ -139,7 +129,6 @@ export function changeItemInfo(params) {
       method: 'POST',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: obj
     })
@@ -181,7 +170,6 @@ export function changeItemInfo(params) {
       method: 'POST',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: obj
     })
@@ -195,7 +183,6 @@ export function changeItemInfo(params) {
       method: 'POST',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: obj
     })

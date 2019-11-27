@@ -52,19 +52,25 @@
                         </el-form-item>
                         <!-- 主供应商号 -->
                         <el-form-item>
-                            <el-input
-                                placeholder="主供应商号"
-                                v-model="formInline.MainSupplierID"
-                                clearable>
-                            </el-input>
+                            <el-select v-model="formInline.MainSupplierID" placeholder="主供应商">
+                                <el-option
+                                v-for="item in formInline.option1"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <!-- 供应商号 -->
                         <el-form-item>
-                            <el-input
-                                placeholder="供应商号"
-                                v-model="formInline.SupplierID"
-                                clearable>
-                            </el-input>
+                            <el-select v-model="formInline.SupplierID" placeholder="供应商">
+                                <el-option
+                                v-for="item in formInline.option2"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <!-- 购买人姓名 -->
                         <!-- <el-form-item style="width:15vh">
@@ -296,6 +302,7 @@
 <script>
 import { getOrderList,orderDetail,changePayMethod,changePayNum } from "@/api/orderList"
 import qs from 'qs';
+import { SupplierListGetByLevel } from '@/api/goodsList';
 import JsBarcode from 'jsbarcode'
     // const cityOptions = ['待支付', '待分单', '待分配', '待集货','待分拣','待复核','待配送','待自提','取件中','配送中','已收货','已完成','已取消'];
     export default{
@@ -319,6 +326,8 @@ import JsBarcode from 'jsbarcode'
                 
                 
                 formInline:{
+                    option1:[],
+                    option2:[],
                     orderNum:'',            /* 订单号 */
                     memberID:'',            /* 会员号 */
                     MainSupplierID:'',      /* 主供应商号 */
@@ -485,9 +494,65 @@ import JsBarcode from 'jsbarcode'
                 dateTime = getTime.toLocaleString();
                 return dateTime;
             },
+            getMainSupplier(){
+                let params = {
+                    Level:1
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.formInline.option1 = JSON.parse(res.data.Result)
+                        console.log(this.option1)
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            getSupplier(){
+                let params = {
+                    Level:2
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.formInline.option2 = JSON.parse(res.data.Result)
+                        console.log(this.option2)
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
         },
         created(){
             this.getTableData();
+            this.getMainSupplier()
+            this.getSupplier()
         },
         mounted() {
 

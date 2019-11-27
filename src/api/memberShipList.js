@@ -4,11 +4,10 @@ import request from '../utils/request';
 
 /* 会员列表获取 */
 export function getMemberList(obj) {
-    return request({
+    return axios({
       url: '/api/Member/MemberListGet',
       method: 'POST',
       headers:{
-        TokenID:'jd',
         'Content-Type':' application/x-www-form-urlencoded '
       },
       data: obj
@@ -22,7 +21,6 @@ export function resetMemberPsd(obj) {
       url: '/api/Member/MemberChangePassWord',
       method: 'POST',
       headers:{
-        TokenID:'jd',
         'Content-Type':' application/x-www-form-urlencoded '
       },
       data: obj
@@ -36,7 +34,6 @@ export function deleteMember(obj) {
       url: '/api/Member/MemberDelete',
       method: 'POST',
       headers:{
-        TokenID:'jd',
         'Content-Type':' application/x-www-form-urlencoded '
       },
       data: obj

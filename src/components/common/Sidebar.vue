@@ -168,6 +168,22 @@
                                 title: '订单列表'
                             }
                         ]
+                    },
+                    {
+                        icon: 'el-icon-s-tools',
+                        index: '9',
+                        title: '权限管理',
+                        subs: [
+                            {
+                                index: 'application',
+                                title: '应用'
+                            },
+                            
+                            {
+                                index: 'role',
+                                title: '角色'
+                            },
+                        ]
                     }
                 ]
             }

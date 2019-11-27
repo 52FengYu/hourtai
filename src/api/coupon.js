@@ -4,12 +4,11 @@ import request from '../utils/request';
 
 /* 领券活动列表获取 */
 export function MemberGiftTokenGiveOutMasterListGet(params) {
-    return request({
+    return axios({
       url: '/api/Member/MemberGiftTokenGiveOutMasterListGet',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -18,12 +17,11 @@ export function MemberGiftTokenGiveOutMasterListGet(params) {
 
 /* 领券活动主表添加 */
 export function MemberGiftTokenGiveOutMasterAdd(params) {
-    return request({
+    return axios({
       url: '/api/Member/MemberGiftTokenGiveOutMasterAdd',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -32,12 +30,11 @@ export function MemberGiftTokenGiveOutMasterAdd(params) {
 
 /* 修改领券活动主表 */
 export function MemberGiftTokenGiveOutMasterUpdate(params) {
-    return request({
+    return axios({
       url: '/api/Member/MemberGiftTokenGiveOutMasterUpdate',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -46,12 +43,11 @@ export function MemberGiftTokenGiveOutMasterUpdate(params) {
 
 /* 废弃领券活动 */
 export function MemberGiftTokenGiveOutMasterDelete(params) {
-    return request({
+    return axios({
       url: '/api/Member/MemberGiftTokenGiveOutMasterDelete',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -60,12 +56,11 @@ export function MemberGiftTokenGiveOutMasterDelete(params) {
 
 /* 领券活动明细添加 */
 export function MemberGiftTokenGiveOutDetailAdd(params) {
-    return request({
+    return axios({
       url: '/api/Member/MemberGiftTokenGiveOutDetailAdd',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -74,12 +69,11 @@ export function MemberGiftTokenGiveOutDetailAdd(params) {
 
 /* 修改领券明细信息 */
 export function MemberGiftTokenGiveOutDetailUpdate(params) {
-    return request({
+    return axios({
       url: '/api/Member/MemberGiftTokenGiveOutDetailUpdate',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -88,12 +82,11 @@ export function MemberGiftTokenGiveOutDetailUpdate(params) {
 
 /* 删除领券活动明细 */
 export function MemberGiftTokenGiveOutDetailDelete(params) {
-    return request({
+    return axios({
       url: '/api/Member/MemberGiftTokenGiveOutDetailDelete',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -102,12 +95,11 @@ export function MemberGiftTokenGiveOutDetailDelete(params) {
 
 /* 根据领券活动主表ID获取领券活动明细 */
 export function MemberGiftTokenGiveOutDetailListGetFromGiftTokenGiveOutMasterID(params) {
-    return request({
+    return axios({
       url: '/api/Member/MemberGiftTokenGiveOutDetailListGetFromGiftTokenGiveOutMasterID',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -116,12 +108,11 @@ export function MemberGiftTokenGiveOutDetailListGetFromGiftTokenGiveOutMasterID(
 
 /* 领券活动审核 */
 export function MemberGiftTokenGiveOutMasterAudit(params) {
-    return request({
+    return axios({
       url: '/api/Member/MemberGiftTokenGiveOutMasterAudit',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
@@ -130,12 +121,11 @@ export function MemberGiftTokenGiveOutMasterAudit(params) {
 
 /* 停止领券活动 */
 export function MemberGiftTokenGiveOutMasterStop(params) {
-    return request({
+    return axios({
       url: '/api/Member/MemberGiftTokenGiveOutMasterStop',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
-        TokenID : 'jd'
       },
       data: params
     })
