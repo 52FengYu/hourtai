@@ -18,31 +18,8 @@
                                 clearable>
                             </el-input>
                         </el-form-item>
-                        <!-- 选择门店 -->
-                        <!-- <el-form-item >
-                            <el-row class="demo-autocomplete">
-                                <el-col :span="12" style="width:100%">
-                                    <el-autocomplete
-                                    class="inline-input"
-                                    v-model="state1"
-                                    :fetch-suggestions="querySearch"
-                                    placeholder="请选择门店"
-                                    @select="handleSelect"
-                                    style="width:100%"
-                                    ></el-autocomplete>
-                                </el-col>
-                            </el-row>
-                        </el-form-item> -->
                         <!-- 活动类型 -->
                         <el-form-item>
-                            <!-- <el-select v-model="activeTypeValue" clearable placeholder="活动类型">
-                                <el-option
-                                v-for="item in activeType"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                                </el-option>
-                            </el-select> -->
                             <!-- 会员号 -->
                             <el-input
                                 placeholder="会员号"
@@ -72,22 +49,6 @@
                                 </el-option>
                             </el-select>
                         </el-form-item>
-                        <!-- 购买人姓名 -->
-                        <!-- <el-form-item style="width:15vh">
-                            <el-input
-                                placeholder="收货人姓名"
-                                v-model="buyerName"
-                                clearable>
-                            </el-input>
-                        </el-form-item> -->
-                        <!-- 购买人手机号 -->
-                        <!-- <el-form-item>
-                            <el-input
-                                placeholder="收货人手机号"
-                                v-model="buyerMobile"
-                                clearable>
-                            </el-input>
-                        </el-form-item> -->
                         <!-- 收货人姓名 -->
                         <el-form-item>
                             <el-input
@@ -151,10 +112,24 @@
                         <el-switch v-model="formInline.DelFLag"></el-switch>
                     </el-form-item>
                     <el-form-item label="订单状态">
-
+                        <el-select v-model="formInline.OrderState" clearable placeholder="请选择">
+                            <el-option
+                            v-for="item in formInline.OrderStateList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="分单类型">
-
+                        <el-select v-model="formInline.DeliveryType" clearable placeholder="请选择">
+                            <el-option
+                            v-for="item in formInline.DeliveryTypeList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="getTableData">搜索</el-button>
@@ -162,13 +137,6 @@
                         <el-button type="primary" :disabled="true">导出</el-button>
                     </el-form-item>
                 </el-form>
-                <!-- <div class="chackBox">
-                    <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
-                    <div style="margin-right: 15px 0;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-                    <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
-                        <el-checkbox v-for="city in cities" :label="city" :key="city">{{city}}</el-checkbox>
-                    </el-checkbox-group>
-                </div> -->
                 <el-table :data="listData.ModelList" border class="table" ref="multipleTable">
                     <el-table-column prop="ID" label="订单号"  width="80" align=center></el-table-column>
                     <el-table-column prop="DeliveryType" label="分单结果" width="120" align=center></el-table-column>
@@ -304,7 +272,6 @@ import { getOrderList,orderDetail,changePayMethod,changePayNum } from "@/api/ord
 import qs from 'qs';
 import { SupplierListGetByLevel } from '@/api/goodsList';
 import JsBarcode from 'jsbarcode'
-    // const cityOptions = ['待支付', '待分单', '待分配', '待集货','待分拣','待复核','待配送','待自提','取件中','配送中','已收货','已完成','已取消'];
     export default{
         data(){
             return{
@@ -317,9 +284,6 @@ import JsBarcode from 'jsbarcode'
                 currentSize:10,             /* 每页多少条数据 */
                 state1: '',
                 checkAll: false,        /* 复选框 */
-                // checkedCities: ['待支付', '待分单', '待分配', '待集货','待分拣','待复核','待配送','待自提','取件中','配送中','已收货','已完成','已取消'],        /* 复选框相关 */
-                /* cities: cityOptions, */        /* 复选框相关 */
-                // isIndeterminate: true,      /* 复选框相关 */
                 loading: false,     /* 是否有其他任务正在执行 */
                 listData:[],        /* 存放列表数据 */
                 printListData:[],       /* 打印数据 */
@@ -339,6 +303,41 @@ import JsBarcode from 'jsbarcode'
                     timeEnd: '',     /* 时间选择器（下单开结束时间）的value */
                     paymentTimeBegin: '',     /* 时间选择器（支付开始时间）的value */
                     paymentTimeEnd: '',     /* 时间选择器（支付截止时间）的value */
+                    OrderState:'',          /* 订单状态 */
+                    OrderStateList:[
+                        {
+                            value:'N',
+                            label:'新建',
+                        },
+                        {
+                            value:'A',
+                            label:'审核',
+                        },
+                        {
+                            value:'O',
+                            label:'出库',
+                        },
+                        {
+                            value:'R',
+                            label:'确认收货',
+                        }
+                    ],
+                    DeliveryType:'',            /* 分单类型 */
+                    DeliveryTypeList:[
+                        {
+                            value:'SH',
+                            label:'纯门店'
+                        },
+                        {
+                            value:'ST',
+                            label:'纯仓库'
+                        },
+                        {
+                            value:'CP',
+                            label:'集货'
+                        }
+
+                    ],
                     distribution:[{
                         value:'选项1',
                         label:'送货上门',
@@ -351,24 +350,6 @@ import JsBarcode from 'jsbarcode'
             }
         },
         methods:{
-            // 选择门店相关
-            querySearch(queryString, cb) {
-                var restaurants = this.restaurants;
-                var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
-                // 调用 callback 返回建议列表的数据
-                cb(results);
-            },
-            /* 复选框有关 */
-            /* handleCheckAllChange(val) {     
-                this.checkedCities = val ? cityOptions : [];
-                this.isIndeterminate = false;
-            }, */
-            /* 复选框相关 */
-            /* handleCheckedCitiesChange(value) {
-                let checkedCount = value.length;
-                this.checkAll = checkedCount === this.cities.length;
-                this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
-            }, */
             // 订单列表 获取   点击搜索
             getTableData () {
                 let params = {
@@ -397,12 +378,7 @@ import JsBarcode from 'jsbarcode'
                         this.listData = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
@@ -508,10 +484,6 @@ import JsBarcode from 'jsbarcode'
                         console.log("数据请求失败，请重试")
                         console.log(res.data.Result)
                         this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")

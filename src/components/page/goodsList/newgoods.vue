@@ -17,14 +17,16 @@
                 <span>商品图</span>
                 <div>
                     <el-upload
-                        action= '/api/Product/ProductContentImageAdd'
+                        action= '/api/Product/ProductHeadImageAdd'
                         list-type="picture-card"
                         :on-preview="handlePictureCardPreview1"
                         :on-success="handleAvatarSuccess"
                         :on-error="imgUploadError"
                         accept="image/png, image/jpeg"
                         :file-list="fileLists1"
-                        :limit="1"
+                        :multiple = true                    
+                        :headers="TokenID"
+                        :data="upLoadData"
                         :on-progress="upLoadH"
                         :on-remove="handleRemoveH">
                         <i class="el-icon-plus"></i>
@@ -395,7 +397,14 @@ import qs from 'qs';
                 result:[],                   /* 根据统一编码获取到的信息 */
                 option2:[],
                 UniType:'',
-                productOptions:[]           /* 全部分类 */
+                productOptions:[],           /* 全部分类 */
+                upLoadData:{
+                    ImageUseType:'ProductHead'           /*  Page，ProductContent，ProductHead */
+                },
+                TokenID:{
+                    TokenID:sessionStorage.getItem('TokenID'),
+                },
+                HeadPictureUrl:'',                  /* 主图url */
             }
         },
         methods:{
@@ -452,12 +461,13 @@ import qs from 'qs';
                 this.dialogImageUrl = file.url;
                 this.dialogVisible2 = true;
             },
-            handleAvatarSuccess(res, file) {//图片上传成功
-                console.log(res);
+            handleAvatarSuccess(res, file) {                        //图片上传成功调用的方法
+                console.log(JSON.parse(res.Result)[0]);
+                this.HeadPictureUrl = JSON.parse(res.Result)[0]
                 console.log(file);
-                this.imageUrl = URL.createObjectURL(file.raw);
+            
             },
-            imgUploadError(err, file, fileList){//图片上传失败调用
+            imgUploadError(err, file, fileList){                    //图片上传失败调用
                 console.log(err)
                 this.$message.error('上传图片失败!');
             },
@@ -643,7 +653,7 @@ import qs from 'qs';
             },
             upLoadC(){
                 console.log('详情图上传')
-            }
+            },
         },
         created(){
             this.getSupplier()

@@ -1,8 +1,8 @@
 <template>
     <div>
         <el-card>
-            <el-button type="primary" @click="editVisible = true">添加</el-button>
-            <el-button type="primary" @click="editVisible3 = true">关联模块和权限</el-button>
+            <!-- <el-button type="primary" @click="editVisible = true">添加</el-button> -->
+            <el-button type="primary" @click="connectModule">关联模块和权限</el-button>
             <el-table :data="tableData" border style="width: 100%">
                 <el-table-column prop="ID" label="模块权限ID" align="center"></el-table-column>
                 <el-table-column prop="ModuleID" label="模块ID" align="center"></el-table-column>
@@ -58,23 +58,21 @@
         
         <!-- 关联模块和权限弹出框 -->
         <el-dialog title="关联模块和权限" :visible.sync="editVisible3" width="40%">
-            <el-form ref="form" :model="connect" label-width="100px">
-                <el-form-item label="模块权限ID">
-                    <el-input v-model="connect.ID" ></el-input>
-                </el-form-item>
-                <el-form-item label="模块ID">
-                    <el-input v-model="connect.ModuleID"></el-input>
-                </el-form-item>            
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible3 = false">取 消</el-button>
-                <el-button type="primary" @click="connectModule">确 定</el-button>
-            </span>
+            <el-tree
+                :data="limit"
+                ref="tree"
+                show-checkbox
+                node-key="id"
+                default-expand-all
+                :default-checked-keys =  this.AuthorityIDList
+                :props="defaultProps">
+            </el-tree>
+            <el-button type="primary" @click="submit">提交</el-button>
         </el-dialog>
     </div>
 </template>
 <script>
-import { SysAuthorityListGetFromModuleID,SysAuthorityAdd,SysAuthorityUpdate,SysAuthorityModuleRelevant } from '@/api/competence'
+import { SysAuthorityListGetFromModuleID,SysAuthorityAdd,SysAuthorityUpdate,SysAuthorityModuleRelevant,AuthorityListGet,SysRoleSetAuthority } from '@/api/competence'
 import qs from 'qs'
     export default{
         data(){
@@ -93,10 +91,16 @@ import qs from 'qs'
                     AuthorityKey:'',
                     AuthorityName:'',
                 },
-                connect:{
+                Module:{
                     ID:'',
                     ModuleID:''
-                }
+                },
+                limit:[],               /* data */
+                defaultProps: {
+                    children: 'children',
+                    label: 'label'
+                },
+                AuthorityIDList:[],             /* 已经关联的 */
             }
         },
         methods:{
@@ -110,6 +114,10 @@ import qs from 'qs'
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
                         this.tableData = JSON.parse(res.data.Result)
+                        for(var i = 0; i < this.tableData.length; i++){
+                            this.AuthorityIDList.push(this.tableData[i].ID)
+                        }
+                        console.log(JSON.stringify(this.AuthorityIDList))
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
@@ -123,10 +131,10 @@ import qs from 'qs'
                     console.log('出错了')
                 })
             },
-            addModule(){
+            /* addModule(){
                 let params = {
                     ModuleID : this.form.ModuleID,
-                    AuthorityKey:this.form.AuthorityKey,
+                    AuthortyKey:this.form.AuthorityKey,
                     AuthorityName:this.form.AuthorityName
                 }
                 SysAuthorityAdd(qs.stringify(params)).then((res)=>{
@@ -139,7 +147,7 @@ import qs from 'qs'
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
@@ -148,7 +156,7 @@ import qs from 'qs'
                     console.log(e)
                     console.log('出错了')
                 })
-            },
+            }, */
             change(row){
                 console.log(row)
                 this.row.ID = row.ID,
@@ -182,21 +190,44 @@ import qs from 'qs'
                     console.log('出错了')
                 })
             },
-            connectModule(){
+            connectModule(){                /* 关联模块和权限,获取全部的权限数据 */
+                this.editVisible3 = true
+                let params = {}
+                AuthorityListGet(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        console.log(res.data.Result)
+                        this.limit = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            submit(){
+                console.log(JSON.stringify(this.$refs.tree.getCheckedKeys(true)))
                 let params = {
-                    ID:this.connect.ID,
-                    ModuleID:this.connect.ModuleID	
+                    ModuleID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    ID:JSON.stringify(this.$refs.tree.getCheckedKeys(true)),
                 }
                 SysAuthorityModuleRelevant(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
-                        this.$message.success('关联成功')
+                        this.$message.success('提交成功')
                         this.editVisible3 = false
-                        this.getData()
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
@@ -206,7 +237,7 @@ import qs from 'qs'
                     console.log(e)
                     console.log('出错了')
                 })
-            }
+            },
         },
         created(){
             this.getData()

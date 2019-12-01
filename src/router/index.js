@@ -171,7 +171,7 @@ const router = new Router({
                 },
                 {
                     path: '/users',
-                    component: resolve => require(['../components/page/competence/role/users.vue'], resolve),
+                    component: resolve => require(['../components/page/competence/users/index.vue'], resolve),
                     meta: { title: '用户',requireAuth:true }
                 },
                 {
@@ -180,14 +180,19 @@ const router = new Router({
                     meta: { title: '权限',requireAuth:true }
                 },
                 {
+                    path: '/section',
+                    component: resolve => require(['../components/page/competence/section/index.vue'], resolve),
+                    meta: { title: '部门',requireAuth:true }
+                },
+                {
                     path: '/role',
                     component: resolve => require(['../components/page/competence/role/index.vue'], resolve),
                     meta: { title: '角色',requireAuth:true }
                 },
                 {
-                    path: '/operator',
-                    component: resolve => require(['../components/page/competence/operator.vue'], resolve),
-                    meta: { title: '操作员',requireAuth:true }
+                    path: '/authority',
+                    component: resolve => require(['../components/page/competence/authority/index.vue'], resolve),
+                    meta: { title: '权限列表',requireAuth:true }
                 },
                 {
                     path: '/404',

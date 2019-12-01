@@ -1,15 +1,18 @@
 <template>
     <div>
         <el-card>
-            <el-button type="primary" @click="editVisible2 = true">添加</el-button>
+            <el-button type="primary" @click="editVisible = true">添加</el-button>
             <el-table :data="tableData.ModelList" border style="width: 100%">
-                <el-table-column prop="ID" label="部门编号" align="center"></el-table-column>
-                <el-table-column prop="DeptName" label="部门名称" align="center"></el-table-column>
-                <el-table-column prop="CreateTime" label="添加时间" align="center"></el-table-column>
-                <el-table-column fixed="right" label="操作" align="center">
+                <el-table-column prop="ID" label="角色ID" align="center"></el-table-column>
+                <el-table-column prop="RoleName" label="角色名称" align="center"></el-table-column>
+                <el-table-column prop="AuthorityIDList" label="角色对应的模块权限ID列表" align="center">
                     <template slot-scope="scope">
-                        <el-button @click="change(scope.row)" type="text" size="small">修改</el-button>
-                        <el-button @click="detail(scope.row)" type="text" size="small">详情</el-button>
+                        <el-button type="text" @click="show(scope.row)">点击查看</el-button>
+                    </template>
+                </el-table-column>
+                <el-table-column fixed="right" label="操作" width="100">
+                    <template slot-scope="scope">
+                        <el-button @click="handleClick(scope.row)" type="text" size="small">修改</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -18,61 +21,79 @@
                 @current-change="handleCurrentChange"
                 :current-page.sync="PageIndex"
                 :page-size= this.PageSize
-                layout="sizes, prev, pager, next"
                 align="right"
-                :total= tableData.TotalCount>
+                :total= this.tableData.Totalcount>
             </el-pagination>
         </el-card>
+
         
-        <!-- 修改部门信息 -->
-        <el-dialog title="修改部门信息" :visible.sync="editVisible" width="40%">
-            <el-form ref="form" :model="form" label-width="100px">
-                <el-form-item label="部门ID">
-                    <el-input v-model="form.ID" :disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="部门名称">
-                    <el-input v-model="form.DeptName"></el-input>
+        <!-- 新建角色弹出框 -->
+        <el-dialog title="新建角色" :visible.sync="editVisible" width="40%">
+            <el-form ref="form" :model="addRole" label-width="100px">
+                <el-form-item label="角色名称">
+                    <el-input v-model="addRole.RoleName"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="changeInfo">确 定</el-button>
+                <el-button type="primary" @click="addRoles">确 定</el-button>
             </span>
         </el-dialog>
 
-        
-        <!-- 新增部门信息 -->
-        <el-dialog title="新增部门信息" :visible.sync="editVisible2" width="40%">
-            <el-form ref="form" :model="addInfo" label-width="100px">
-                <el-form-item label="部门名称">
-                    <el-input v-model="addInfo.DeptName"></el-input>
+        <!-- 修改角色弹出框 -->
+        <el-dialog title="修改角色" :visible.sync="editVisible2" width="40%">
+            <el-form ref="form" :model="changeRole" label-width="100px">
+                <el-form-item label="角色名称">
+                    <el-input v-model="changeRole.RoleName"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible2 = false">取 消</el-button>
-                <el-button type="primary" @click="add">确 定</el-button>
+                <el-button type="primary" @click="changeRoles">确 定</el-button>
             </span>
+        </el-dialog>
+
+        
+        <!-- 角色弹出框 -->
+        <el-dialog title="权限列表" :visible.sync="editVisible3" width="40%">
+            <el-tree
+                :data="role"
+                ref="tree"
+                show-checkbox
+                node-key="id"
+                default-expand-all
+                :default-checked-keys =  this.AuthorityIDList
+                :props="defaultProps">
+            </el-tree>
+            <el-button type="primary" @click="submit">提交</el-button>
         </el-dialog>
     </div>
 </template>
 <script>
-import { SysDeptListGet,SysDeptUpdate,SysDeptAdd } from '@/api/competence'
+import { SysRoleListGet,SysRoleAdd,SysRoleUpdate,AuthorityListGet,SysRoleSetAuthority } from '@/api/competence'
 import qs from 'qs'
     export default{
         data(){
             return{
-                tableData:[],                    /* 列表数据 */
-                PageIndex:1,
+                tableData:[],               /* 列表数据 */
                 PageSize:10,
-                editVisible:false,              /* 修改 */
-                editVisible2:false,              /* 修改 */
-                form:{
-                    ID:'',  
-                    DeptName:''
+                PageIndex:1,
+                editVisible:false,          /* 新建 */
+                editVisible2:false,          /* 新建 */
+                editVisible3:false,
+                addRole:{
+                    RoleName:'',            /* 新建角色-角色名 */
                 },
-                addInfo:{
-                    DeptName:'',
-                }
+                ID:'',                      /* 存放修改角色的ID */
+                AuthorityIDList:'',
+                changeRole:{
+                    RoleName:''
+                },
+                defaultProps: {
+                    children: 'children',
+                    label: 'label'
+                },
+                role:[],
             }
         },
         methods:{
@@ -81,7 +102,7 @@ import qs from 'qs'
                     PageNo:this.PageIndex,
                     PageSize:this.PageSize,
                 }
-                SysDeptListGet(qs.stringify(params)).then((res)=>{
+                SysRoleListGet(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
@@ -103,29 +124,31 @@ import qs from 'qs'
             handleSizeChange(val) {
                 this.PageSize = val
                 console.log(`每页 ${val} 条`);
+                this.getData()
             },
             handleCurrentChange(val) {
                 this.PageIndex = val
                 console.log(`当前页: ${val}`);
+                this.getData()
             },
-            change(row){
+            handleClick(row){
                 console.log(row)
-                this.editVisible = true
-                this.form.ID = row.ID
-                this.form.DeptName = row.DeptName
+                this.ID = row.ID
+                this.changeRole.RoleName = row.RoleName
+                this.editVisible2 = true
             },
-            changeInfo(){
+            changeRoles(){
                 let params = {
-                    ID:this.form.ID,
-                    DeptName:this.form.DeptName
+                    ID:this.ID,
+                    RoleName:this.changeRole.RoleName
                 }
-                SysDeptUpdate(qs.stringify(params)).then((res)=>{
+                SysRoleUpdate(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
-                        this.$message.success('修改成功')
+                        this.$message.success("修改成功")
+                        this.editVisible2 = false
                         this.getData()
-                        this.editVisible = false
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
@@ -139,22 +162,21 @@ import qs from 'qs'
                     console.log('出错了')
                 })
             },
-            add(){
+            addRoles(){
                 let params = {
-                    DeptName:this.addInfo.DeptName
+                    RoleName:this.addRole.RoleName
                 }
-                SysDeptAdd(qs.stringify(params)).then((res)=>{
+                SysRoleAdd(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
-                        this.$message.success('添加成功')
+                        this.$message.success("角色新建成功")
+                        this.editVisible = false
                         this.getData()
-                        this.editVisible2 = false
-                        this.addInfo.DeptName = ''
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
-                        this.$message(res.data.Result)
+                        console.log(res.data.Result)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
@@ -164,15 +186,59 @@ import qs from 'qs'
                     console.log('出错了')
                 })
             },
-            detail(row){
-                this.$router.push({
-                    path:'/users',
-                    query:{
-                        ID:row.ID
+            show(row){
+                console.log(row)
+                this.editVisible3 = true
+                this.ID = row.ID
+                this.AuthorityIDList = row.AuthorityIDList
+                let params = {}
+                AuthorityListGet(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        console.log(res.data.Result)
+                        this.role = JSON.parse(res.data.Result)
                     }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
                 })
-            }
-        },
+            },
+            submit(){
+                console.log(JSON.stringify(this.$refs.tree.getCheckedKeys(true)))
+                let params = {
+                    RoleID:this.ID,
+                    AuthorityIDS:JSON.stringify(this.$refs.tree.getCheckedKeys(true)),
+                }
+                SysRoleSetAuthority(qs.stringify(params)).then((res)=>{
+                    console.log(res.data)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.$message.success('提交成功')
+                        this.editVisible3 = false
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+
+
+},
         created(){
             this.getData()
         }

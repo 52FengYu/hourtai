@@ -311,3 +311,16 @@ export function SysRoleSetAuthority(params) {
       data: params
     })
   }
+                     
+
+/* 完整权限列表返回 */
+export function AuthorityListGet(params) {
+  return axios({
+    url: 'http://128.192.80.135:8030/Api/User/AuthorityListGet',
+    method: 'post',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded ',
+    },
+    data: params
+  })
+}

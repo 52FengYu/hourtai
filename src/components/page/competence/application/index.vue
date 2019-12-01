@@ -150,10 +150,12 @@ import qs from 'qs'
             handleSizeChange(val) {
                 this.PageSize = val;
                 console.log(`每页 ${val} 条`);
+                this.getLIst()
             },
             handleCurrentChange(val) {
                 this.PageIndex = val;
                 console.log(`当前页: ${val}`);
+                this.getLIst()
             },
             save(){
                 let params = {

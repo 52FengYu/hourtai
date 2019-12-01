@@ -7,8 +7,8 @@
                 </el-form-item>
             </el-form>
             <el-table :data="tableData.ModelList"  border style="width: 100%">
-                <el-table-column prop="AppID" label="AppID" align="center"></el-table-column>
-                <el-table-column prop="ID" label="模块ID" align="center"></el-table-column>
+               <!--  <el-table-column prop="AppID" label="AppID" align="center"></el-table-column>
+                <el-table-column prop="ID" label="模块ID" align="center"></el-table-column> -->
                 <el-table-column prop="ModuleName" label="模块名称" align="center"></el-table-column>
                  <el-table-column fixed="right" label="操作" align="center">
                 <template slot-scope="scope">
@@ -112,10 +112,12 @@ import qs from 'qs'
             handleSizeChange(val) {
                 this.PageSize = val
                 console.log(`每页 ${val} 条`);
+                this.getData()
             },
             handleCurrentChange(val) {
                 this.currentPage2 = val
                 console.log(`当前页: ${val}`);
+                this.getData()
             },
             addApp(){
                 let params = {
@@ -154,7 +156,7 @@ import qs from 'qs'
                 SysModuleUpdate(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
-                        this.message.success("修改成功")
+                        this.$message.success("修改成功")
                         this.editVisible2 = false
                         this.getData()
                     }

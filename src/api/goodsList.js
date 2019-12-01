@@ -287,3 +287,18 @@ export function changeProduct(obj) {
       data: obj
     })
   }
+  
+  
+
+  /* 上传图片 */
+  export function UploadImage(obj) {
+    return axios({
+      url: '/api/Image/UploadImage',
+      method: 'POST',
+      headers:{
+        'Content-Type':' application/x-www-form-urlencoded ',
+        'TokenID':SessionStorage.getItem('TokenID')
+      },
+      data: obj
+    })
+  }

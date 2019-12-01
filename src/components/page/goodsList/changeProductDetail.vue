@@ -2,27 +2,19 @@
     <div>
         <el-form ref="form" :model="form" label-width="120px">
             <el-form-item label="商品主图">
-                <!-- <template>
-                    <el-image
-                        class="table-td-HeadImageURL"
-                        :src="HeadImage[0].ImageURL"
-                        :preview-src-list="[HeadImage]"
-                        action="/api/Product/ProductHeadImageAdd"
-                        list-type="picture-card"
-                        :on-preview="handlePictureCardPreviewH"             
-                        :on-remove="handleRemoveH">                                  
-                        <i class="el-icon-plus"></i>  -->       <!-- on-preview 点击文件列表中已上传的文件时的钩子 -->  <!-- on-remove	文件列表移除文件时的钩子 -->
-                    <!-- ></el-image> -->
-                <!-- </template> -->
                 <el-upload
-                    action="/api/Product/ProductHeadImageAdd"
+                    action="/api/Image/UploadImage"
                     class="table-td-HeadImageURL"
                     :src="HeadImage.ImageURL"
                     :preview-src-list="[HeadImage]"
                     list-type="picture-card"
                     :file-list="fileLists1"
-                    :on-preview="handlePictureCardPreviewH"             
+                    :on-preview="handlePictureCardPreviewH" 
+                    :on-success="HeadImageSuccess"            
                     :on-remove="handleRemoveH"
+                    :headers="TokenID"
+                    :data="upLoadData"
+                    :limit="1"
                     >
                     <i class="el-icon-plus"></i>
                 </el-upload>
@@ -31,26 +23,18 @@
                 </el-dialog>
             </el-form-item>
              <el-form-item label="商品详情图">
-                <!--<template>
-                    <el-image
-                        class="table-td-ContentImageURL"
-                        action="/api/Product/ProductHeadImageAdd"
-                        :src="ContentImage.ImageURL"
-                        list-type="picture-card"
-                        :preview-src-list="[ContentImage]"
-                        :on-preview="handlePictureCardPreviewC"             
-                        :on-remove="handleRemoveC"
-                    ></el-image>
-                </template>-->
                 <el-upload
-                    action="/api/Product/ProductHeadImageAdd"
+                    action="/api/Image/UploadImage"
                     class="table-td-HeadImageURL"
                     :src="ContentImage"
                     :preview-src-list="[ContentImage]"
                     list-type="picture-card"
                     :file-list="fileLists2"
                     :on-preview="handlePictureCardPreviewC"             
+                    :on-success="ContentImageSuccess" 
                     :on-remove="handleRemoveC"
+                    :headers="TokenID"
+                    :data="upLoadContentData"
                     >
                     <i class="el-icon-plus"></i>
                 </el-upload>
@@ -130,7 +114,7 @@
     </div>
 </template>
 <script>
-import { changeProduct,getProductDetail,delPicture,delDetailMap } from "@/api/goodsList"
+import { changeProduct,getProductDetail,delPicture,delDetailMap,addPicture,AddDetailMap } from "@/api/goodsList"
 import qs from 'qs';    
     export default{
         data(){
@@ -166,7 +150,17 @@ import qs from 'qs';
                 dialogImageUrlC: '',
                 dialogVisibleC: false,
                 fileLists1:[],
-                fileLists2:[]
+                fileLists2:[],
+                upLoadData:{
+                    ImageUseType:'ProductHead'           /*  Page，ProductContent，ProductHead */
+                },
+                upLoadContentData:{
+                    ImageUseType:'ProductContent'
+                },
+                TokenID:{
+                    TokenID:sessionStorage.getItem('TokenID'),
+                },
+                HeadPictureUrl:'',                  /* 主图url */
             }
         },methods:{
             getData(){
@@ -191,6 +185,16 @@ import qs from 'qs';
                         if(this.ContentImage != null){
                             for( var i = 0; i < this.ContentImage.length ; i++){
                                 this.fileLists2.push({url: 'http://images.liqunshop.com/' + this.ContentImage[i].ImageURL})
+                            }
+                        }
+                        console.log(this.fileLists2)
+                        for(var i = 0; i < this.ContentImage.length; i ++){
+                            for( var k = 0; k < this.fileLists2.length; k++){
+                                if(i == k){
+                                    this.fileLists2[k].ID = this.ContentImage[i].ID
+                                    console.log(this.fileLists2[k])
+                                    console.log(this.ContentImage[i].ID)
+                                }
                             }
                         }
                         console.log(this.fileLists2)
@@ -297,20 +301,130 @@ import qs from 'qs';
                 this.formInline.UnitID = '',
                 this.formInline.Weight = ''
             },
-            handleRemoveH(file, fileList) {                  /* 移除时调用的钩子，删除图片 */
-                console.log(file, fileList);
+            handleRemoveH(res,file, fileList) {                  /* 移除主图时调用的钩子，删除图片 */
+                console.log(res,file, fileList);
+                let params = {
+                    ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
+                    ID:this.HeadImage[0].ID
+                }
+                delPicture(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.$message.success('主图删除成功')
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+
             },
             handlePictureCardPreviewH(file) {                /* 点击文件列表中已上传的文件时的钩子 */
                 this.dialogImageUrl = file.url;
                 this.dialogVisible = true;
             },
-            handleRemoveC(file, fileList) {                  /* 移除时调用的钩子，删除图片 */
-                console.log(file, fileList);
+            handleRemoveC(file, fileList) {                  /* 移除详情图时调用的钩子，删除图片 */
+                console.log(file);
+                console.log(fileList)
+                console.log(this.fileLists2)
+                let params = {
+                    ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
+                    ID:file.ID
+                }
+                delDetailMap(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.$message.success('详情图删除成功')
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
             },
             handlePictureCardPreviewC(file) {                /* 点击文件列表中已上传的文件时的钩子 */
                 this.dialogImageUrl = file.url;
                 this.dialogVisible = true;
-            }
+            },
+            HeadImageSuccess(res,file){
+                console.log(res)
+                console.log(JSON.parse(res.Result)[0])
+                let params = {
+                    ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
+                    ImageURL:JSON.parse(res.Result)[0],
+                    ImageIndex:1
+                }
+                addPicture(qs.stringify(params)).then((res)=>{
+                    console.log(res.data.Result)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.$message.success('主图添加成功')
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            ContentImageSuccess(res,file){
+                console.log(JSON.parse(res.Result)[0])
+                console.log(this.fileLists2.length)
+                console.log(res)
+                console.log(file)
+                let params = {
+                    ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
+                    ImageURL:JSON.parse(res.Result)[0],
+                    ImageIndex:this.fileLists2.length
+                }
+                AddDetailMap(qs.stringify(params)).then((res)=>{
+                    console.log(res.data.Result)
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.$message.success('上传成功')
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
         },
         created(){
             this.getData()

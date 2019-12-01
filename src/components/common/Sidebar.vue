@@ -178,11 +178,22 @@
                                 index: 'application',
                                 title: '应用'
                             },
-                            
+                            {
+                                index: 'section',
+                                title: '部门'
+                            },
+                            {
+                                index: 'users',
+                                title: '用户'
+                            },
                             {
                                 index: 'role',
                                 title: '角色'
                             },
+                            {
+                                index:'authority',
+                                title:'权限列表'
+                            }
                         ]
                     }
                 ]
