@@ -28,7 +28,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="editVisible2 = false">取 消</el-button>
                 <el-button type="primary" @click="addModule">确 定</el-button>
             </span>
         </el-dialog>
@@ -47,7 +47,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible2 = false">取 消</el-button>
+                <el-button @click="editVisible = false">取 消</el-button>
                 <el-button type="primary" @click="fixModule">确 定</el-button>
             </span>
         </el-dialog>

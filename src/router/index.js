@@ -146,7 +146,7 @@ const router = new Router({
                 },
                 {
                     path: '/activeList',
-                    component: resolve => require(['../components/page/activeList.vue'], resolve),
+                    component: resolve => require(['../components/page/activeList/index.vue'], resolve),
                     meta: { title: '活动列表',requireAuth:true }
                 },
                 {
@@ -193,6 +193,16 @@ const router = new Router({
                     path: '/authority',
                     component: resolve => require(['../components/page/competence/authority/index.vue'], resolve),
                     meta: { title: '权限列表',requireAuth:true }
+                },
+                {
+                    path: '/map1',
+                    component: resolve => require(['../components/page/goodsList/map1.vue'], resolve),
+                    meta: { title: '地图1',requireAuth:true }
+                },
+                {
+                    path: '/place',
+                    component: resolve => require(['../components/page/goodsList/place.vue'], resolve),
+                    meta: { title: '地图',requireAuth:true }
                 },
                 {
                     path: '/404',

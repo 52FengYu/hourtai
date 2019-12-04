@@ -1,5 +1,4 @@
 import axios from "axios"
-import request from '../utils/request'; 
 
 
 /* 订单列表获取 */

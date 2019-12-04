@@ -94,6 +94,7 @@ import qs from 'qs'
                     label: 'label'
                 },
                 role:[],
+                choose:'',                  /* 当前已选中的 */
             }
         },
         methods:{
@@ -107,11 +108,10 @@ import qs from 'qs'
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         this.tableData = JSON.parse(res.data.Result)
-                        console.log(this.tableData)
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
@@ -152,7 +152,7 @@ import qs from 'qs'
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
@@ -176,7 +176,7 @@ import qs from 'qs'
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
@@ -201,7 +201,7 @@ import qs from 'qs'
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
@@ -212,10 +212,18 @@ import qs from 'qs'
                 })
             },
             submit(){
-                console.log(JSON.stringify(this.$refs.tree.getCheckedKeys(true)))
+                console.log(this.$refs.tree.getCheckedKeys(true))
+                const tree = JSON.stringify(this.$refs.tree.getCheckedKeys(true))
+                let reg=new RegExp(',','g')//g代表全部
+                let newMsg=tree.replace(reg,'|');
+                console.log(newMsg)
+                var deleteY = newMsg.substring(1, newMsg.length - 1);
+                console.log(deleteY)
+                let reg1=new RegExp('"','g')//g代表全部
+                let newMsg1=deleteY.replace(reg1,'');
                 let params = {
                     RoleID:this.ID,
-                    AuthorityIDS:JSON.stringify(this.$refs.tree.getCheckedKeys(true)),
+                    AuthorityIDS:newMsg1,
                 }
                 SysRoleSetAuthority(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
@@ -223,10 +231,11 @@ import qs from 'qs'
                         console.log("数据请求成功")
                         this.$message.success('提交成功')
                         this.editVisible3 = false
+                        this.getData()
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")

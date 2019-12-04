@@ -412,11 +412,11 @@ export default {
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
-                        this.$message('向上移动设置成功');
+                        this.$message.Success('向上移动设置成功');
                         this.reload()
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -999){
                         console.log("用户未登录")
@@ -442,11 +442,11 @@ export default {
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
                         console.log(JSON.parse(res.data.Result))
-                        this.$message('向下移动设置成功');
+                        this.$message.success('向下移动设置成功');
                         this.reload()
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -999){
                         console.log("用户未登录")

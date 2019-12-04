@@ -230,7 +230,7 @@ import qs from 'qs'
             }
         },
         created(){
-             
+             this.getLIst()
         }
     }
 </script>  

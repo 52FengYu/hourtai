@@ -5,11 +5,10 @@ import axios from 'axios';
 // import VueAxios from 'vue-axios';
 import VueResource from 'vue-resource';
 import ElementUI from 'element-ui';
-import VueI18n from 'vue-i18n';
-import { messages } from './components/common/i18n';
+// import VueI18n from 'vue-i18n';
 import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 import './assets/css/icon.css';
-import './components/common/directives';
+// import './components/common/directives';
 import "babel-polyfill";
 import md5 from 'js-md5';
 import Print from '@/utils/print.js'
@@ -21,7 +20,7 @@ Vue.config.productionTip = false
 
 Vue.prototype.$md5 = md5;
 
-Vue.use(VueI18n);
+// Vue.use(VueI18n);
 Vue.use(VueResource);
 Vue.use(axios)
 Vue.use(Print);
@@ -32,10 +31,10 @@ Vue.use(ElementUI, {
 Vue.prototype.$axios = axios;
 // Vue.prototype.$http = axios;
 
-const i18n = new VueI18n({
+/* const i18n = new VueI18n({
     locale: 'zh',
     messages
-})
+}) */
 
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
@@ -68,6 +67,6 @@ router.beforeEach((to, from, next) => {
 
 new Vue({
     router,
-    i18n,
+    // i18n,
     render: h => h(App)
 }).$mount('#app')

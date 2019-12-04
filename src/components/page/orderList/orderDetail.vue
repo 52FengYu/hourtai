@@ -338,10 +338,6 @@ inject:['reload'];
                         console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
                         console.log("请求错误")
                     }
@@ -421,8 +417,8 @@ inject:['reload'];
                 })
             },
             Reverse(){
-                var address = encodeURI("山东省青岛市李沧区","UTF-8") 
-                var url = "http://apis.map.qq.com/ws/geocoder/v1";
+                var address = "山东省青岛市李沧区"
+                var url = "/direction";
                 var param= {params:{
                     'key':"F4ZBZ-6C2CK-BVGJG-APW5U-7XOYE-TRBUX",
                     'address':address,
@@ -434,13 +430,10 @@ inject:['reload'];
                     url,
                     param
                 ).then(function (data) {
-                    callBackFunc(data.data);
                     console.log(data)
                 }).catch(function (e) {
                     console.log(e)
                 });
-
-
             }
         },
         mounted(){

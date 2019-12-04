@@ -10,7 +10,7 @@ module.exports = {
     chainWebpack: () => { },
     configureWebpack: () => { },
     // 生产环境是否生成 sourceMap 文件
-    productionSourceMap: true,
+    productionSourceMap: false,
     // css相关配置
     css: {
         // 是否使用css分离插件 ExtractTextPlugin
@@ -29,13 +29,20 @@ module.exports = {
     devServer: {
         open: true,
         host: '127.0.0.1',
-        port: 8080,
+        port: 8081,
         https: false,
         hotOnly: false,
         proxy: {
             '/api':{
-                target:'http://128.192.80.135',                 /* http://128.192.80.135:8030 */
-                // target:'http://128.192.80.135:8030',
+                target:'http://128.192.80.135/api',                 /* http://128.192.80.135:8030 */
+                //target:'http://128.192.80.135:8030',
+                changeOrigin:true,
+                pathRewrite:{
+                    '/api':''
+                }
+            },
+            '/direction':{
+                target:'https://apis.map.qq.com/ws/geocoder/v1/',                 
                 changeOrigin:true,
                 pathRewrite:{
                     '/api':''
@@ -44,6 +51,11 @@ module.exports = {
         }, // 设置代理
         before: app => { }
     },
+    configureWebpack: {
+        externals: {
+          'AMap': 'AMap' // 高德地图配置
+        }
+      },
     // 第三方插件配置
     pluginOptions: {
         // ...

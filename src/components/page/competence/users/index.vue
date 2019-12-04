@@ -428,16 +428,21 @@ import qs from 'qs'
             },
             submit(){                   /* 用户绑定角色 */
                 console.log(JSON.stringify(this.$refs.tree.getCheckedKeys()))
+                const tree = JSON.stringify(this.$refs.tree.getCheckedKeys(true))
+                let reg=new RegExp(',','g')//g代表全部
+                let newMsg=tree.replace(reg,'|');
+                var deleteY = newMsg.substring(1, newMsg.length - 1);
+                let reg1=new RegExp('"','g')//g代表全部
+                let newMsg1=deleteY.replace(reg1,'');
                 let params = {
                     ID:this.ID,
-                    RoleIDS:JSON.stringify(this.$refs.tree.getCheckedKeys())
+                    RoleIDS:newMsg1
                 }
                 SysUserSetRole(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
                         console.log("数据请求成功")
-                        this.role =  JSON.parse(res.data.Result).ModelList
-                        console.log(this.role)
+                        this.$message.success('提交成功')
+                        this.getData()
                         this.editVisible3 = false
                     }
                     if(res.data.Success == 0){

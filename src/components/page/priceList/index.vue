@@ -10,10 +10,24 @@
     <div class="container">
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item label="主供应商号">
-          <el-input v-model="formInline.MainSupplierID" placeholder="主供应商号"></el-input>
+          <el-select v-model="formInline.MainSupplierID" placeholder="主供应商">
+              <el-option
+                  v-for="item in formInline.option1"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                  </el-option>
+              </el-select>
         </el-form-item>
         <el-form-item label="供应商号">
-          <el-input v-model="formInline.SupplierID" placeholder="供应商号"></el-input>
+          <el-select v-model="formInline.SupplierID" placeholder="供应商">
+              <el-option
+                  v-for="item in formInline.option2"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                  </el-option>
+              </el-select>
         </el-form-item>
         <el-form-item label="全部审核状态">
           <el-select v-model="formInline.region" placeholder="全部审核状态">
@@ -155,7 +169,7 @@
       </div>
 </template>
 <script>
-import { changePriceList,PriceAdjustmentReview,ProductPriceAdjustment,ProductPriceChange,StopPriceAdjustment,PriceAdjustment } from '@/api/goodsList';
+import { changePriceList,PriceAdjustmentReview,ProductPriceAdjustment,ProductPriceChange,StopPriceAdjustment,PriceAdjustment,SupplierListGetByLevel } from '@/api/goodsList';
 import qs from 'qs'
   export default {
     data() {
@@ -171,6 +185,8 @@ import qs from 'qs'
           region: "",
           timeStart:'',                    /* 时间选择器开始 */
           timeEnd:'',                     /* 时间选择器结束 */
+          option1:[],
+          option2:[]
         },
         form: {
           AuditRemark: "",               /* 审核备注 */
@@ -411,10 +427,66 @@ import qs from 'qs'
             this.discard1()
         })
         .catch(() => {});
-      }
+      },
+      getMainSupplier(){
+                let params = {
+                    Level:1
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.formInline.option1 = JSON.parse(res.data.Result)
+                        console.log(this.formInline.option1)
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            getSupplier(){
+                let params = {
+                    Level:2
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        console.log("数据请求成功")
+                        this.formInline.option2 = JSON.parse(res.data.Result)
+                        console.log(this.formInline.option2)
+                    }
+                    if(res.data.Success == 0){
+                        console.log("数据请求失败，请重试")
+                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -999){
+                        console.log("用户未登录")
+                        console.log(res.data)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            }
     },
     created(){
       this.getData()
+      this.getMainSupplier()
+      this.getSupplier()
     }
   }
 </script>  

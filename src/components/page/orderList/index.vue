@@ -156,7 +156,11 @@
                     <el-table-column prop="DiscountMoney" label="优惠金额"  width="150" align=center></el-table-column>
                     <el-table-column prop="PayTime" label="支付时间" width="180" align=center></el-table-column>
                     <el-table-column prop="OutStockAddPrice" label="出库增加金额"  align=center></el-table-column>
-                    <el-table-column prop="IsOutStockAddPricePay" label="出库增加金额是否支付" width="180" align=center></el-table-column>
+                    <el-table-column label="出库增加金额是否支付" width="180" align=center>
+                        <template slot-scope="scope">
+                            {{scope.row.IsOutStockAddPricePay === 'Y' ? '是' : '否'}}
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作" width="180" align="center" fixed="right">
                         <template slot-scope="scope">
                             <el-button type="text" icon="el-icon-edit" @click="print(scope.$index, scope.row);show()">打印</el-button>
