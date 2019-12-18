@@ -8,19 +8,22 @@
         <div class="container">
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
                 <el-form-item label="品牌名称">
-                    <el-input v-model="formInline.name" placeholder="请输入品牌名称"></el-input>
+                    <el-input v-model="formInline.BrandName" placeholder="请输入品牌名称" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="品牌ID">
+                    <el-input v-model="formInline.ID" placeholder="请输入品牌ID" clearable></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="onSubmit">搜索</el-button>
-                    <el-button type="primary" @click="clear">重置</el-button>
-                    <el-button type="primary" ><router-link to="addBrand">新增品牌</router-link></el-button>
+                    <el-button type="primary" @click="getData">搜索</el-button>
+                    <el-button type="primary" @click="addVisible = true">新增品牌</el-button>
                 </el-form-item>
             </el-form>
-            <el-table :data="tableData" border style="width: 100%"> 
-                <el-table-column prop="China" label="品牌中文名" width="200" align="center"></el-table-column> 
-                <el-table-column prop="English" label="品牌英文名" width="200" align="center"></el-table-column> 
-                <el-table-column prop="ascription" label="归属地" width="200" align="center"></el-table-column> 
-                <el-table-column prop="logo" label="品牌logo" width="200" align="center"></el-table-column> 
+            <el-table :data="tableData.ModelList" border style="width: 100%"> 
+                <el-table-column prop="ID" label="品牌编号" width="200" align="center"></el-table-column> 
+                <el-table-column prop="BrandName" label="品牌名称" width="200" align="center"></el-table-column> 
+                <el-table-column prop="LiQunCode" label="利群内部系统编号" width="200" align="center"></el-table-column> 
+                <el-table-column prop="SearchCoefficient" label="搜索加权系数" width="200" align="center"></el-table-column> 
+                <el-table-column prop="Remark" label="备注" width="200" align="center"></el-table-column>
                 <el-table-column fixed="right" label="操作" align="center"> 
                     <template slot-scope="scope">
                         <el-button @click="handleClick(scope.row)" type="text">编辑</el-button>
@@ -31,51 +34,168 @@
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
                 :current-page="currentPage4"
-                :page-sizes="[100, 200, 300, 400]"
-                :page-size="100"
+                :page-size= this.PageSize
                 layout="total, sizes, prev, pager, next, jumper"
-                :total="400"
+                :total= this.tableData.TotalCount
                 style="text-align:right">
             </el-pagination>
         </div>
+
+        <!-- 修改品牌 -->
+         <el-dialog title="修改品牌" :visible.sync="editVisible" width="40%">
+                <el-form ref="form" :model="row" label-width="80px">
+                    <el-form-item label="品牌名称">
+                        <el-input v-model="row.BrandName"></el-input>
+                    </el-form-item>
+                    <el-form-item label="利群内部品牌编码">
+                        <el-input v-model="row.LiQunCode" ></el-input>
+                    </el-form-item>
+                    <el-form-item label="搜索加权系数">
+                        <el-input v-model="row.SearchCoefficient" ></el-input>
+                    </el-form-item>
+                    <el-form-item label="备注">
+                        <el-input v-model="row.Remark" ></el-input>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="editVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="onSubmit">确 定</el-button>
+                </span>
+            </el-dialog>
+            
+            <!-- 添加品牌 -->
+            <el-dialog title="添加品牌" :visible.sync="addVisible" width="40%">
+                <el-form ref="form" :model="addBand" label-width="80px">
+                    <el-form-item label="品牌名称">
+                        <el-input v-model="addBand.BrandName"></el-input>
+                    </el-form-item>
+                    <el-form-item label="利群内部品牌编码">
+                        <el-input v-model="addBand.LiQunCode" ></el-input>
+                    </el-form-item>
+                    <el-form-item label="搜索加权系数">
+                        <el-input v-model="addBand.SearchCoefficient" ></el-input>
+                    </el-form-item>
+                    <el-form-item label="备注">
+                        <el-input v-model="addBand.Remark" ></el-input>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="addVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="Submit">确 定</el-button>
+                </span>
+            </el-dialog>
     </div>
 </template>
 <script>
+import { BaseBrandListGet,BaseBrandAdd,BaseBrandUpdate } from '@/api/common'
+import qs from 'qs'
     export default{
         data(){
             return{
-                currentPage4: 4,        /* 分页用 */
+                currentPage4: 1,        /* 分页用 */
                 formInline:{
-                    name:"",            /* 品牌名称 */
+                    BrandName:"",            /* 品牌名称 */
+                    ID:'',                     /* 品牌编号 */
                 },
-                tableData:[{
-                    China:'3213',           /* 品牌中文名 */
-                    English:'354165',         /* 品牌英文名 */
-                    ascription:'65496',      /* 归属地 */
-                    logo:'224654',            /* 品牌logo */
-                },{
-                    China:'123',
-                    English:'34354354534',
-                    ascription:'741',
-                    logo:'123',
-                },{
-                    China:'123',
-                    English:'34354354534',
-                    ascription:'741',
-                    logo:'123',
-                }]
+                tableData:[],
+                PageSize:10,
+                row:[],          /* 点击修改时的数据存放 */
+                editVisible:false,               /* 修改品牌 */
+                addVisible:false,               /* 添加品牌 */
+                addBand:{
+                    BrandName:'',
+                    LiQunCode:'',
+                    Remark:'',
+                    SearchCoefficient:''
+                }
             }
         },
         methods:{
             handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
+                this.PageSize = val
+                this.getData()
             },
             handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+                this.currentPage4 = val
+                this.getData()
             },
             clear(){
-                this.formInline.name=""
+                this.formInline.BrandName=""
+                this.formInline.ID = ''
+            },
+            getData(){
+                let params = {
+                    BrandName:this.formInline.BrandName,
+                    ID:this.formInline.ID,
+                    PageIndex:this.currentPage4,
+                    PageSize:this.PageSize
+                }
+                BaseBrandListGet(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.tableData = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            handleClick(row){                   /* 编辑 */
+                this.row = row
+                this.editVisible = true
+            },
+            onSubmit(){                 /* 修改品牌 */
+                let params = {
+                    ID:this.row.ID,
+                    BrandName:this.row.BrandName,
+                    LiQunCode:this.row.LiQunCode,
+                    Remark:this.row.Remark,
+                    SearchCoefficient:this.row.SearchCoefficient
+                }
+                BaseBrandUpdate(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.editVisible = false
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            Submit(){               /* 添加品牌 */
+                let params = {
+                    BrandName:this.addBand.BrandName,
+                    LiQunCode:this.addBand.LiQunCode,
+                    Remark:this.addBand.Remark,
+                    SearchCoefficient:this.addBand.SearchCoefficient
+                }
+                BaseBrandAdd(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.addVisible = false
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
             }
+        },
+        created(){
+            this.getData()
         }
     }
 </script>

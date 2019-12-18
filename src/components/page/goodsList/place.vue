@@ -1,7 +1,7 @@
 <template>
     <div id="all">
-    <input type="text" id="suggestId" name="address_detail" placeholder="地址" v-model="address_detail" class="input_style">
-    <div id="allmap"></div>
+        <el-input type="text" id="suggestId" name="address_detail" placeholder="地址" v-model="address_detail" class="input_style"></el-input>
+        <div id="allmap"></div>
     </div>
 </template>
 <script>
@@ -15,7 +15,6 @@
        },
        mounted(){
            this.$nextTick(function () {
-
                    var th = this
                    // 创建Map实例
                    var map = new BMap.Map("allmap");
@@ -25,8 +24,8 @@
                    map.enableScrollWheelZoom();
                    var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
                        {
-                           "input": "suggestId"
-                           , "location": map
+                        "input": "suggestId",
+                         "location": map
                        })
                    var myValue
                    ac.addEventListener("onconfirm", function (e) {    //鼠标点击下拉列表后的事件

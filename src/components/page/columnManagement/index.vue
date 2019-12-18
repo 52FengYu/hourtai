@@ -7,19 +7,8 @@
         </div>
         <div class="container">
             <el-form :inline="true" :model="formInline" class="demo-form-inline" >
-                <el-form-item label="类型">
-                    <el-select v-model="formInline.ID" placeholder="请选择类型" clearable>
-                        <el-option
-                            v-for="item in formInline.options"
-                            :key="item.ID"
-                            :label="item.PageTypeName"
-                            :value="item.ID"
-                        >
-                        </el-option>
-                    </el-select>
-                </el-form-item>
                 <el-form-item label="主供应商号">
-                    <el-select v-model="formInline.MainSupplierID" placeholder="主供应商" clearable >
+                    <el-select v-model="formInline.MainSupplierID" placeholder="主供应商" filterable clearable  @change="getSupplierList">
                         <el-option
                         v-for="item in option1"
                         :key="item.value"
@@ -29,7 +18,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="供应商号">
-                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable >
+                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable>
                         <el-option
                         v-for="item in option2"
                         :key="item.value"
@@ -38,14 +27,25 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="页面类型编号">
-                    <el-input v-model="formInline.PageTypeID" placeholder="非必填"></el-input>
+                <el-form-item label="页面类型">
+                    <el-select v-model="formInline.PageTypeID" placeholder="请选择类型" clearable>
+                        <el-option
+                            v-for="item in formInline.options"
+                            :key="item.ID"
+                            :label="item.PageTypeName"
+                            :value="item.ID"
+                        >
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="页面编号">
+                    <el-input v-model="formInline.ID" placeholder="非必填"></el-input>
                 </el-form-item>
                 <el-form-item label="页面名称">
                     <el-input v-model="formInline.PageName" placeholder="非必填"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="search">搜索</el-button>
+                    <el-button type="primary" @click="getData">搜索</el-button>
                     <el-button type="primary" @click="clear">重置</el-button>
                     <el-button type="primary" @click="AddPage">添加</el-button>
                 </el-form-item>
@@ -57,38 +57,44 @@
                 class="table"
                 header-cell-class-name="table-header"
             >
-                <el-table-column prop="ID" label="ID" width="300" align="center"></el-table-column>
-                <el-table-column prop="PageName" label="名称" width="300" align="center"></el-table-column>
-                <el-table-column prop="PageTypeID" label="所属类型" width="300" align="center">
-                </el-table-column>
-                <el-table-column label="操作" align="center" fixed="right" min-width="150">
+                <el-table-column prop="ID" label="ID" align="center"></el-table-column>
+                <el-table-column prop="PageName" label="页面名称" align="center"></el-table-column>
+                <el-table-column prop="MainSupplierID" label="主供应商号" align="center"></el-table-column>
+                <el-table-column prop="SupplierID" label="供应商号" align="center"></el-table-column>
+                <el-table-column prop="PageTypeID" label="所属类型" align="center"></el-table-column>
+                <el-table-column prop="BackgroundColor" label="背景色" align="center"></el-table-column>
+                <el-table-column prop="CreateManID" label="创建人" align="center"></el-table-column>
+                <el-table-column prop="CreateTime" label="创建时间" align="center"></el-table-column>
+                <el-table-column prop="LastUpdateManID" label="修改人" align="center"></el-table-column>
+                <el-table-column prop="LastUpdateTime" label="修改时间" align="center"></el-table-column>
+                <el-table-column label="操作" align="center" fixed="right">
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" plain @click="handleEdit(scope.$index,scope.row)">修改</el-button>
-                        <el-button type="primary" icon="el-icon-s-tools" @click="changeColu(scope.$index,scope.row);goPage()">修改栏目</el-button>
+                        <el-button type="primary" icon="el-icon-s-tools" @click="changeColu(scope.$index,scope.row);goPage()">修改页面</el-button>
                     </template>
                 </el-table-column>
             </el-table>
             <el-pagination
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :current-page.sync="currentPage1"
-                :page-size="10"
+                :current-page.sync="PageIndex"
+                :page-size= this.PageSize
                 layout="total, prev, pager, next"
-                :total="total"
+                :total= this.total
                 style="text-align:right">
             </el-pagination>
         </div>
          <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
             <el-form ref="form" :model="form" label-width="70px">
-                <el-form-item label="ID">
+                <!-- <el-form-item label="ID">
                     <el-input v-model="this.forms.ID" :disabled="true"></el-input>
+                </el-form-item> -->
+                <el-form-item label="页面名称">
+                    <el-input v-model="form.pageName"></el-input>
                 </el-form-item>
                 <el-form-item label="背景颜色">
                     <el-input v-model="form.backgroundColor"></el-input>
-                </el-form-item>
-                <el-form-item label="页面名称">
-                    <el-input v-model="form.pageName"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -97,22 +103,46 @@
             </span>
         </el-dialog>
          <!-- 新增页面弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible2" width="50%">
-            <el-form ref="form" :model="addPage" label-width="70px">
+        <el-dialog title="新建" :visible.sync="editVisible2" width="45%">
+            <el-form ref="form" :model="addPage" label-width="120px" :inline="true">
                 <el-form-item label="页面名称（必填）">
                     <el-input v-model="addPage.PageName"></el-input>
                 </el-form-item>
                 <el-form-item label="页面类型编号（必填）">
-                    <el-input v-model="addPage.PageTypeID"></el-input>
+                    <el-select v-model="addPage.PageTypeID" placeholder="请选择类型" clearable>
+                        <el-option
+                            v-for="item in formInline.options"
+                            :key="item.ID"
+                            :label="item.PageTypeName"
+                            :value="item.ID"
+                        >
+                        </el-option>
+                    </el-select>
                 </el-form-item>
+                <template v-if="!this.formInline.SupplierID">
+                    <el-form-item label="主供应商号">
+                        <el-select v-model="addPage.MainSupplierID" placeholder="主供应商" clearable filterable @change="getSupplier">
+                            <el-option
+                            v-for="item in option1"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="供应商号">
+                        <el-select v-model="addPage.SupplierID" placeholder="供应商" clearable filterable>
+                            <el-option
+                            v-for="item in option2"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </template>
                 <el-form-item label="背景颜色">
                     <el-input v-model="addPage.BackguoundColor"></el-input>
-                </el-form-item>
-                <el-form-item label="主供应商号">
-                    <el-input v-model="addPage.MainSupplierID"></el-input>
-                </el-form-item>
-                <el-form-item label="供应商号">
-                    <el-input v-model="addPage.SupplierID"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -133,7 +163,7 @@ import qs from 'qs';
                 list:[],
                 formInline:{        /* el-form */
                     type:'全部',        /* 类型 */
-                    ID:'',              /* ID */
+                    ID:'',              /* 页面编号 */
                     options:[],        /* 备选项 */
                     MainSupplierID:"",      /* 主供应商号 */
                     SupplierID:"",          /* 供应商号 */
@@ -159,104 +189,60 @@ import qs from 'qs';
                 },
                 total:"",            /* 总页数 */
                 currentPage1: 1,
-                ID:'',                 /* 修改栏目用的id */
+                PageTypeID:'',                 /* 修改栏目用的id */
+                ID:'',
                 option1:[],
-                option2:[]
+                option2:[],
+                PageIndex:1,
+                PageSize:10,
+
             }
         },
         methods:{
-            getPageLists(){          /* 列表获取 */
-                let params = {
-                    PageIndex:this.currentPage1,
-                }
-                getPageList(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
-                    if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
-                        this.resData = JSON.parse(res.data.Result)
-                        this.total = this.resData.TotalCount
-                    }
-                    if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
-                    if(res.data.Success == -998){
-                        console.log("请求错误")
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                    console.log('出错了')
-                })
-            },
             getPageType(){      /* 下拉菜单 */
                 let params = {
                     PageIndex:1,
                 }
                 getAddItemType(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.formInline.options = JSON.parse(res.data.Result)
-                        console.log(this.formInline.options)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             clear(){
                 this.formInline.ID=""
             },
-            search(){
-                console.log(this.formInline.ID)
+            getData(){
                 let params = {
-                    PageIndex:1,
-                    PageTypeID:this.formInline.ID,
+                    PageIndex:this.PageIndex,
+                    PageSize:this.PageSize,
+                    ID:this.formInline.ID,
                     MainSupplierID:this.formInline.MainSupplierID,
                     SupplierID:this.formInline.SupplierID,
-                    // PageTypeID:this.formInline.PageTypeID,
+                    PageTypeID:this.formInline.PageTypeID,
                     PageName:this.formInline.PageName,
                 }
                 getPageList(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.resData = JSON.parse(res.data.Result)
                         this.total = this.resData.TotalCount
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             handleEdit(index, row) {
@@ -271,44 +257,33 @@ import qs from 'qs';
                     PageName:this.form.pageName
                 }
                 changeItemInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.$message('修改成功');
                         this.editVisible = false
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             AddPage(){
                 this.editVisible2 = true;
             },
-            save(){
+            save(){         /* 新增 */
                 let params = {
                     PageName:this.addPage.PageName,
                     PageTypeID:this.addPage.PageTypeID,
                     BackguoundColor:this.addPage.BackguoundColor,
-                    MainSupplierID:this.addPage.MainSupplierID,
-                    SupplierID:this.addPage.SupplierID,
+                    MainSupplierID: this.formInline.SupplierID ? this.formInline.MainSupplierID : this.addPage.MainSupplierID,
+                    SupplierID:this.formInline.SupplierID? this.formInline.SupplierID:this.addPage.SupplierID,
                 }
                 addPage(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message('数据添加成功');
                         this.editVisible2 = false;
                         this.addPage.PageName = '',
@@ -316,37 +291,36 @@ import qs from 'qs';
                         this.addPage.BackguoundColor  = '',
                         this.addPage.MainSupplierID = '',
                         this.addPage.SupplierID = ''
+                        this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             handleSizeChange(val) {
+                this.PageSize = val
+                this.getData()
             },
             handleCurrentChange(val) {
-                this.currentPage1 = val;
-                this.getPageLists()
+                this.PageIndex = val;
+                this.getData()
             },
             changeColu(index, row){       /* 修改栏目 */
-                this.ID = row.ID;
+                this.PageTypeID = row.PageTypeID;
+                this.ID = row.ID
             },
             goPage(id){
                 this.$router.push({
                     path:'/columnManagement',
                     query:{
-                        ID:this.ID
+                        PageTypeID:this.PageTypeID,
+                        ID:this.ID,
                     }
                 })
             },
@@ -356,48 +330,56 @@ import qs from 'qs';
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.option1 = JSON.parse(res.data.Result)
-                        console.log(this.option1)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getSupplier(){
+                this.option2 = ''
+                this.addPage.SupplierID = '',                   /* 新建 */
+                this.formInline.SupplierID = ''                 /* 主页面 */
                 let params = {
-                    Level:2
+                    Level:2,
+                    MainSupplierID:this.addPage.MainSupplierID 
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.option2 = JSON.parse(res.data.Result)
-                        console.log(this.option2)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                    if(res.data.Success == -998){
+                        this.$message(this.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            getSupplierList(){
+                this.option2 = ''
+                this.formInline.SupplierID = ''                 /* 主页面 */
+                let params = {
+                    Level:2,
+                    MainSupplierID:this.formInline.MainSupplierID 
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.option2 = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(this.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -406,10 +388,10 @@ import qs from 'qs';
             }
          },
         mounted(){
-            this.getPageLists();
+            this.getData();
             this.getPageType();
             this.getMainSupplier()
-            this.getSupplier()
+            // this.getSupplier()
         },
     }
 </script>  

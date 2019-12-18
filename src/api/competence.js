@@ -4,7 +4,7 @@ import axios from "axios"
 /* 增加应用 */
 export function SysAppAdd(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysAppAdd',
+      url: '/webapi/User/SysAppAdd',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -17,7 +17,7 @@ export function SysAppAdd(params) {
 /* 修改应用信息 */
 export function SysAppUpdate(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysAppUpdate',
+      url: '/webapi/User/SysAppUpdate',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -30,7 +30,7 @@ export function SysAppUpdate(params) {
 /* 应用列表获取 */
 export function SysAppListGet(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysAppListGet',
+      url: '/webapi/User/SysAppListGet',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -43,7 +43,7 @@ export function SysAppListGet(params) {
 /* 添加部门信息 */
 export function SysDeptAdd(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysDeptAdd',
+      url: '/webapi/User/SysDeptAdd',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -56,7 +56,7 @@ export function SysDeptAdd(params) {
 /* 修改部门信息 */
 export function SysDeptUpdate(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysDeptUpdate',
+      url: '/webapi/User/SysDeptUpdate',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -69,7 +69,7 @@ export function SysDeptUpdate(params) {
 /* 获取部门列表 */
 export function SysDeptListGet(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysDeptListGet',
+      url: '/webapi/User/SysDeptListGet',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -82,7 +82,7 @@ export function SysDeptListGet(params) {
 /* 添加用户信息信息 */
 export function SysUserAdd(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysUserAdd',
+      url: '/webapi/User/SysUserAdd',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -95,7 +95,7 @@ export function SysUserAdd(params) {
 /* 修改用户 */
 export function SysUserUpdate(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysUserUpdate',
+      url: '/webapi/User/SysUserUpdate',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -108,7 +108,7 @@ export function SysUserUpdate(params) {
 /* 删除用户 */
 export function SysUserDelete(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysUserDelete',
+      url: '/webapi/User/SysUserDelete',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -121,7 +121,7 @@ export function SysUserDelete(params) {
 /* 停用用户 */
 export function SysUserStop(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysUserStop',
+      url: '/webapi/User/SysUserStop',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -134,7 +134,7 @@ export function SysUserStop(params) {
 /* 启用用户 */
 export function SysUserSetEnable(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysUserSetEnable',
+      url: '/webapi/User/SysUserSetEnable',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -147,7 +147,7 @@ export function SysUserSetEnable(params) {
 /* 设置用户角色 */
 export function SysUserSetRole(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysUserSetRole',
+      url: '/webapi/User/SysUserSetRole',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -160,7 +160,7 @@ export function SysUserSetRole(params) {
 /* 用户列表获取 */
 export function SysUserListGet(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysUserListGet',
+      url: '/webapi/User/SysUserListGet',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -173,7 +173,7 @@ export function SysUserListGet(params) {
 /* 添加应用模块 */
 export function SysModuleAdd(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysModuleAdd',
+      url: '/webapi/User/SysModuleAdd',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -186,7 +186,7 @@ export function SysModuleAdd(params) {
 /* 修改应用模块 */
 export function SysModuleUpdate(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysModuleUpdate',
+      url: '/webapi/User/SysModuleUpdate',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -199,7 +199,7 @@ export function SysModuleUpdate(params) {
 /* 根据AppID获取模块信息 */
 export function SysModuleListGetFromAppID(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysModuleListGetFromAppID',
+      url: '/webapi/User/SysModuleListGetFromAppID',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -212,7 +212,7 @@ export function SysModuleListGetFromAppID(params) {
 /* 根据模块ID获取模块权限信息 */
 export function SysAuthorityListGetFromModuleID(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysAuthorityListGetFromModuleID',
+      url: '/webapi/User/SysAuthorityListGetFromModuleID',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -225,7 +225,7 @@ export function SysAuthorityListGetFromModuleID(params) {
 /* 模块权限信息添加 */
 export function SysAuthorityAdd(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysAuthorityAdd',
+      url: '/webapi/User/SysAuthorityAdd',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -238,7 +238,7 @@ export function SysAuthorityAdd(params) {
 /* 修改模块权限信息 */
 export function SysAuthorityUpdate(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysAuthorityUpdate',
+      url: '/webapi/User/SysAuthorityUpdate',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -251,7 +251,7 @@ export function SysAuthorityUpdate(params) {
 /* 关联模块和权限 */
 export function SysAuthorityModuleRelevant(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysAuthorityModuleRelevant',
+      url: '/webapi/User/SysAuthorityModuleRelevant',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -264,7 +264,7 @@ export function SysAuthorityModuleRelevant(params) {
 /* 增加角色信息 */
 export function SysRoleAdd(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysRoleAdd',
+      url: '/webapi/User/SysRoleAdd',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -277,7 +277,7 @@ export function SysRoleAdd(params) {
 /* 修改角色信息 */
 export function SysRoleUpdate(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysRoleUpdate',
+      url: '/webapi/User/SysRoleUpdate',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -290,7 +290,7 @@ export function SysRoleUpdate(params) {
 /* 角色列表获取 */
 export function SysRoleListGet(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysRoleListGet',
+      url: '/webapi/User/SysRoleListGet',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -303,7 +303,7 @@ export function SysRoleListGet(params) {
 /* 角色权限维护 */
 export function SysRoleSetAuthority(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/SysRoleSetAuthority',
+      url: '/webapi/User/SysRoleSetAuthority',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -316,7 +316,7 @@ export function SysRoleSetAuthority(params) {
 /* 完整权限列表返回 */
 export function AuthorityListGet(params) {
   return axios({
-    url: 'http://128.192.80.135:8030/Api/User/AuthorityListGet',
+    url: '/webapi/User/AuthorityListGet',
     method: 'post',
     headers:{
       'Content-Type':' application/x-www-form-urlencoded ',

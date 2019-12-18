@@ -10,7 +10,7 @@
     <div class="container">
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item label="主供应商号">
-          <el-select v-model="formInline.MainSupplierID" placeholder="主供应商">
+          <el-select v-model="formInline.MainSupplierID" placeholder="主供应商"  clearable filterable @change="getSupplier">
               <el-option
                   v-for="item in formInline.option1"
                   :key="item.value"
@@ -20,7 +20,7 @@
               </el-select>
         </el-form-item>
         <el-form-item label="供应商号">
-          <el-select v-model="formInline.SupplierID" placeholder="供应商">
+          <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable >
               <el-option
                   v-for="item in formInline.option2"
                   :key="item.value"
@@ -37,23 +37,21 @@
             <el-option label="驳回" value="B"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item>
-          <el-date-picker
+        <el-form-item label="开始时间">
+            <el-date-picker
               v-model="formInline.timeStart"
-              type="date"
-              format="yyyy-MM-dd"
-              value-format="yyyy-MM-dd"
-              placeholder="开始时间"
-              @change="updateDateStart">
-          </el-date-picker>至
-          <el-date-picker
+              type="datetime"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              placeholder="选择日期时间">
+            </el-date-picker>
+        </el-form-item>
+        <el-form-item label="结束时间">
+            <el-date-picker
               v-model="formInline.timeEnd"
-              type="date"
-              format="yyyy-MM-dd"
-              value-format="yyyy-MM-dd"
-              placeholder="结束时间"
-              @change="updateDateEnd">
-          </el-date-picker>
+              type="datetime"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              placeholder="选择日期时间">
+            </el-date-picker>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="getData">搜索</el-button>
@@ -137,22 +135,16 @@
                   <template v-if="this.form.radio == 2">
                     <el-form-item label="调价开始时间">
                         <el-date-picker
-                            v-model="form.changeTimeStart"
-                            type="date"
-                            format="yyyy-MM-dd"
-                            value-format="yyyy-MM-dd"
-                            placeholder="开始时间"
-                            @change="updateDateStart">
+                          v-model="form.changeTimeStart"
+                          type="datetime"
+                          placeholder="选择日期时间">
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item label="调价结束时间">
                         <el-date-picker
-                            v-model="form.changeTimeEnd"
-                            type="date"
-                            format="yyyy-MM-dd"
-                            value-format="yyyy-MM-dd"
-                            placeholder="结束时间"
-                            @change="updateDateEnd">
+                          v-model="form.changeTimeEnd"
+                          type="datetime"
+                          placeholder="选择日期时间">
                         </el-date-picker>
                     </el-form-item>
                   </template>
@@ -225,27 +217,18 @@ import qs from 'qs'
             PageSize : this.PageSize,
         }
         changePriceList(qs.stringify(params)).then((res)=>{
-            console.log(res.data)
             if(res.data.Success == 1){
-                console.log("数据请求成功")
-                console.log(JSON.parse(res.data.Result))
                 this.tableData = JSON.parse(res.data.Result)
                 this.total = this.tableData.tableData
             }
             if(res.data.Success == 0){
-                console.log(res.data.Result)
-            }
-            if(res.data.Success == -999){
-                console.log("用户未登录")
-                console.log(res.data)
-                this.$message('修改失败');
+                this.$message(res.data.Result)
             }
             if(res.data.Success == -998){
-                console.log("请求错误")
+                this.$message(res.data.Result)
             }
         }).catch(function(e){
             console.log(e)
-            console.log('出错了')
         })
       },
       saveEdit(){           /* 调价审核 */
@@ -255,7 +238,6 @@ import qs from 'qs'
             AuditRemark:this.form.AuditRemark,       /* 审核备注 */
         }
         PriceAdjustmentReview(qs.stringify(params)).then((res)=>{
-            console.log(res.data)
             if(res.data.Success == 1){
               this.editVisible = false
                 this.$message({
@@ -266,42 +248,25 @@ import qs from 'qs'
             if(res.data.Success == 0){
                 this.$message(res.data.Result)
             }
-            if(res.data.Success == -999){
-                console.log("用户未登录")
-                console.log(res.data)
-                this.$message('修改失败');
-            }
             if(res.data.Success == -998){
-                console.log("请求错误")
                 this.$message(res.data)
             }
         }).catch(function(e){
             console.log(e)
-            console.log('出错了')
         })
       },
       check(row){
         this.editVisible = true,
         this.ID = row.ID
+        this.form.radio = ''
+        this.form.AuditRemark = ''
       },
       edit(row){
         this.editVisible2 = true,
         this.form.ProductID = row.ID,
         this.form.ProductName = row.ProductName
       },
-      updateDateStart(val) {
-          console.log("val:" + val)
-          this.formInline.timeStart = val + " 00:00:00"
-          this.form.changeTimeStart = val + " 00:00:00"
-          console.log("this.value1:" + this.value1)
-      },
-      updateDateEnd(val) {
-          console.log("val:" + val)
-          this.formInline.timeEnd = val + " 00:00:00"
-          this.form.changeTimeEnd = val + " 00:00:00"
-          console.log("this.value1:" + this.value1)
-      },
-       handleSizeChange(size) {
+      handleSizeChange(size) {
         console.log(`每页 ${size} 条`);
         this.PageSize = size;
         this.getData()
@@ -321,7 +286,6 @@ import qs from 'qs'
             Remark:this.form.Remark
         }
         ProductPriceChange(qs.stringify(params)).then((res)=>{
-            console.log(res.data)
             if(res.data.Success == 1){
               this.editVisible = false
                 this.$message({
@@ -339,17 +303,11 @@ import qs from 'qs'
             if(res.data.Success == 0){
                 this.$message(res.data.Result)
             }
-            if(res.data.Success == -999){
-                console.log("用户未登录")
-                console.log(res.data)
-                this.$message('修改失败');
-            }
             if(res.data.Success == -998){
-                console.log("请求错误")
+                this.$message(res.data.Result)
             }
         }).catch(function(e){
             console.log(e)
-            console.log('出错了')
         })
       },
       stop1(){
@@ -357,27 +315,17 @@ import qs from 'qs'
           ID:this.ID
       }
       StopPriceAdjustment(qs.stringify(params)).then((res)=>{
-          console.log(res.data)
           if(res.data.Success == 1){
-              console.log("数据请求成功")
-              console.log(JSON.parse(res.data.Result))
               this.$message.success('删除成功');
           }
           if(res.data.Success == 0){
-              console.log(res.data.Result)
               this.$message(res.data.Result)
           }
-          if(res.data.Success == -999){
-              console.log("用户未登录")
-              console.log(res.data)
-              this.$message(res.data.Result);
-          }
           if(res.data.Success == -998){
-              console.log("请求错误")
+              this.$message(res.data.Result)
           }
         }).catch(function(e){
             console.log(e)
-            console.log('出错了')
           })
       },
       stop(row) {
@@ -395,27 +343,17 @@ import qs from 'qs'
           ID:this.ID
       }
       PriceAdjustment(qs.stringify(params)).then((res)=>{
-          console.log(res.data)
           if(res.data.Success == 1){
-              console.log("数据请求成功")
-              console.log(JSON.parse(res.data.Result))
               this.$message.success('废弃成功');
           }
           if(res.data.Success == 0){
-              console.log(res.data.Result)
               this.$message(res.data.Result)
           }
-          if(res.data.Success == -999){
-              console.log("用户未登录")
-              console.log(res.data)
-              this.$message(res.data.Result);
-          }
           if(res.data.Success == -998){
-              console.log("请求错误")
+              this.$message(res.data.Result)
           }
         }).catch(function(e){
             console.log(e)
-            console.log('出错了')
           })
       },
       discard(row){                                   /* 点击废弃按钮之后调用这个方法 点击确定之后会调用上面的discard1的方法 */
@@ -434,59 +372,43 @@ import qs from 'qs'
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.formInline.option1 = JSON.parse(res.data.Result)
-                        console.log(this.formInline.option1)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getSupplier(){
+                this.formInline.SupplierID = '',
+                this.formInline.option2 = ''
                 let params = {
-                    Level:2
+                    Level:2,
+                    MainSupplierID:this.formInline.MainSupplierID
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.formInline.option2 = JSON.parse(res.data.Result)
-                        console.log(this.formInline.option2)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             }
     },
     created(){
       this.getData()
       this.getMainSupplier()
-      this.getSupplier()
     }
   }
 </script>  

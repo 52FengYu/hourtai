@@ -31,7 +31,7 @@
                     </span>
                     <el-dropdown-menu slot="dropdown">
                         <a href="#" target="_blank">        <!-- 修改密码页面还没有写 -->
-                            <el-dropdown-item>修改密码</el-dropdown-item>
+                            <!-- <el-dropdown-item>修改密码</el-dropdown-item> -->
                         </a>
                         <el-dropdown-item divided  command="loginout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>

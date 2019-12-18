@@ -287,13 +287,13 @@ export function changeProduct(obj) {
       data: obj
     })
   }
-  
-  
+    
 
   /* 上传图片 */
   export function UploadImage(obj) {
     return axios({
-      url: '/api/Image/UploadImage',
+      //url:'/api/Image/UploadImage',          /* https://o2o.liqunshop.com/adminwebapi/api/Image/UploadImage */     
+      url:'https://o2o.liqunshop.com/adminwebapi/api/Image/UploadImage',
       method: 'POST',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',

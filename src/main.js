@@ -47,6 +47,7 @@ router.beforeEach((to, from, next) => {
         this.$message('执行了')
     } */
     const role = localStorage.getItem('role');
+    // console.log(process.env.NODE_ENV)
     if (!role && to.path !== '/login') {
         next('/login');
     } else if (to.meta.permission) {

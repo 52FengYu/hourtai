@@ -8,16 +8,19 @@
         <div class="container">
             <div class="head">
                 <el-form :inline="true" :model="formInline" class="demo-form-inline">
-                    <el-form-item>
-                        <el-input v-model="formInline.phone" placeholder="请输入用户手机号或名称"></el-input>
+                    <el-form-item label="手机号">
+                        <el-input v-model="formInline.phone" placeholder="请输入用户手机号"></el-input>
                     </el-form-item>
-                    <el-form-item>
+                    <el-form-item label="用户名">
+                        <el-input v-model="formInline.MemberName" placeholder="请输入用户名"></el-input>
+                    </el-form-item>
+                    <el-form-item label="礼品卡编号">
                         <el-input v-model="formInline.giftCardID" placeholder="礼品卡编号"></el-input>
                     </el-form-item>
                     <!-- <el-form-item>
                         <el-input v-model="formInline.giftCardTypeNum" placeholder="礼品卡类型编号"></el-input>
                     </el-form-item> -->
-                    <el-form-item>
+                    <el-form-item label="礼品卡使用时间">
                         <el-date-picker
                             v-model="formInline.timeStart"
                             type="date"
@@ -64,13 +67,13 @@
                     </el-table-column>
                 </el-table>
                 <el-pagination
-                    style=" text-align:right"
+                    align="right"
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
-                    :current-page="currentPage4"
-                    :page-size = this.PageSize
+                    :current-page= this.currentPage4
+                    :page-size= this.PageSize
                     layout="total, sizes, prev, pager, next, jumper"
-                    :total = this.tableData.length>
+                    :total= tableData._totalcount>
                 </el-pagination>
             </div>
         </div>
@@ -86,16 +89,17 @@ import qs from 'qs';
         data(){
             return{
                 currentPage4: 1,                /* 分页器 */
+                PageSize:10,
                 formInline:{
                     giftCardTypeNum:'',         /* 礼品卡类型编号 */
                     giftCardID:'',              /* 礼品卡编号 */
-                    phone:"",                   /* 请输入用户手机号或名称 */
+                    phone:"",                   /* 请输入用户手机号 */
+                    MemberName:'',                  /* 用户名 */
                     timeStart:'',                    /* 时间选择器开始 */
                     timeEnd:'',                     /* 时间选择器结束 */
                     },
                 value2: '',
                 tableData:[],
-                PageSize:10,
             }
         },
         created(){
@@ -103,7 +107,6 @@ import qs from 'qs';
         },
         methods:{
             handleClick(row) {
-                console.log(row);
                 this.$router.push({
                     path:'/giftDetail',
                     query:{
@@ -111,56 +114,43 @@ import qs from 'qs';
                     }
                 })
             },
-            handleSizeChange(size) {
-                console.log(`每页 ${size} 条`);
-                this.PageSize = size
+            handleSizeChange(val) {
+                this.PageSize = val
+                this.getData()
             },
-            handleCurrentChange(index) {
-                console.log(`当前页: ${index}`);
-                this.currentPage4 = index
+            handleCurrentChange(val) {
+                this.currentPage4 = val
+                this.getData()
             },
             getData(){
                 let params = {
                     PageNo:this.currentPage4,
-                    PageSize:this.PageSize,
-                    MemberName:this.formInline.phone,
+                    PageSize:this.PageSize, 
+                    MemberName:this.formInline.MemberName,
                     Mobile:this.formInline.phone,
                     BeginTime:this.formInline.timeStart,
                     EndTime:this.formInline.timeEnd,
                     ID:this.formInline.giftCardID
                 }
                 getGiftList(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.tableData = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             updateDateStart(val) {
-                console.log("val:" + val)
                 this.formInline.timeStart = val + " 00:00:00"
-                console.log("this.value1:" + this.value1)
             },
             updateDateEnd(val) {
-                console.log("val:" + val)
                 this.formInline.timeEnd =val + " 00:00:00"
-                console.log("this.value1:" + this.value1)
             },
             DelFlag(row){
                 let params = {
@@ -168,28 +158,18 @@ import qs from 'qs';
                     DelFlag:row.DelFlag == "N" ? 'Y' : 'N'
                 }
                 changeGiftList(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
-                        // this.tableData = JSON.parse(res.data.Result)
-                        this.$message('修改成功')
+                        this.$message.success('修改成功')
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             }
         }

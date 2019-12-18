@@ -41,9 +41,9 @@
                     {
                         icon: 'el-icon-user-solid',
                         index: '0',
-                        title: '用户管理',
+                        title: '权限管理',
                         subs: [
-                            {
+                            /* {
                                 index: 'useManagement',
                                 title: '用户列表'
                             },
@@ -54,6 +54,26 @@
                             {
                                 index: 'roleList',
                                 title: '角色列表'
+                            } */
+                            {
+                                index: 'application',
+                                title: '应用'
+                            },
+                            {
+                                index: 'section',
+                                title: '部门'
+                            },
+                            {
+                                index: 'users',
+                                title: '用户'
+                            },
+                            {
+                                index: 'role',
+                                title: '角色'
+                            },
+                            {
+                                index:'authority',
+                                title:'权限列表'
                             }
                         ]
                     },
@@ -66,10 +86,10 @@
                                 index:'membershipList',
                                 title:'会员列表'
                             },
-                            {
+                            /* {
                                 index:'memberReg',
                                 title:'会员注册数统计'
-                            }
+                            } */
                         ]
                     },
                     {
@@ -78,8 +98,20 @@
                         title: '门店管理',
                         subs:[
                             {
-                                index:'shopList',
-                                title:'门店列表'
+                                index:'Correspondence',  
+                                title:'对应关系'
+                            },
+                            {
+                                index:'Supplier',
+                                title:'供应商列表'
+                            },
+                            {
+                                index:'showLevel',
+                                title:'三级分类获取'
+                            },
+                            {
+                                index:'SupplierFeeList',
+                                title:'运费列表'
                             }
                         ]
                     },
@@ -90,7 +122,7 @@
                         subs: [
                             {
                                 index: 'columnManagementList',
-                                title: '栏目管理'
+                                title: '页面管理'
                             },
                             {
                                 index: 'hotManagement',
@@ -111,10 +143,10 @@
                                 index:'brandManagement',
                                 title:'品牌管理'
                             },
-                            {
+                            /* {
                                 index:'List',
                                 title:'类目列表'
-                            }
+                            } */
                         ]
                     },
                     {
@@ -126,10 +158,10 @@
                                 index: 'priceList',
                                 title: '价格审核列表',
                             },
-                            {
+                            /* {
                                 index: 'priceChange',
                                 title: '价格变更列表',
-                            }
+                            } */
                         ]
                     },
                     {
@@ -159,17 +191,25 @@
                         ]
                     },
                     {
-                        icon: 'el-icon-paperclip',
+                        icon: 'el-icon-paperclip',                     
                         index: '8',
                         title: '订单管理',
                         subs: [
                             {
                                 index: 'orderList',
                                 title: '订单列表'
+                            },
+                            {
+                                index: 'Sorting',
+                                title: '分拣集货'
+                            },
+                            {
+                                index: 'ReturnGoods',
+                                title: '退货列表'
                             }
                         ]
                     },
-                    {
+                    /* {
                         icon: 'el-icon-s-tools',
                         index: '9',
                         title: '权限管理',
@@ -195,7 +235,7 @@
                                 title:'权限列表'
                             }
                         ]
-                    }
+                    } */
                 ]
             }
         },

@@ -68,7 +68,7 @@ import qs from 'qs';
                 }
                 UserLogin(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        this.$message.success('欢迎' + res.data.Result + '，回来!')
+                        this.$message.success('欢迎回来,' + res.data.Result)
                         window.localStorage.setItem('role',res.data.Result)
                         this.$router.push('/');
                     }
@@ -85,11 +85,11 @@ import qs from 'qs';
              },
             getTokenID(){
                 let params = {}
-                console.log(321)
                 getTokenID(qs.stringify(params)).then((res)=>{
                      if(res.data.Success == 1){
                        console.log( 'TokenID:'  + res.data.Result)
                        sessionStorage.setItem('TokenID', res.data.Result)
+                       this.getdata()
                     }
                     if(res.data.Success == 0){
                        this.$message(res.data.Result)
@@ -101,7 +101,6 @@ import qs from 'qs';
             }
         },
         created(){
-            this.getdata()
             this.getTokenID()
         }
     }

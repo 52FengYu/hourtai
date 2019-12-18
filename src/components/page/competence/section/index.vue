@@ -26,9 +26,9 @@
         <!-- 修改部门信息 -->
         <el-dialog title="修改部门信息" :visible.sync="editVisible" width="40%">
             <el-form ref="form" :model="form" label-width="100px">
-                <el-form-item label="部门ID">
+                <!-- <el-form-item label="部门ID">
                     <el-input v-model="form.ID" :disabled="true"></el-input>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="部门名称">
                     <el-input v-model="form.DeptName"></el-input>
                 </el-form-item>
@@ -81,22 +81,17 @@ import qs from 'qs'
                     PageSize:this.PageSize,
                 }
                 SysDeptListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.tableData = JSON.parse(res.data.Result)
-                        console.log(this.tableData)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             handleSizeChange(val) {
@@ -110,7 +105,6 @@ import qs from 'qs'
                 this.getData()
             },
             change(row){
-                console.log(row)
                 this.editVisible = true
                 this.form.ID = row.ID
                 this.form.DeptName = row.DeptName
@@ -121,23 +115,19 @@ import qs from 'qs'
                     DeptName:this.form.DeptName
                 }
                 SysDeptUpdate(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('修改成功')
                         this.getData()
                         this.editVisible = false
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             add(){
@@ -145,24 +135,20 @@ import qs from 'qs'
                     DeptName:this.addInfo.DeptName
                 }
                 SysDeptAdd(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('添加成功')
                         this.getData()
                         this.editVisible2 = false
                         this.addInfo.DeptName = ''
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             }
         },

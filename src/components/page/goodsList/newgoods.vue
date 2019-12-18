@@ -17,12 +17,12 @@
                 <span>商品图</span>
                 <div>
                     <el-upload
-                        action= '/api/Product/ProductHeadImageAdd'
+                        action= '/adminwebapi/api/Product/ProductHeadImageAdd'
                         list-type="picture-card"
                         :on-preview="handlePictureCardPreview1"
                         :on-success="handleAvatarSuccess"
                         :on-error="imgUploadError"
-                        accept="image/png, image/jpeg"
+                        accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                         :file-list="fileLists1"
                         :multiple = true                    
                         :headers="TokenID"
@@ -39,14 +39,15 @@
             <div class="three">
                 <span>商品详情图</span>
                 <el-upload
-                    action= '/api/Product/ProductContentImageAdd'
+                    action= '/adminwebapi/api/Product/ProductContentImageAdd'
                     list-type="picture-card"
                     :on-preview="handlePictureCardPreview2"
                     :on-success="handleAvatarSuccess"
                     :on-error="imgUploadError"
-                    accept="image/png, image/jpeg"
+                    accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                     :file-list="fileLists2"
                     :on-progress="upLoadC"
+                    :data="upLoadData"
                     :on-remove="handleRemoveC">
                     <i class="el-icon-plus"></i>
                 </el-upload>
@@ -57,11 +58,18 @@
             <div class="four">
                 <span>基础信息</span>
                 <div>
-                    <el-form  :model="formInline" class="demo-form-inline">
-                        <el-form-item label="品牌编号">
-                            <el-input v-model="formInline.BrandID" placeholder="品牌编号"></el-input>
+                    <el-form :model="formInline" class="demo-form-inline">
+                        <el-form-item label="品牌名">
+                            <el-select v-model="formInline.BrandID" filterable  clearable placeholder="请选择">
+                                <el-option
+                                    v-for="item in brands"
+                                    :key="item.ID"
+                                    :label="item.BrandName"
+                                    :value="item.ID">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
-                        <el-form-item label="三级分类编号">
+                        <el-form-item label="三级分类名">
                             <!-- <el-cascader :options="productOptions"  clearable v-model="formInline.ClassID" @change="handleChange" placeholder="请选择类目"></el-cascader> -->
                             <el-cascader :options="productOptions" :show-all-levels="false" @change="cascaderChange" value="formInline.ClassID"></el-cascader>
                         </el-form-item>
@@ -114,8 +122,15 @@
                         <el-form-item label="副标题">
                             <el-input v-model="formInline.TitalInfo" placeholder="副标题"></el-input>
                         </el-form-item>
-                        <el-form-item label="单位编号">
-                            <el-input v-model="formInline.UnitID" placeholder="单位编号"></el-input>
+                        <el-form-item label="单位名称">
+                            <el-select v-model="formInline.UnitID" filterable  clearable placeholder="请选择">
+                                <el-option
+                                    v-for="item in qualit"
+                                    :key="item.ID"
+                                    :label="item.UnitName"
+                                    :value="item.ID">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item label="重量">
                             <el-input v-model="formInline.Weight" placeholder="重量"></el-input>
@@ -130,6 +145,10 @@
                                 </el-option>
                             </el-select>
                         </el-form-item>
+                        <el-form-item label="门店码">
+                            <el-input v-model="formInline.ShopCode" placeholder="门店码"></el-input>
+                            <el-button type="primary" plain @click="Inquire">查询</el-button>
+                        </el-form-item>
                         <el-form-item label="库存">
                             <el-input v-model="formInline.Stock" placeholder="库存"></el-input>
                         </el-form-item>
@@ -142,11 +161,14 @@
                         <el-form-item label="物流码">
                             <el-input v-model="formInline.Fxxcode" placeholder="物流码"></el-input>
                         </el-form-item>
-                        <el-form-item label="门店码">
-                            <el-input v-model="formInline.ShopCode" placeholder="门店码"></el-input>
-                        </el-form-item>
                         <el-form-item label="统一分类">
                             <el-input v-model="formInline.UniType" placeholder="统一分类"></el-input>
+                        </el-form-item>
+                        <el-form-item label="是否必须自提">
+                            <el-select v-model="formInline.IsMustSelfReceiver" clearable placeholder="请选择">
+                                <el-option label="是" value="Y"></el-option>
+                                <el-option label="否" value="N"></el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="onSubmit">提交</el-button>
@@ -160,6 +182,7 @@
 </template>
 <script>
 import { getProductInfo,getProductDetail,getPicInfo,addPicture,AddDetailMap,delPicture,delDetailMap,SupplierListGetByLevel,addProduct,getIDclass } from "@/api/goodsList"
+import { BaseBrandListGet,BaseUnitListGet } from '@/api/common'
 import qs from 'qs';    
     export default{
         data(){
@@ -195,6 +218,7 @@ import qs from 'qs';
                     Unicode:'',
                     Fxxcode:'',
                     ShopCode:'',
+                    IsMustSelfReceiver:"",          /* 是否必须自提 N 否 Y 是 */
                 },
                  /* 动态添加的数据存放在这里 */
                 prop:{
@@ -202,191 +226,7 @@ import qs from 'qs';
                     attributeValues:"",     /* 属性值 */
                 },
                 list:[],        /* 展示参数用 */
-                qualit: [{
-                    value: '选项1',
-                    label: '个'
-                    }, {
-                    value: '选项2',
-                    label: '箱'
-                    }, {
-                    value: '选项3',
-                    label: '袋'
-                    }, {
-                    value: '选项4',
-                    label: '盒'
-                    }, {
-                    value: '选项5',
-                    label: '瓶'
-                    },{
-                    value: '选项6',
-                    label: '只'
-                    }, {
-                    value: '选项7',
-                    label: '件'
-                    }, {
-                    value: '选项8',
-                    label: '条'
-                    }, {
-                    value: '选项9',
-                    label: '块'
-                    }, {
-                    value: '选项10',
-                    label: '副'
-                    },{
-                    value: '选项11',
-                    label: '片'
-                    }, {
-                    value: '选项12',
-                    label: '份'
-                    }, {
-                    value: '选项13',
-                    label: '罐'
-                    }, {
-                    value: '选项14',
-                    label: '桶'
-                    }, {
-                    value: '选项15',
-                    label: '提'
-                    },{
-                    value: '选项16',
-                    label: '组'
-                    }, {
-                    value: '选项17',
-                    label: '支'
-                    }, {
-                    value: '选项18',
-                    label: '包'
-                    }, {
-                    value: '选项19',
-                    label: 'kg'
-                    }, {
-                    value: '选项20',
-                    label: '套'
-                    },{
-                    value: '选项21',
-                    label: '杯'
-                    }, {
-                    value: '选项22',
-                    label: '碗'
-                    }, {
-                    value: '选项23',
-                    label: '粒'
-                    }, {
-                    value: '选项24',
-                    label: '把'
-                    }, {
-                    value: '选项25',
-                    label: '串'
-                    },{
-                    value: '选项26',
-                    label: '打'
-                    }, {
-                    value: '选项27',
-                    label: '克'
-                    }, {
-                    value: '选项28',
-                    label: '斤'
-                    }, {
-                    value: '选项29',
-                    label: '公斤'
-                    }, {
-                    value: '选项30',
-                    label: '千克'
-                    },{
-                    value: '选项31',
-                    label: '颗'
-                    }, {
-                    value: '选项32',
-                    label: '卷'
-                    }, {
-                    value: '选项33',
-                    label: '台'
-                    }, {
-                    value: '选项34',
-                    label: '双'
-                    }, {
-                    value: '选项35',
-                    label: '枚'
-                    },{
-                    value: '选项36',
-                    label: '对'
-                    }, {
-                    value: '选项37',
-                    label: '本'
-                    }, {
-                    value: '选项38',
-                    label: '根'
-                    }, {
-                    value: '选项39',
-                    label: '卡'
-                    }, {
-                    value: '选项40',
-                    label: '筒'
-                    },{
-                    value: '选项41',
-                    label: '张'
-                    }, {
-                    value: '选项42',
-                    label: '辆'
-                    }, {
-                    value: '选项43',
-                    label: '扎'
-                    }, {
-                    value: '选项44',
-                    label: '板'
-                    }, {
-                    value: '选项45',
-                    label: '听'
-                    },{
-                    value: '选项46',
-                    label: '两'
-                    }, {
-                    value: '选项47',
-                    label: '升'
-                    }, {
-                    value: '选项48',
-                    label: '毫升'
-                    }, {
-                    value: '选项49',
-                    label: '捆'
-                    }, {
-                    value: '选项50',
-                    label: '册'
-                    },{
-                    value: '选项51',
-                    label: '艘'
-                    }, {
-                    value: '选项52',
-                    label: '架'
-                    }, {
-                    value: '选项53',
-                    label: '枝'
-                    }, {
-                    value: '选项54',
-                    label: '棵'
-                    }, {
-                    value: '选项55',
-                    label: '株'
-                    },{
-                    value: '选项56',
-                    label: '盘'
-                    }, {
-                    value: '选项57',
-                    label: '盆'
-                    }, {
-                    value: '选项58',
-                    label: '刀'
-                    }, {
-                    value: '选项59',
-                    label: '扇'
-                    }, {
-                    value: '选项60',
-                    label: '合'
-                    }, {
-                    value: '选项61',
-                    label: '束'
-                    }
-                ],
+                qualit: [],     /* 单位 */
                 value: '',      /* 计量单位 */
                 isSingle: false,
                 attrList: [],   /* 底部的保存按钮 会将数据存到这里 */
@@ -405,6 +245,7 @@ import qs from 'qs';
                     TokenID:sessionStorage.getItem('TokenID'),
                 },
                 HeadPictureUrl:'',                  /* 主图url */
+                brands:[]
             }
         },
         methods:{
@@ -425,7 +266,6 @@ import qs from 'qs';
                 this.formInline.Remark = ''
                 this.formInline.TaxRate = ''
                 this.formInline.TitalInfo = ''
-
                 this.formInline.UnitID = ''
                 this.formInline.Weight = ''
                 this.formInline.SupplierID = ''
@@ -435,10 +275,8 @@ import qs from 'qs';
                 this.formInline.Fxxcode = ''
                 this.formInline.ShopCode = ''
                 this.formInline.UniType = ''
-                
             },
             handle(row,column,event,cell){
-                console.log(row.chinese)
                 this.brand = row.chinese;
             },
             setCurrent(row) {
@@ -462,13 +300,9 @@ import qs from 'qs';
                 this.dialogVisible2 = true;
             },
             handleAvatarSuccess(res, file) {                        //图片上传成功调用的方法
-                console.log(JSON.parse(res.Result)[0]);
                 this.HeadPictureUrl = JSON.parse(res.Result)[0]
-                console.log(file);
-            
             },
             imgUploadError(err, file, fileList){                    //图片上传失败调用
-                console.log(err)
                 this.$message.error('上传图片失败!');
             },
             onSubmit() {
@@ -499,12 +333,11 @@ import qs from 'qs';
                     ShopCode : this.formInline.ShopCode,
                     UniType : this.formInline.UniType,
                     HeadImage : this.fileLists1,
-                    ContentImage : this.fileLists2
+                    ContentImage : this.fileLists2,
+                    IsMustSelfReceiver: this.formInline.IsMustSelfReceiver
                 }
                 addProduct(qs.stringify(params)).then((res)=>{
-                    console.log(res.data.Result)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('提交成功')
                         this.clear()
                         this.$router.push({
@@ -512,20 +345,13 @@ import qs from 'qs';
                         })
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             add() {
@@ -547,66 +373,81 @@ import qs from 'qs';
                 this.editVisible = false;
             },
             found(){    
+                this.fileLists1 = []
+                this.fileLists2 = []
                 let params = {
-                    Unicode:this.formInline.uniformCode             /* 003567647 */
+                    Unicode:this.formInline.uniformCode             /* 003567647 */     /* 100008215 */
                 }
                 getPicInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.result = JSON.parse(res.data.Result)
-                        this.fileLists1.push({url: 'http://images.liqunshop.com/' + this.result.HeadImageList})
-                        for( var i = 0; i < this.result.ContentImageList.length ; i++){
-                            this.fileLists2.push({url: 'http://images.liqunshop.com/' + this.result.ContentImageList[i]})
+                        for( var i = 0; i < this.result.HeadImageList.length ; i++){
+                            let URLHead = this.result.HeadImageList[i]
+                            if(URLHead.substr(0,4) == 'http'){
+                                this.fileLists1.push({url: this.result.HeadImageList})
+                            }else{
+                                this.fileLists1.push({url:  'http://images.liqunshop.com/' + this.result.HeadImageList})
+                            }
                         }
-                        console.log(this.fileLists1)
-                        console.log(this.fileLists2)
+                        for( var i = 0; i < this.result.ContentImageList.length ; i++){
+                            let URLHead = this.result.ContentImageList[i]
+                            if(URLHead.substr(0,4) == 'http'){
+                                this.fileLists2.push({url: this.result.ContentImageList[i]})
+                            }else{
+                                this.fileLists2.push({url:  'http://images.liqunshop.com/' + this.result.ContentImageList[i]})
+                            }
+                        }
                         this.formInline.UniType = this.result.UNITYPE
+                        this.formInline.KeyWord = this.result.KEYNAME
+                        this.formInline.ProductName = this.result.PNAME
+                        this.formInline.uniformCode = this.result.UNICODE
+                        this.formInline.Fxxcode = this.result.Fxxcodes
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
+                })
+            },
+            unit(){
+                let params = {
+                    PageIndex:-1,
+                    PageSize:-1
+                }
+                BaseUnitListGet(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.qualit = JSON.parse(res.data.Result).ModelList
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
                 })
             },
             getSupplier(){
                 let params = {
-                    Level:2
+                    Level:2,
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.option2 = JSON.parse(res.data.Result)
-                        console.log(this.option2)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             productData(){
@@ -614,39 +455,27 @@ import qs from 'qs';
                     
                 }
                 getIDclass(qs.stringify(params)).then((res)=>{
-                    console.log(res.data.Result)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.productOptions = JSON.parse(res.data.Result)
-                        console.log(this.productOptions)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             cascaderChange(value) {
-              console.log(value)
               let rang = []
                 for(let i = 0 ; i < value.length; i++){
                     if(i == value.length - 1){
                         rang.push(value[i])
                     }
                 }
-                console.log(rang)
                 this.formInline.ClassID = rang[0]
-                console.log(this.formInline.ClassID)
             },
             upLoadH(){
                 console.log('主图上传')
@@ -654,10 +483,53 @@ import qs from 'qs';
             upLoadC(){
                 console.log('详情图上传')
             },
+            getBrand(){
+                let params = {
+                   PageIndex:-1,
+                   PageSize:-1, 
+                }
+                BaseBrandListGet(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.brands = JSON.parse(res.data.Result).ModelList
+                    }
+                    if(res.data.Success == 0){
+                       this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            Inquire(){
+                let params = {
+                   ShopCode:this.formInline.ShopCode,
+                   SupplierID:this.formInline.SupplierID
+                }
+                getProductInfo(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.formInline.uniformCode = JSON.parse(res.data.Result).UNICODE
+                        this.formInline.UniType = JSON.parse(res.data.Result).UNITYPE
+                        this.formInline.Fxxcode = JSON.parse(res.data.Result).Fxxcodes
+                        this.formInline.UniType = JSON.parse(res.data.Result).UNIBRAND
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            }
         },
-        created(){
+        mounted(){
             this.getSupplier()
             this.productData()
+            this.getBrand()
+            this.unit()
         }
     }
 </script>  
@@ -687,29 +559,6 @@ import qs from 'qs';
     .four{
         .el-form{
             margin-left:5vh;
-            /* .info1 .el-form-item:nth-child(2){
-                margin-left:6vh
-            }
-            .info2 .el-form-item:nth-child(2){
-                margin-left:6vh
-            }
-            .info3 .el-form-item:nth-child(2){
-                margin-left:6vh;
-                display:flex;
-                .el-form-item__content{
-                    display:flex!important;
-                }
-            }
-            .info4 .el-form-item:nth-child(2){
-                margin-left:11vh
-            }
-            .info8 .el-form-item:nth-child(2){
-                margin-left:15vh
-            }
-            .info3{
-                display:flex;
-                
-            } */
             .el-form-item{
                 width:30vw
             }

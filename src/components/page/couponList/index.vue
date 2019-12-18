@@ -9,7 +9,7 @@
             <div class="head">
                 <el-form :inline="true" :model="formInline" class="demo-form-inline">
                     <el-form-item label="主供应商">
-                        <el-select v-model="formInline.MainSupplierID" placeholder="主供应商">
+                        <el-select v-model="formInline.MainSupplierID" placeholder="主供应商" clearable filterable @change="getSupplier">
                             <el-option
                             v-for="item in formInline.option1"
                             :key="item.value"
@@ -19,7 +19,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="供应商">
-                        <el-select v-model="formInline.SupplierID" placeholder="供应商">
+                        <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable>
                             <el-option
                             v-for="item in formInline.option2"
                             :key="item.value"
@@ -72,6 +72,7 @@
             </div>
             <el-table :data="tableData.ModelList" border class="tableData" ref="multipleTable">
                 <el-table-column prop="GiftTokenGiveOutName" label="领券活动名称" align="center" ></el-table-column>
+                <el-table-column prop="ID" label="领券活动ID" align="center" ></el-table-column>
                 <el-table-column prop="Audit" label="审核状态" align="center" >
                     <template slot-scope="scope">
                     {{scope.row.Audit === 'N' ? '新建' : ( scope.row.Audit === 'O' ? '审核通过' : ( scope.row.Audit === 'T' ? '停止' : '驳回'))}}
@@ -80,6 +81,8 @@
                 <el-table-column prop="AuditMan" label="审核人" align="center" ></el-table-column>
                 <el-table-column prop="AuditRemark" label="审核备注"   align="center" ></el-table-column>
                 <el-table-column prop="AuditTime" label="审核时间" align="center" ></el-table-column>
+                <el-table-column prop="MainSupplierID" label="主供应商号(为空表示不限)"  align="center" ></el-table-column>
+                <el-table-column prop="SupplierID" label="供应商号(为空表示不限)" align="center" ></el-table-column>
                 <el-table-column prop="CreateManID" label="创建人编号" align="center" ></el-table-column>
                 <el-table-column prop="CreateTime" label="创建时间"  align="center" ></el-table-column>
                 <el-table-column prop="DayGiveOutNum" label="当日已领数量"  align="center" ></el-table-column>
@@ -88,25 +91,22 @@
                     <!-- {{tableData.ModelList.DelFlag == 'Y' ? '是' : '否'}} -->
                 </el-table-column>
                 <el-table-column prop="GiveBeginTime" label="开始领券时间"  align="center" ></el-table-column>
+                <el-table-column prop="LastGiveOutTime" label="最后领券时间"  align="center" ></el-table-column>
                 <el-table-column prop="GiveEndTime" label="结束领券时间" align="center" ></el-table-column>
 
                 <el-table-column prop="GiveOutNum" label="已发数量" align="center" ></el-table-column>
                 <el-table-column prop="GiveOutType" label="领券类型" align="center" >{{this.tableData.ModelList === 'C' ? '直接发放' : '密码发放'}}</el-table-column>
-                <el-table-column prop="ID" label="领券活动ID" align="center" ></el-table-column>
                 <el-table-column prop="IsLastRegTime" label="会员最后注册时间"  align="center" ></el-table-column>
-                <el-table-column prop="IsMastNewMember" label="是否必须新会员" align="center" ></el-table-column>
-                <el-table-column prop="IsMemberLoginAutoSend" label="是否会员登陆自动发放" align="center" ></el-table-column>
-                <el-table-column prop="LastGiveOutTime" label="最后领券时间"  align="center" ></el-table-column>
                 <el-table-column prop="LastUpdateManID" label="最后修改人"  align="center" ></el-table-column>
                 <el-table-column prop="LastUpdateTime" label="最后修改时间" align="center" ></el-table-column>
-                <el-table-column prop="MainSupplierID" label="主供应商号(为空表示不限)"  align="center" ></el-table-column>
+                <el-table-column prop="IsMastNewMember" label="是否必须新会员" align="center" ></el-table-column>
+                <el-table-column prop="IsMemberLoginAutoSend" label="是否会员登陆自动发放" align="center" ></el-table-column>
                 <el-table-column prop="MaxNum " label="最大数量"  align="center" ></el-table-column>
                 <el-table-column prop="MemberIDBlackRange" label="会员黑名单" align="center" ></el-table-column>
 
                 <el-table-column prop="MemberIDRange" label="指定发放会员" align="center" ></el-table-column>
                 <el-table-column prop="MemberMaxNum" label="每个会员最大领取数量"  align="center" ></el-table-column>
                 <el-table-column prop="Remark" label="备注"  align="center" ></el-table-column>
-                <el-table-column prop="SupplierID" label="供应商号(为空表示不限)" align="center" ></el-table-column>
                 <el-table-column label="操作" width="100vw" fixed="right">
                     <template slot-scope="scope">
                         <el-button size="mini" type="success" @click="choose(scope.row)" v-if="scope.row.Audit == 'N'">审核</el-button>
@@ -213,26 +213,17 @@ import qs from 'qs'
                     PageSize:10,
                 }
                 MemberGiftTokenGiveOutMasterListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.tableData = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getMainSupplier(){
@@ -241,68 +232,47 @@ import qs from 'qs'
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.formInline.option1 = JSON.parse(res.data.Result)
-                        console.log(this.option1)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getSupplier(){
+                this.formInline.SupplierID = ''
                 let params = {
-                    Level:2
+                    Level:2,
+                    MainSupplierID:this.formInline.MainSupplierID
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.formInline.option2 = JSON.parse(res.data.Result)
-                        console.log(this.option2)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             updateDateStart(val) {
-                console.log("val:" + val)
                 this.formInline.timeStart = val + " 00:00:00"
                 this.form.changeTimeStart = val + " 00:00:00"
-                console.log("this.value1:" + this.value1)
             },
             updateDateEnd(val) {
-                console.log("val:" + val)
                 this.formInline.timeEnd = val + " 00:00:00"
                 this.form.changeTimeEnd = val + " 00:00:00"
-                console.log("this.value1:" + this.value1)
             },
             choose(row){
-                console.log(row.ID)
                 this.editVisible = true,
                 this.ID = row.ID
             },
@@ -313,7 +283,6 @@ import qs from 'qs'
                     AuditRemark:this.form.AuditRemark,       /* 审核备注 */
                 }
                 MemberGiftTokenGiveOutMasterAudit(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
                     this.editVisible = false
                         this.$message({
@@ -327,18 +296,11 @@ import qs from 'qs'
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message(res.data)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             addCouponActivity(){
@@ -356,7 +318,6 @@ import qs from 'qs'
             },
             discard(row){
                 this.ID = row.ID
-                console.log(this.ID)
                 this.$confirm('此操作将不可逆, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -375,7 +336,6 @@ import qs from 'qs'
                     ID:this.ID,            /* 调价单号 */
                 }
                 MemberGiftTokenGiveOutMasterDelete(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
                     this.editVisible = false
                         this.$message({
@@ -387,23 +347,15 @@ import qs from 'qs'
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message(res.data)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             stop(row){                                  /* MemberGiftTokenGiveOutMasterStop */
                 this.ID = row.ID;
-                console.log(this.ID)
                 this.$confirm('此操作将不可逆, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -422,7 +374,6 @@ import qs from 'qs'
                     ID:this.ID,            /* 调价单号 */
                 }
                 MemberGiftTokenGiveOutMasterStop(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
                     this.editVisible = false
                         this.$message({
@@ -434,22 +385,14 @@ import qs from 'qs'
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message(res.data)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             detail(row,ID){
-                console.log(row.ID)
                 this.$router.push({
                     path:'/MemberGiftTokenGiveOutDetailListGetFromGiftTokenGiveOutMasterID',
                     query:{
@@ -461,7 +404,6 @@ import qs from 'qs'
         },
         created(){
             this.getMainSupplier()
-            this.getSupplier()
             this.getData()
         }
     }

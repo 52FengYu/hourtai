@@ -43,11 +43,9 @@
                     </el-form-item>
                     <el-form-item label="支付方式">
                         <span>{{this.listData.PayType}}</span>
-                        <el-button type="primary" @click="editVisible3 = true">修改支付方式</el-button>
+                            <el-button type="primary" @click="getPayMethods" v-if="this.listData.OrderState === '新建' && this.listData.PayTime === null && this.listData.DelFlag === 'N'">修改支付方式</el-button>
                     </el-form-item>
-
                     <h6 style="margin-left:1%">支付信息</h6>
-
                     <el-form-item label="商品金额">
                         <span>{{this.listData.ProductPrice}}</span>
                     </el-form-item>
@@ -178,9 +176,9 @@
         <!-- 修改弹出框 -->
             <el-dialog title="修改" :visible.sync="editVisible2" width="30%">
                 <el-form ref="form" :model="form" label-width="80px">
-                    <el-form-item label="订单号">
+                    <!-- <el-form-item label="订单号">
                         <el-input v-model="this.listData.ID" :disabled="true"></el-input>
-                    </el-form-item>
+                    </el-form-item> -->
                     <el-form-item label="商品编码">
                         <el-input v-model="this.ProductID" :disabled="true"></el-input>
                     </el-form-item>
@@ -197,41 +195,6 @@
                 </span>
             </el-dialog>
 
-            
-        <!-- 修改订单弹出框 -->
-            <el-dialog title="修改订单信息" :visible.sync="editVisible3" width="60%">
-                <el-form ref="form" :model="PayMethods" label-width="100px">
-                    <el-form-item label="支付方式">
-                        <el-select v-model="PayMethods.PayID" clearable placeholder="请选择">
-                            <el-option v-for="item in PayMethodsLIst" :key="item.ID" :label="item.PayName" :value="item.ID"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="送货方式">
-                        <el-radio v-model="PayMethods.ReceiverType" label="S">自提</el-radio>
-                        <el-radio v-model="PayMethods.ReceiverType" label="R">送货上门</el-radio>
-                    </el-form-item>
-                    <el-form-item label="收货详细地址" v-if="this.PayMethods.ReceiverType == 'R'">
-                        <el-input v-model="PayMethods.ReceiveAddr" @blur="Reverse"></el-input>
-                    </el-form-item>
-                    <el-form-item label="收货地区编号" v-if="this.PayMethods.ReceiverType == 'R'">
-                        <el-input v-model="PayMethods.ReceiveAreaID" ></el-input>
-                    </el-form-item>
-                    <el-form-item label="收货人">
-                        <el-input v-model="PayMethods.ReceiveMan"></el-input>
-                    </el-form-item>
-
-                    <el-form-item label="运费">
-                        <el-input v-model="PayMethods.SendFee"></el-input>
-                    </el-form-item>
-                    <el-form-item label="收货人手机号">
-                        <el-input v-model="PayMethods.Moblie"></el-input>
-                    </el-form-item>
-                </el-form>
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="editVisible3 = false">取 消</el-button>
-                    <el-button type="primary" @click="changePayMethods">确 定</el-button>
-                </span>
-            </el-dialog>
     </div>
 </template>
 <script>
@@ -260,9 +223,11 @@ inject:['reload'];
                     ReceiveMan:'',
                     SendFee	:'',
                     Moblie:'',
-                    ReceiverType:''
+                    ReceiverType:'',
+                    AddrX:'',
+                    AddrY:''
                 },
-                editVisible3:false,
+                // editVisible3:false,
                 PayMethodsLIst:[],                                      /* 所有支付方式 */
                 ID:''
             }
@@ -273,15 +238,11 @@ inject:['reload'];
                     ID:decodeURI(location.href).split('?')[1].split('=')[1],
                 }
                 orderDetail(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("超级管理员")
                         this.listData = JSON.parse(res.data.Result)
-                        console.log(this.listData)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             goPage(){
@@ -310,7 +271,6 @@ inject:['reload'];
                 this.$print(this.$refs.print) // 使用
             },
             handleEdit(index, row){
-                console.log(row);
                 this.ID = row.ID
                 this.ProductID = row.ProductID;
                 this.editVisible2 = true;
@@ -326,120 +286,32 @@ inject:['reload'];
                     MemberPrice : this.form.MemberPrice
                 }
                 changePayNum(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message('提交成功')
                         this.reload()
                         this.editVisible2 = false
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                    console.log('出错了')
-                })
-            },
-            changePayMethods(){
-                let params = {
-                    ID:decodeURI(location.href).split('?')[1].split('=')[1],
-                    PayID:this.PayMethods.PayID,
-                    ReceiveAreaID:this.PayMethods.ReceiveAreaID,
-                    ReceiveAddr:this.PayMethods.ReceiveAddr,
-                    ReceiveMan:this.PayMethods.ReceiveMan,
-                    SendFee:this.PayMethods.SendFee,
-                    Moblie:this.PayMethods.Moblie,
-                    ReceiverType:this.PayMethods.ReceiverType,
-                }
-                changePayMethod(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
-                    if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        this.$message.success('修改成功')
-                        this.getData()
-                        this.editVisible3 = false
-                        this.PayMethods.PayID = '',
-                        this.PayMethods.ReceiveAreaID = '',
-                        this.PayMethods.ReceiveAddr = '',
-                        this.PayMethods.ReceiveMan = '',
-                        this.PayMethods.SendFee = '',
-                        this.PayMethods.Moblie = '',
-                        this.PayMethods.ReceiverType = ''
-                    }
-                    if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
-                    if(res.data.Success == -998){
-                        console.log("请求错误")
-                    }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
-            getPayMethods(){
-                let params = {
-                }
-                BasePayAllList(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
-                    if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        this.PayMethodsLIst = JSON.parse(res.data.Result)
-                        console.log(this.PayMethodsLIst)
+            getPayMethods(ID){
+                this.$router.push({
+                    path:'/changeOrder',
+                    query:{
+                        ID:decodeURI(location.href).split('?')[1].split('=')[1],
                     }
-                    if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
-                    if(res.data.Success == -998){
-                        console.log("请求错误")
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                    console.log('出错了')
                 })
-            },
-            Reverse(){
-                var address = "山东省青岛市李沧区"
-                var url = "/direction";
-                var param= {params:{
-                    'key':"F4ZBZ-6C2CK-BVGJG-APW5U-7XOYE-TRBUX",
-                    'address':address,
-                    'dataType':"JSONP",
-                    'jsonp':'callback',
-                    'callback':'showLocation',
-                }};
-                this.$http.get(
-                    url,
-                    param
-                ).then(function (data) {
-                    console.log(data)
-                }).catch(function (e) {
-                    console.log(e)
-                });
             }
         },
         mounted(){
             this.getData()
-            this.getPayMethods()
-            this.Reverse()
         }
     }
 </script>  
@@ -471,4 +343,10 @@ body{
         }
     }
 }
+    #allmap{
+        width: 400px;
+        height: 400px;
+        font-family: "微软雅黑";
+        border:1px solid green;
+    }
 </style>

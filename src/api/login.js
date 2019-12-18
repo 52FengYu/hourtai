@@ -1,9 +1,9 @@
-import request from '../utils/request'; 
 import axios from "axios"
+
 /* 获取用户可添加的页面类型 */
 export function getTokenID(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/api/user/SessionTokenIDGet',
+      url: '/webapi/user/SessionTokenIDGet',
       method: 'post',
       headers:{
       },
@@ -14,7 +14,7 @@ export function getTokenID(params) {
   /* 用户登录 */
   export function UserLogin(params) {
     return axios({
-      url: 'http://128.192.80.135:8030/api/user/UserLogin',
+      url: '/webapi/user/UserLogin',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
@@ -26,7 +26,7 @@ export function getTokenID(params) {
   /* 获取图形验证码 */
   export function GetValidateCode(obj) {
     return axios({
-      url: 'http://128.192.80.135:8030/Api/User/GetValidateCode',
+      url: '/webapi/User/GetValidateCode',
       method: 'post',
       headers:{
         'Content-Type':' application/x-www-form-urlencoded ',

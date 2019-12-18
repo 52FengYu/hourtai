@@ -1,5 +1,31 @@
 import axios from "axios"
 
+
+/* 活动审核 */
+export function PromotionAudit(params) {
+  return axios({
+    url:'/api/Promotion/PromotionAudit',
+    method: 'post',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded ',
+    },
+    data: params
+  })
+}
+
+
+/* 停止领券活动 */
+export function PromotiomStop(params) {
+  return axios({
+    url: '/api/Promotion/PromotiomStop',
+    method: 'post',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded ',
+    },
+    data: params
+  })
+}
+
 /* 活动列表获取 */
 export function PromotionListGet(params) {
     return axios({
@@ -160,6 +186,19 @@ export function PromotionGiftDetailAdd(params) {
 export function PromotionGiftDetailUpdate(params) {
   return axios({
     url: '/api/Promotion/PromotionGiftDetailUpdate',
+    method: 'post',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded ',
+    },
+    data: params
+  })
+}
+
+  
+/* 根据满赠活动ID获取赠品列表 */
+export function PromotionGiftDetailListGetFromPromotionGiftID(params) {
+  return axios({
+    url: '/api/Promotion/PromotionGiftDetailListGetFromPromotionGiftID',
     method: 'post',
     headers:{
       'Content-Type':' application/x-www-form-urlencoded ',

@@ -39,9 +39,9 @@
         <!-- 修改弹出框 -->
         <el-dialog title="应用模块修改" :visible.sync="editVisible2" width="40%">
             <el-form ref="form" :model="row" label-width="80px">
-                <el-form-item label="ID">
+                <!-- <el-form-item label="ID">
                     <el-input v-model="row.ID" :disabled="true"></el-input>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="权限Key">
                     <el-input v-model="row.AuthorityKey"></el-input>
                 </el-form-item>            
@@ -57,12 +57,12 @@
 
         
         <!-- 关联模块和权限弹出框 -->
-        <el-dialog title="关联模块和权限" :visible.sync="editVisible3" width="40%">
+        <el-dialog title="现未关联的权限" :visible.sync="editVisible3" width="40%">
             <el-tree
                 :data="limit"
                 ref="tree"
                 show-checkbox
-                node-key="id"
+                node-key="ID"
                 default-expand-all
                 :default-checked-keys =  this.AuthorityIDList
                 :props="defaultProps">
@@ -98,7 +98,7 @@ import qs from 'qs'
                 limit:[],               /* data */
                 defaultProps: {
                     children: 'children',
-                    label: 'label'
+                    label: 'AuthorityName'
                 },
                 AuthorityIDList:[],             /* 已经关联的 */
             }
@@ -109,56 +109,45 @@ import qs from 'qs'
                     ModuleID : decodeURI(location.href).split('?')[1].split('=')[1]
                 }
                 SysAuthorityListGetFromModuleID(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.tableData = JSON.parse(res.data.Result)
                         for(var i = 0; i < this.tableData.length; i++){
                             this.AuthorityIDList.push(this.tableData[i].ID)
                         }
-                        console.log(JSON.stringify(this.AuthorityIDList))
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
-            /* addModule(){
+            addModule(){
                 let params = {
                     ModuleID : this.form.ModuleID,
                     AuthortyKey:this.form.AuthorityKey,
                     AuthorityName:this.form.AuthorityName
                 }
                 SysAuthorityAdd(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('模块权限信息添加成功')
                         this.editVisible = false
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
-            }, */
+            },
             change(row){
-                console.log(row)
                 this.row.ID = row.ID,
                 this.row.AuthorityKey = row.AuthorityKey,
                 this.row.AuthorityName = row.AuthorityName,
@@ -171,71 +160,59 @@ import qs from 'qs'
                     AuthorityName:this.row.AuthorityName
                 }
                 SysAuthorityUpdate(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('模块权限信息修改成功')
                         this.editVisible2 = false
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             connectModule(){                /* 关联模块和权限,获取全部的权限数据 */
                 this.editVisible3 = true
-                let params = {}
-                AuthorityListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
+                let params = {
+                    ModuleID:'0000000000'
+                }
+                SysAuthorityListGetFromModuleID(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(res.data.Result)
                         this.limit = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        console.log("请求错误")
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                    console.log('出错了')
-                })
-            },
-            submit(){
-                console.log(JSON.stringify(this.$refs.tree.getCheckedKeys(true)))
-                let params = {
-                    ModuleID:decodeURI(location.href).split('?')[1].split('=')[1],
-                    ID:JSON.stringify(this.$refs.tree.getCheckedKeys(true)),
-                }
-                SysAuthorityModuleRelevant(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
-                    if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        this.$message.success('提交成功')
-                        this.editVisible3 = false
-                    }
-                    if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
+                })
+            },
+            submit(){
+                let params = {
+                    ModuleID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    IDS:JSON.stringify(this.$refs.tree.getCheckedKeys(true)),
+                }
+                SysAuthorityModuleRelevant(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.$message.success('提交成功')
+                        this.editVisible3 = false
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
                 })
             },
         },

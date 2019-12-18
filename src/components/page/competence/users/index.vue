@@ -14,6 +14,8 @@
                 </el-form-item>
             </el-form>
             <el-table :data="tableData.ModelList" border style="width: 100%">
+                <el-table-column prop="UserID" label="用户编号" align="center"></el-table-column>
+                <el-table-column prop="UserName" label="用户姓名" align="center"></el-table-column>
                 <el-table-column prop="DeptName" label="部门名称" align="center"></el-table-column>
                 <el-table-column prop="DelFlag" label="是否废弃" align="center"></el-table-column>
                 <el-table-column prop="ID" label="用户表ID" align="center"></el-table-column>
@@ -22,8 +24,6 @@
                 <el-table-column prop="LastLoginTime" label="最后登陆时间" align="center"></el-table-column>
                 <el-table-column prop="LoginCount" label="登陆次数" align="center"></el-table-column>
                 <el-table-column prop="Remark" label="备注" align="center"></el-table-column>
-                <el-table-column prop="UserID" label="用户编号" align="center"></el-table-column>
-                <el-table-column prop="UserName" label="用户姓名" align="center"></el-table-column>
                 <el-table-column prop="State" label="当前状态" align="center">
                     <template slot-scope="scope">
                         {{scope.row.State == 'N' ? '新建' : (scope.row.State == 'Y' ? '启用' : '停用')}}
@@ -183,23 +183,17 @@ import qs from 'qs'
                     HasDelFlag:this.HasDelFlag
                 }
                 SysUserListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.tableData = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             handleSizeChange(val) {
@@ -222,32 +216,36 @@ import qs from 'qs'
                     UserName:this.addInfo.UserName,
                 }
                 SysUserAdd(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('添加成功')
                         this.editVisible = false
                         this.getData()
+                        this.addInfo.DeptID = ''
+                        this.addInfo.UserID = ''
+                        this.addInfo.Tel = ''
+                        this.addInfo.Remark = ''
+                        this.addInfo.IsAdmin = ''
+                        this.addInfo.UserName = ''
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             change(row){                    /* 在这里进行数据回显 */
-                // console.log(row)
-                this.ID = row.ID
-                this.editVisible2 = true
+                console.log(row),
+                this.ID = row.ID,
+                this.editVisible2 = true,
                 this.addInfo.UserName = row.UserName,
                 this.addInfo.Remark = row.Remark,
-                this.addInfo.UserID = row.UserID
+                this.addInfo.UserID = row.UserID,
+                this.addInfo.IsAdmin = row.IsAdmin
+                this.addInfo.Tel = row.Tel
             },
             changeInfo(){
                 let params = {
@@ -260,27 +258,25 @@ import qs from 'qs'
                     UserName:this.addInfo.UserName,
                 }
                 SysUserUpdate(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('修改成功')
                         this.editVisible2 = false
                         this.getData()
-                        this.addInfo.UserName = '',
+                        /* this.addInfo.UserName = '',
                         this.addInfo.UserID = '',
                         this.addInfo.IsAdmin = '',
-                        this.addInfo.Tel=""
+                        this.addInfo.Tel="" */
+                        this.addInfo = ''
                     }
                     if(res.data.Success == 0){
                         console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getSection(){
@@ -289,29 +285,23 @@ import qs from 'qs'
                     PageSize:-1
                 }
                 SysDeptListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.addInfo.deptPool = JSON.parse(res.data.Result).ModelList
-                        console.log(this.addInfo.deptPool)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             test(){
                 console.log(this.addInfo.DeptID[0])
             },
             deleteItem(row){
-                console.log(row)
                 this.ID = row.ID,
                 this.open()
             },
@@ -320,22 +310,18 @@ import qs from 'qs'
                     ID:this.ID
                 }
                 SysUserDelete(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('删除成功')
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             open() {                                /* 删除提示框 */
@@ -357,22 +343,18 @@ import qs from 'qs'
                     ID:row.ID
                 }
                 SysUserStop(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('禁用成功')
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             start(row){
@@ -380,54 +362,43 @@ import qs from 'qs'
                     ID:row.ID
                 }
                 SysUserSetEnable(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('启用成功')
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             itemRole(row){
                 this.RoleIDs = row.RoleIDs
                 this.ID = row.ID
-                console.log(this.RoleIDs)
                 this.editVisible3 = true
                 let params = {
                     PageNo:-1,
                     PageSize:-1
                 }
                 SysRoleListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.role =  JSON.parse(res.data.Result).ModelList
-                        console.log(this.role)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             submit(){                   /* 用户绑定角色 */
-                console.log(JSON.stringify(this.$refs.tree.getCheckedKeys()))
                 const tree = JSON.stringify(this.$refs.tree.getCheckedKeys(true))
                 let reg=new RegExp(',','g')//g代表全部
                 let newMsg=tree.replace(reg,'|');
@@ -440,13 +411,11 @@ import qs from 'qs'
                 }
                 SysUserSetRole(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('提交成功')
                         this.getData()
                         this.editVisible3 = false
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
@@ -454,7 +423,6 @@ import qs from 'qs'
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             }
         },

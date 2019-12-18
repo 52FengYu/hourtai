@@ -25,33 +25,63 @@
                                             <div class="displayFlex">
                                                 <el-button type="text" @click="moveUp($event);" :id="item.ID" >上移</el-button>
                                                 <el-button type="text" @click="moveDown($event)" :id="item.ID">下移</el-button>
+                                                <el-button type="text" @click="deleteItem($event)" :id="item.ID">删除</el-button>
+                                                <el-button type="text" @click="change($event)" :id="item.ID">修改</el-button>
                                                 <el-button type="text" @click="edit($event)" :id="item.ID">编辑</el-button>
                                             </div>
                                         </div>
                                     </div>
                                 </el-scrollbar>
+
+                                <!-- 新增页面内容 -->
                                  <el-dialog title="新增" :visible.sync="editVisible" width="50%">
                                             <div slot="header" class="clearfix">
                                                 <span>选择模板类型</span>
                                             </div>
-                                            <el-form :inline="true" class="demo-form-inline" ref="form" :model="newPage">       
-                                                <el-form-item label="页面类型编号（必填）">
-                                                    <el-input v-model="newPage.ContentTypeID"></el-input>
+                                            <el-form  class="demo-form-inline" ref="form" :model="newPage">       
+                                                <el-form-item label="*页面内容类型编号">
+                                                    <el-select v-model="newPage.ContentTypeID" placeholder="请选择类型" clearable>
+                                                        <el-option
+                                                            v-for="item in options"
+                                                            :key="item.ID"
+                                                            :label="item.ContentTypeName"
+                                                            :value="item.ID"
+                                                        >
+                                                        </el-option>
+                                                    </el-select>
                                                 </el-form-item>
-                                                <el-form-item label="只对新会员可见（必填）">
-                                                    <el-switch v-model="newPage.IsNewMemberSee"></el-switch>
-                                                </el-form-item>
-                                                <el-form-item label="背景图">
-                                                    <el-input v-model="newPage.BackGroundImageURL"></el-input>
-                                                </el-form-item>
+                                                <!-- <el-form-item label="*页面编号">
+                                                    <el-input v-model="newPage.PageID" :disabled="true"></el-input>
+                                                </el-form-item> -->
                                                 <el-form-item label="背景颜色">
                                                     <el-input v-model="newPage.BackGroundColor"></el-input>
                                                 </el-form-item>
-                                                <el-form-item label="页面编号（必填）">
-                                                    <el-input v-model="newPage.PageID"></el-input>
-                                                </el-form-item>
-                                                <el-form-item label="序号(必填)">
+                                                <el-form-item label="序号">
                                                     <el-input v-model="newPage.OrderID"></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="特殊标签">
+                                                    <el-input v-model="newPage.Note"></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="*只对新会员可见">
+                                                    <el-select v-model="newPage.IsNewMemberSee" placeholder="只对新会员可见" clearable >
+                                                        <el-option label="是" value="Y"></el-option>
+                                                        <el-option label="否" value="N"></el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                                <el-form-item label="背景图"><!-- /adminwebapi -->
+                                                    <el-upload
+                                                        action= '/api/Image/UploadImage'
+                                                        list-type="picture-card"
+                                                        :on-success="handleAvatarSuccess2"
+                                                        accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
+                                                        :limit='1'
+                                                        :file-list="fileLists1"
+                                                        :on-error="imgUploadError"
+                                                        :headers="TokenID"
+                                                        :data="upLoadData"
+                                                        >
+                                                        <i class="el-icon-plus"></i>
+                                                    </el-upload>
                                                 </el-form-item>
                                             </el-form>
                                             <span slot="footer" class="dialog-footer">
@@ -62,63 +92,83 @@
                                 <el-button slot="reference" @click="editVisible=true">+</el-button>
                             </div>
                         </div>
+                        <!-- 右侧 -->
                         <div class="style-sdit large">
                             <el-card class="box-card">
-                                    <div v-for="item in this.content" :key="item.ID">
-                                        <div slot="header" class="clearfix">
-                                            <span>填写信息</span>
-                                            <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="deleteInfo($event)">删除</el-button>
-                                            <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="infoMoveDown($event)">下移</el-button>
-                                            <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="infoMoveUp($event)">上移</el-button>
-                                            <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="InfoEdit($event)">编辑</el-button>
-                                        </div>
-                                        <div>
-                                            <el-form ref="form" label-width="80px">         <!-- 动态 -->
-                                                <el-form-item label="banner图">
-                                                    <img :src="item.BackgroundImageURL" alt="">
+                                <div v-for="item in this.content" :key="item.ID">
+                                    <div slot="header" class="clearfix">
+                                        <span>填写信息</span>
+                                        <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="deleteInfo($event)">删除</el-button>
+                                        <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="infoMoveDown($event)">下移</el-button>
+                                        <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="infoMoveUp($event)">上移</el-button>
+                                        <el-button style="float: right; padding: 3px 0" type="text" :id="item.ID" @click="InfoEdit($event)">编辑</el-button>
+                                    </div>
+                                    <div>
+                                        <el-form ref="form" label-width="80px">         <!-- 动态 -->
+                                            <el-form-item label="banner图">
+                                                <img :src="item.BackgroundImageURL" alt="">
+                                            </el-form-item>
+                                            <el-form-item label="活动链接">
+                                                <el-input v-model="item.LinkURL" :disabled="true" placeholder="请输入活动链接"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="活动名称">
+                                                <el-input v-model="item.Title" :disabled="true" placeholder="请输入活动名称"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="背景底色">
+                                                <el-input v-model="item.BackgroundColor" :disabled="true" placeholder="请填写背景底色"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="序号">
+                                                <el-input v-model="item.OrderID" :disabled="true" placeholder="请填写序号"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="商品编号">
+                                                <el-input v-model="item.ProductID" :disabled="true" placeholder="请填写商品编号"></el-input>
+                                            </el-form-item>
+                                            <el-form-item label="活动号">
+                                                <el-input v-model="item.PromotionID" :disabled="true" placeholder="请填写活动号"></el-input>
+                                            </el-form-item>
+                                        </el-form>
+
+                                        <!-- 右侧修改弹出框 -->
+                                        <el-dialog title="编辑" :visible.sync="editVisible2" width="50%">
+                                            <el-form ref="form" :model="InfoForm"  label-width="80px">
+                                                <el-form-item label="banner图">     <!-- /adminwebapi -->
+                                                    <el-upload
+                                                        action= '/api/Image/UploadImage'
+                                                        list-type="picture-card"
+                                                        :on-success="handleAvatarSuccess"
+                                                        :on-error="imgUploadError"
+                                                        accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
+                                                        :limit='1'
+                                                        :file-list="fileLists2"
+                                                        :headers="TokenID"
+                                                        :data="upLoadData"
+                                                        >
+                                                        <i class="el-icon-plus"></i>
+                                                    </el-upload>
+                                                </el-form-item>
+                                                <el-form-item label="背景色">
+                                                    <el-input v-model="InfoForm.BackGroundColor" placeholder="请填写背景色"></el-input>
                                                 </el-form-item>
                                                 <el-form-item label="活动链接">
-                                                    <el-input v-model="item.LinkURL" :disabled="true" placeholder="请输入活动链接"></el-input>
+                                                    <el-input v-model="InfoForm.LinkURL" placeholder="请输入活动链接（非必填）"></el-input>
                                                 </el-form-item>
-                                                <el-form-item label="活动名称">
-                                                    <el-input v-model="item.Title" :disabled="true" placeholder="请输入活动名称"></el-input>
+                                                <el-form-item label="标题">
+                                                    <el-input v-model="InfoForm.Title" placeholder="请输入标题（非必填）"></el-input>
                                                 </el-form-item>
-                                                <el-form-item label="背景底色">
-                                                    <el-input v-model="item.BackgroundColor" :disabled="true" placeholder="请填写背景底色"></el-input>
+                                                <el-form-item label="商品编码">
+                                                    <el-input v-model="InfoForm.ProductID" placeholder="请填写商品编码（非必填）"></el-input>
                                                 </el-form-item>
-                                                <el-form-item label="序号">
-                                                    <el-input v-model="item.OrderID" :disabled="true" placeholder="请填写序号"></el-input>
+                                                <el-form-item label="活动号">
+                                                    <el-input v-model="InfoForm.PromotionID" placeholder="请填写活动号（非必填）"></el-input>
                                                 </el-form-item>
                                             </el-form>
-                                            <!-- 右侧修改弹出框 -->
-                                            <el-dialog title="编辑" :visible.sync="editVisible2" width="50%">
-                                                <el-form ref="form" :model="InfoForm"  label-width="80px">
-                                                    <el-form-item label="banner图">
-                                                        <el-input v-model="InfoForm.BackGroundImageURL" placeholder="请输入banner图（非必填）"></el-input>
-                                                    </el-form-item>
-                                                    <el-form-item label="活动链接">
-                                                        <el-input v-model="InfoForm.LinkURL" placeholder="请输入活动链接（非必填）"></el-input>
-                                                    </el-form-item>
-                                                    <el-form-item label="标题">
-                                                        <el-input v-model="InfoForm.Title" placeholder="请输入标题（非必填）"></el-input>
-                                                    </el-form-item>
-                                                    <el-form-item label="背景色">
-                                                        <el-input v-model="InfoForm.BackGroundColor" placeholder="请填写背景色"></el-input>
-                                                    </el-form-item>
-                                                    <el-form-item label="商品编码">
-                                                        <el-input v-model="InfoForm.ProductID" placeholder="请填写商品编码（非必填）"></el-input>
-                                                    </el-form-item>
-                                                    <el-form-item label="活动号">
-                                                        <el-input v-model="InfoForm.PromotionID" placeholder="请填写活动号（非必填）"></el-input>
-                                                    </el-form-item>
-                                                </el-form>
-                                                <span slot="footer" class="dialog-footer">
-                                                    <el-button @click="editVisible2 = false">取 消</el-button>
-                                                    <el-button type="primary" :id="item.ID"  @click="addSave($event)">确 定</el-button>
-                                                </span>
-                                            </el-dialog>
-                                        </div>
+                                            <span slot="footer" class="dialog-footer">
+                                                <el-button @click="editVisible2 = false">取 消</el-button>
+                                                <el-button type="primary" :id="item.ID"  @click="addSave($event)">确 定</el-button>
+                                            </span>
+                                        </el-dialog>
                                     </div>
+                                </div>
                             </el-card>
                         </div>
                     </div>
@@ -126,8 +176,107 @@
             <div class="button">
                 <el-button type="primary" @click="onSubmit">确认提交</el-button>
                 <el-button type="primary" @click="temp">预览</el-button>
+                <el-button type="primary" plain @click="editVisible3 = true">新增页面明细</el-button>
             </div>
         </div>
+
+        <!-- 添加页面明细 -->
+        <el-dialog title="添加页面明细" :visible.sync="editVisible3" width="50%">
+            <el-form ref="form" :model="addPageContentInfo"  label-width="110px">
+                <el-form-item label="banner图"><!-- /adminwebapi -->
+                    <el-upload
+                        action= '/api/Image/UploadImage'
+                        list-type="picture-card"
+                        :on-success="handleAvatarSuccess3"
+                        :on-error="imgUploadError"
+                        accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
+                        :limit='1'
+                        :file-list="fileLists3"
+                        :headers="TokenID"
+                        :data="upLoadData"
+                        >
+                        <i class="el-icon-plus"></i>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="背景色">
+                    <el-input v-model="addPageContentInfo.BackGroundColor" placeholder="请填写背景色"></el-input>
+                </el-form-item>
+                <el-form-item label="活动链接">
+                    <el-input v-model="addPageContentInfo.LinkURL" placeholder="请输入活动链接（非必填）"></el-input>
+                </el-form-item>
+                <el-form-item label="标题">
+                    <el-input v-model="addPageContentInfo.Title" placeholder="请输入标题（非必填）"></el-input>
+                </el-form-item>
+                <el-form-item label="序号">
+                    <el-input v-model="addPageContentInfo.OrderID" placeholder="请填写序号"></el-input>
+                </el-form-item>
+                <!-- <el-form-item label="页面内容编号">
+                    <el-select v-model="addPageContentInfo.pageContentID" clearable placeholder="请选择">
+                        <el-option
+                            v-for="item in Features"
+                            :key="item.ID"
+                            :label="item.ContentTypeName"
+                            :value="item.ID">
+                        </el-option>
+                    </el-select>
+                </el-form-item> -->
+                <el-form-item label="商品编码">
+                    <el-input v-model="addPageContentInfo.ProductID" placeholder="请填写商品编码（非必填）"></el-input>
+                </el-form-item>
+                <el-form-item label="活动号">
+                    <el-input v-model="addPageContentInfo.PromotionID" placeholder="请填写活动号（非必填）"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible3 = false">取 消</el-button>
+                <el-button type="primary"   @click="PageContentInfo">确 定</el-button>
+            </span>
+        </el-dialog>
+        
+        <!-- 修改页面内容 -->
+            <el-dialog title="修改" :visible.sync="editVisible4" width="50%">
+                    <div slot="header" class="clearfix">
+                        <span>选择模板类型</span>
+                    </div>
+                    <el-form :inline="true" class="demo-form-inline" ref="form" :model="changePage">       
+                        <!-- <el-form-item label="*页面内容编号">
+                            <el-input v-model="changePage.PageContentCode" :disabled="true"></el-input>
+                        </el-form-item> -->
+                        <el-form-item label="背景颜色">
+                            <el-input v-model="changePage.BackGroundColor"></el-input>
+                        </el-form-item>
+                        <el-form-item label="特殊标签">
+                            <el-input v-model="changePage.Note"></el-input>
+                        </el-form-item>
+                        <el-form-item label="*只对新会员可见">
+                            <el-select v-model="changePage.IsNewMemberSee" placeholder="只对新会员可见" clearable >
+                                <el-option label="是" value="Y"></el-option>
+                                <el-option label="否" value="N"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="背景图">   <!-- /adminwebapi -->
+                            <el-upload
+                                action= '/api/Image/UploadImage'
+                                list-type="picture-card"
+                                :on-success="handleAvatarSuccess4"
+                                accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
+                                :limit='1'
+                                :file-list="fileLists4"
+                                :headers="TokenID"
+                                :data="upLoadData"
+                                >
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+<!--                             <el-dialog :visible.sync="dialogVisible">
+                                <img width="100%" :src="dialogImageUrl" alt="">
+                            </el-dialog>
+ -->                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="editVisible4 = false">取 消</el-button>
+                        <el-button type="primary" @click="changePageContent">确 定</el-button>
+                    </span>
+        </el-dialog>
     </div>
 </template>
 <style lang="scss" scoped>
@@ -267,22 +416,34 @@
             margin:1.5vh 0;
         }
     }
+    
 </style>
 
 <script>
-import { getItemInfo,move,getItemContentInfo,changeItemContentInfo,moveItemContentInfo,deleteItemContentInfo,addItemInfo,getPageJS } from "@/api/columnManagement"
+import { getItemInfo,move,getItemContentInfo,changeItemContentInfo,moveItemContentInfo,deleteItemContentInfo,addItemInfo,getPageJS,getAddItemType,addItemContentInfo,getItemType,changeItemContent,deleteItemInfo } from "@/api/columnManagement"
 import qs from 'qs';
 export default {
     inject:['reload'],
         data() {
             return {
                 newPage:{
-                    ContentTypeID:'',       /* 新增 */
-                    IsNewMemberSee:false,
-                    BackGroundColor:"",
-                    BackGroundImageURL:"",
-                    PageID:'',
+                    // ContentTypeID:'',       /* 新增 */
+                    // IsNewMemberSee:false,
+                    // BackGroundColor:"",
+                    // BackGroundImageURL:"",
+                    // PageID:'',
+                    // OrderID:'',
+                    // Note:''
+                },
+                addPageContentInfo:{
+                    BackGroundImageURL:'',
+                    LinkURL:"",
+                    Title:'',
+                    BackGroundColor:'',
+                    PromotionID:'',
+                    ProductID:'',
                     OrderID:'',
+                    pageContentID:''
                 },
                 InfoForm:{
                     BackGroundImageURL:'',
@@ -294,6 +455,8 @@ export default {
                 },
                 editVisible:false,
                 editVisible2:false,
+                editVisible3:false,
+                editVisible4:false,        /* 修改页面内容 */
                 ID:'',                  /* 上一个页面传过来的id */
                 Features:'',            /* 功能首页的value */
                 content:'',             /* 右侧内容value */
@@ -303,11 +466,31 @@ export default {
                     activeName:"",      /* 活动名称 */
                     background:'',      /* 活动底色 */
                 },
+                options:[],
+                TokenID:{
+                    TokenID:sessionStorage.getItem('TokenID'),
+                },
+                upLoadData:{
+                    ImageUseType:'Page'           /*  Page，ProductContent，ProductHead */
+                },
+                fileLists4:[],              /* 修改页面信息 */
+                fileLists3:[],              /* 增加页面明细 */
+                fileLists2:[],
+                fileLists1:[],
+                changePage:{
+                    PageContentCode:'',         /* 修改时的页面内容编号 */
+                    BackGroundImageURL:'',
+                    BackGroundColor:'',
+                    IsNewMemberSee:'',
+                    Note:''
+                },
+                PageContentID:'',
+                Flag:false
             }
         },
         created() {
              this.feature()
-             
+             this.getPageType()
         },
         computed: {
             
@@ -316,27 +499,20 @@ export default {
             // 预览
             temp(){     
                 let params = {
-                    PageID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    PageID:decodeURI(location.href).split('&')[1].split('=')[1],
                     CreateType:'TEMP',
                 }
                 getPageJS(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(res.data.Result)
-                        window.open(`https://o2o.liqunshop.com/view/page/index.html?pageid=${res.data.Result} `)
+                        window.open(`https://o2o.liqunshop.com/view/page/index.html?pageid=${res.data.Result}&PageOpenType=Share `)
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
                         this.$message('生成页面信息失败');
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
+                        this.$message('生成失败');
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -345,60 +521,44 @@ export default {
             },
             // 刚开始的数据请求
             feature(){
+                this.newPage.PageID = decodeURI(location.href).split('&')[1].split('=')[1]
                 let params = {
-                    PageID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    PageID:decodeURI(location.href).split('&')[1].split('=')[1],
                 }
                 getItemInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.Features = JSON.parse(res.data.Result)
-                        console.log(this.Features)
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             // 提交
             onSubmit(){
                 let params = {
-                    PageID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    PageID:decodeURI(location.href).split('&')[1].split('=')[1],
                     CreateType:'USED ',
                 }
                 getPageJS(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        window.open(`https://o2o.liqunshop.com/view/page/index.html?pageid=${res.data.Result} `)
+                        window.open(`https://o2o.liqunshop.com/view/page/index.html?pageid=${res.data.Result}&PageOpenType=Share `)
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
                         this.$message('生成页面信息失败');
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message('生成页面信息失败');
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             // 左边的上移
@@ -408,28 +568,20 @@ export default {
                     MoveType:'UP' 
                 }
                 move(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
-                        this.$message.Success('向上移动设置成功');
+                        this.$message.success('向上移动设置成功');
                         this.reload()
+                        this.getData()
+                        this.feature()
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message('目前已经是第一个');
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             moveDown(e){
@@ -440,117 +592,140 @@ export default {
                 move(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.$message.success('向下移动设置成功');
                         this.reload()
+                        this.getData()
+                        this.feature()
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message('目前已经是最后一个');
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
-            edit(e){
+            deleteItem(e){
                 let params = {
-                    PageContentId:e.currentTarget.id
+                    ID:e.currentTarget.id,
                 }
-                console.log(this.Features[0].ContentTypeID)
-                getItemContentInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
+                deleteItemInfo(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(e.currentTarget.id)
-                        console.log(JSON.parse(res.data.Result))
-                        this.content = JSON.parse(res.data.Result)
+                        this.$message.success('删除成功');
+                        this.reload()
+                        this.getData()
+                        this.feature()
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message('目前已经是最后一个');
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
-            getData(){
+            edit(e){            /* 左侧编辑 */
+                /* console.log(e.target.parentElement.id)
+                console.log(e.srcElement.parentElement.attributes.id.value) */
+                if(e.target){
+                    this.PageContentID = e.target.parentElement.id
+                }
+                // this.PageContentID = e.target.parentElement.id
+                let params = {
+                    PageContentId:this.PageContentID
+                }
+                getItemContentInfo(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.Flag != this.Flag
+                        this.content = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            change(e){                  /* 点击修改 */
+                this.changePage.PageContentCode = e.srcElement.parentElement.attributes.id.value
+                this.editVisible4 = true
+            },
+            changePageContent(){        /* 修改页面内容  提交 */
+                let params = {
+                    ID:this.changePage.PageContentCode,
+                    BackGroundColor:this.changePage.BackGroundColor,
+                    BackGroundImageURL:this.changePage.BackGroundImageURL,
+                    IsNewMemberSee:this.changePage.IsNewMemberSee,
+                    Note:this.changePage.Note
+                }
+                changeItemContent(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.$message.success('修改成功')
+                        this.changePage = {}
+                        this.fileLists4 = []
+                        this.editVisible4 = false
+
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                        this.changePage = {}
+                        this.fileLists4 = []
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            getData(){                  /* 根据页面内容编号获取页面内容明细类别 */
                 let params = {
                     PageContentId:this.Features[0].ID
                 }
-                console.log(this.Features[0].ContentTypeID)
                 getItemContentInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.content = JSON.parse(res.data.Result)
+                        this.newPage.PageID = decodeURI(location.href).split('&')[1].split('=')[1]
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             IsActive(k) {
                 this.activeClass = k;
             },
             infoMoveUp(e){
-                console.log(e.currentTarget.id)
                 let params = {
                     ID:e.currentTarget.id,
                     MoveType:'UP' 
                 }
                 moveItemContentInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.$message('向上移动设置成功');
-                        this.reload()
+                        this.edit()
+                        console.log('上移')
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message('目前已经是第一个');
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             infoMoveDown(e){
@@ -560,57 +735,39 @@ export default {
                     MoveType:'DOWN' 
                 }
                 moveItemContentInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.$message('向下移动设置成功');
-                        this.reload()
+                        this.edit()
+                        console.log('下移')
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message('目前已经是最后一个');
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             deleteInfo(e){
-                console.log(e.currentTarget.id)
                 let params = {
                     ID:e.currentTarget.id,
                 }
                 deleteItemContentInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.$message('删除成功');
-                        this.reload()
+                        this.edit()
+                        console.log('删除')
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             addPageContent(){
@@ -619,31 +776,25 @@ export default {
                     IsNewMemberSee:this.newPage.IsNewMemberSee == true ? "Y" :"N",
                     BackGroundColor:this.newPage.BackGroundColor,
                     BackGroundImageURL:this.newPage.BackGroundImageURL,
-                    PageID:this.newPage.PageID,
+                    PageID: decodeURI(location.href).split('&')[1].split('=')[1],
                     OrderID:this.newPage.OrderID,
+                    Note:this.newPage.Note
                 }
                 addItemInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
-                        this.$message('添加成功');
+                        this.$message.success('添加成功');
                         this.reload()
+                        this.getData()
+                        this.feature()
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             InfoEdit(e){
@@ -655,40 +806,134 @@ export default {
                     BackGroundColor:this.InfoForm.BackGroundColor,
                     BackGroundImageURL:this.InfoForm.BackGroundImageURL,
                     Title:this.InfoForm.Title,
-                    LinkURL:this.InfoForm.LinkURL,
+                    LinkURL:window.encodeURIComponent(this.InfoForm.LinkURL),
                     ID:this.editID,
                     ProductID:this.InfoForm.ProductID,
                     PromotionID:this.InfoForm.PromotionID,
                 }
                 changeItemContentInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
-                    // console.log(e.currentTarget.id)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
-                        this.$message('添加成功');
+                        this.$message.success('添加成功');
                         this.editVisible2 = false
                         this.InfoForm.BackgroundImageURL = ""
                         this.InfoForm.LinkURL = ''
                         this.InfoForm.Title = ''
                         this.InfoForm.BackgroundColor = ''
-                        this.reload()
+                        this.edit()
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
+            },
+            getPageType(){      /* 下拉菜单 */
+                let params = {
+                    PageTypeID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
+                }
+                getItemType(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.options = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            handleAvatarSuccess(res,file){              /* 右侧修改弹出框 */
+                this.InfoForm.BackGroundImageURL = 'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]
+                /* this.getData()
+                this.feature() */
+            },
+            handleAvatarSuccess2(res,file){                 /* 新增页面内容 */
+                this.newPage.BackGroundImageURL =  JSON.parse(res.Result)[0]                   /* 启明星原地址 */
+                this.getData()
+                this.feature()
+            },
+            handleAvatarSuccess3(res,file){                 /* 增加页面明细 */
+                this.addPageContentInfo.BackGroundImageURL = ''
+                this.addPageContentInfo.BackGroundImageURL =  'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]                   /* 启明星原地址 */
+                // this.getData()
+                // this.feature()
+            },
+            handleAvatarSuccess4(res,file){                 /* 修改页面内容 */
+                this.changePage.BackGroundImageURL = ''
+                this.changePage.BackGroundImageURL =  'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]                   /* 启明星原地址 */
+                this.getData()
+                // this.feature()
+            },
+            // handlePictureCardPrevie4(file) {            /*修改页面信息 */
+            //     this.dialogImageUrl = file.url;
+            //     this.dialogVisible4 = true;
+            // },
+            // handlePictureCardPrevie3(file) {
+            //     this.dialogImageUrl = file.url;
+            //     this.dialogVisible3 = true;
+            // },
+            // handlePictureCardPrevie2(file) {
+            //     this.dialogImageUrl = file.url;
+            //     this.dialogVisible2 = true;
+            // },
+            // handlePictureCardPrevie1(file) {
+            //     this.dialogImageUrl = file.url;
+            //     this.dialogVisible2 = true;
+            // },
+            PageContentInfo(){          /* 添加页面明细 */
+                let params = {
+                    // pageContentID:this.addPageContentInfo.pageContentID,        /* 页面内容ID */   
+                    pageContentID:this.PageContentID,                            
+                    BackGroundColor:this.addPageContentInfo.BackGroundColor,
+                    BackGroundImageURL:this.addPageContentInfo.BackGroundImageURL,
+                    LinkURL:window.encodeURIComponent(this.addPageContentInfo.LinkURL),
+                    OrderID:this.addPageContentInfo.OrderID,
+                    ProductID:this.addPageContentInfo.ProductID,
+                    PromotionID:this.addPageContentInfo.PromotionID,
+                    Title:this.addPageContentInfo.Title
+                }
+                addItemContentInfo(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.$message.success('添加成功')
+                        this.editVisible3 = false
+                        this.edit()
+                        this.addPageContentInfo.pageContentID= ''
+                        this.addPageContentInfo.BackGroundColor = '',
+                        this.addPageContentInfo.BackGroundImageURL = ''
+                        this.addPageContentInfo.LinkURL = ''
+                        this.addPageContentInfo.OrderID = ''
+                        this.addPageContentInfo.ProductID = ''
+                        this.addPageContentInfo.PromotionID = ''
+                        this.addPageContentInfo.Title = ''
+                        this.fileLists3 = []
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                        this.addPageContentInfo.pageContentID= ''
+                        this.addPageContentInfo.BackGroundColor = '',
+                        this.addPageContentInfo.BackGroundImageURL = ''
+                        this.addPageContentInfo.LinkURL = ''
+                        this.addPageContentInfo.OrderID = ''
+                        this.addPageContentInfo.ProductID = ''
+                        this.addPageContentInfo.PromotionID = ''
+                        this.addPageContentInfo.Title = ''
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            imgUploadError(){
+                this.$message('图片上传失败，请重试')
             }
         }
     }

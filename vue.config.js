@@ -33,29 +33,23 @@ module.exports = {
         https: false,
         hotOnly: false,
         proxy: {
-            '/api':{
-                target:'http://128.192.80.135/api',                 /* http://128.192.80.135:8030 */
-                //target:'http://128.192.80.135:8030',
+            '/api':{                        /* 后台其它接口 */
+                target:'https://o2o.liqunshop.com/adminwebapi/api',               /* https://o2o.liqunshop.com/adminwebapi/api/Order/OrderMasterListGet */ 
                 changeOrigin:true,
                 pathRewrite:{
                     '/api':''
                 }
             },
-            '/direction':{
-                target:'https://apis.map.qq.com/ws/geocoder/v1/',                 
+            '/webapi':{                     /* 权限 */
+                target:'https://o2o.liqunshop.com/framewebapi/api',                /* https://o2o.liqunshop.com/framewebapi/api/User/SysAppListGet */
                 changeOrigin:true,
                 pathRewrite:{
-                    '/api':''
+                    '/webapi':''
                 }
-            },
+            }
         }, // 设置代理
         before: app => { }
     },
-    configureWebpack: {
-        externals: {
-          'AMap': 'AMap' // 高德地图配置
-        }
-      },
     // 第三方插件配置
     pluginOptions: {
         // ...

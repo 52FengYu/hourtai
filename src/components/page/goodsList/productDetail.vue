@@ -3,7 +3,7 @@
         <el-form ref="form"  :model="products" label-width="120px">
             <el-form-item label="商品图">
                 <el-upload
-                    action="/api/Image/UploadImage"
+                    action="/adminwebapi/api/Image/UploadImage"
                     class="table-td-HeadImageURL"
                     :src="HeadImage.ImageURL"
                     :preview-src-list="[HeadImage]"
@@ -23,7 +23,7 @@
             </el-form-item>
             <el-form-item label="商品详情图">
                 <el-upload
-                    action="/api/Image/UploadImage"
+                    action="/adminwebapi/api/Image/UploadImage"
                     class="table-td-HeadImageURL"
                     :src="ContentImage"
                     :preview-src-list="[ContentImage]"
@@ -198,59 +198,41 @@ import qs from 'qs';
                     MainSupplierID:decodeURI(location.href).split('&')[1].split('=')[1],
                 }
                 getProductDetail(qs.stringify(params)).then((res)=>{
-                    console.log(res.data.Result)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.products = JSON.parse(res.data.Result)
                         this.shopCode = this.products.LQInfo.ShopCode
-                        console.log(this.products)
-                        console.log(this.shopCode)
                         var tableData = []
                         for (let i in this.products) {
                             tableData.push(this.products[i]); //属性
                         }
                         this.HeadImage = JSON.parse(res.data.Result).HeadImage
-                        console.log(this.HeadImage)
                         this.ContentImage = JSON.parse(res.data.Result).ContentImage
-                        console.log(this.ContentImage)
                         for( var i = 0; i < this.HeadImage.length ; i++){
-                            this.fileLists1.push({url: 'http://images.liqunshop.com/' + this.HeadImage[i].ImageURL})
+                            this.fileLists1.push({url: 'http://images.liqunshop.com/' +  this.HeadImage[i].ImageURL})
                         }
-                        console.log(this.fileLists1)
                         if(this.ContentImage != null){
                             for( var i = 0; i < this.ContentImage.length ; i++){
-                                this.fileLists2.push({url: 'http://images.liqunshop.com/' + this.ContentImage[i].ImageURL})
+                                this.fileLists2.push({url: 'http://images.liqunshop.com/' +  this.ContentImage[i].ImageURL})
                             }
                         }
-                        console.log(this.fileLists2)
                         for(var i = 0; i < this.ContentImage.length; i ++){
                             for( var k = 0; k < this.fileLists2.length; k++){
                                 if(i == k){
                                     this.fileLists2[k].ID = this.ContentImage[i].ID
-                                    console.log(this.fileLists2[k])
-                                    console.log(this.ContentImage[i].ID)
                                 }
                             }
                         }
-                        console.log(this.fileLists2)
                         this.tableData = tableData
-                        console.log(tableData);
                         this.getDetailByShopCode()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getDetailByShopCode(){
@@ -258,55 +240,38 @@ import qs from 'qs';
                     ShopCode:this.products.LQInfo.ShopCode
                 }
                 getProductInfo(qs.stringify(params)).then((res)=>{
-                    console.log(res.data.Result)
                     this.$message(res.data.Result)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.ByshopCode = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
 
             handleRemoveH(res,file, fileList) {                  /* 移除主图时调用的钩子，删除图片 */
-                console.log(res,file, fileList);
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                     ID:this.HeadImage[0].ID
                 }
                 delPicture(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('主图删除成功')
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
 
             },
@@ -315,29 +280,22 @@ import qs from 'qs';
                 this.dialogVisible = true;
             },
             handleRemoveC(file, fileList) {                  /* 移除详情图时调用的钩子，删除图片 */
-                console.log(file);
-                console.log(fileList)
-                console.log(this.fileLists2)
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                     ID:file.ID
                 }
                 delDetailMap(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('详情图删除成功')
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             handlePictureCardPreviewC(file) {                /* 点击文件列表中已上传的文件时的钩子 */
@@ -345,65 +303,43 @@ import qs from 'qs';
                 this.dialogVisible = true;
             },
             HeadImageSuccess(res,file){
-                console.log(res)
-                console.log(JSON.parse(res.Result)[0])
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                     ImageURL:JSON.parse(res.Result)[0],
                     ImageIndex:1
                 }
                 addPicture(qs.stringify(params)).then((res)=>{
-                    console.log(res.data.Result)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('主图添加成功')
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
                         console.log("请求错误")
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             ContentImageSuccess(res,file){
-                console.log(JSON.parse(res.Result)[0])
-                console.log(this.fileLists2.length)
-                console.log(res)
-                console.log(file)
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                     ImageURL:JSON.parse(res.Result)[0],
                     ImageIndex:this.fileLists2.length
                 }
                 AddDetailMap(qs.stringify(params)).then((res)=>{
-                    console.log(res.data.Result)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('上传成功')
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
         },

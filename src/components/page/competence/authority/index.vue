@@ -36,9 +36,9 @@
         <!-- 修改弹出框 -->
         <el-dialog title="应用模块修改" :visible.sync="editVisible" width="40%">
             <el-form ref="form" :model="row" label-width="80px">
-                <el-form-item label="ID">
+                <!-- <el-form-item label="ID">
                     <el-input v-model="row.ID" :disabled="true"></el-input>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="权限Key">
                     <el-input v-model="row.AuthorityKey"></el-input>
                 </el-form-item>            
@@ -79,26 +79,20 @@ import qs from 'qs'
             getData(){
                 let params = {}
                 AuthorityListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.tableData = JSON.parse(res.data.Result)
-                        console.log(this.tableData)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             change(row){
-                console.log(row)
                 this.row.ID = row.id,
                 this.editVisible = true
             },
@@ -111,21 +105,18 @@ import qs from 'qs'
                 SysAuthorityUpdate(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('模块权限信息修改成功')
                         this.editVisible = false
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             addModule(){
@@ -135,23 +126,19 @@ import qs from 'qs'
                     AuthorityName:this.form.AuthorityName
                 }
                 SysAuthorityAdd(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('模块权限信息添加成功')
                         this.editVisible2 = false
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
         },

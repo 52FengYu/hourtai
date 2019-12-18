@@ -14,7 +14,7 @@ const router = new Router({
             component: resolve => require(['../components/common/Home.vue'], resolve),
             meta: { title: '自述文件' },
             children:[
-                {
+                /* {
                     path: '/useManagement',
                     component: resolve => require(['../components/page/useManagement.vue'], resolve),
                     meta: { title: '用户列表',requireAuth:true }
@@ -28,7 +28,7 @@ const router = new Router({
                     path: '/roleList',
                     component: resolve => require(['../components/page/RoleList.vue'], resolve),
                     meta: { title: '角色列表',requireAuth:true }
-                },
+                }, */
                 {
                     path: '/membershipList',
                     component: resolve => require(['../components/page/MembershipList.vue'], resolve),
@@ -45,6 +45,36 @@ const router = new Router({
                     meta: { title: '门店列表',requireAuth:true }
                 },
                 {
+                    path: '/Supplier',
+                    component: resolve => require(['../components/page/Supplier/index.vue'], resolve),
+                    meta: { title: '供应商列表',requireAuth:true }
+                },
+                {
+                    path: '/SupplierDetail',
+                    component: resolve => require(['../components/page/Supplier/supplierDetail.vue'], resolve),
+                    meta: { title: '供应商详情',requireAuth:true }
+                },
+                {
+                    path: '/addSupplier',          
+                    component: resolve => require(['../components/page/Supplier/addSupplier.vue'], resolve),
+                    meta: { title: '新建供应商',requireAuth:true }
+                },
+                {
+                    path: '/Correspondence',
+                    component: resolve => require(['../components/page/Supplier/Correspondence.vue'], resolve),
+                    meta: { title: '对应关系',requireAuth:true }
+                },             
+                {
+                    path: '/showLevel',
+                    component: resolve => require(['../components/page/Supplier/showLevel.vue'], resolve),
+                    meta: { title: '三级分类获取',requireAuth:true }
+                },
+                {
+                    path: '/SupplierFeeList',
+                    component: resolve => require(['../components/page/Supplier/SupplierFeeList.vue'], resolve),
+                    meta: { title: '运费列表',requireAuth:true }
+                },
+                {
                     path: '/newStore',
                     component: resolve => require(['../components/page/shopList/newStore.vue'], resolve),
                     meta: { title: '新增门店',requireAuth:true }
@@ -52,12 +82,12 @@ const router = new Router({
                 {
                     path: '/columnManagement',
                     component: resolve => require(['../components/page/columnManagement/ColumnManagement.vue'], resolve),
-                    meta: { title: '栏目管理',requireAuth:true }    
+                    meta: { title: '页面管理',requireAuth:true }    
                 },
                 {
                     path: '/columnManagementList',
                     component: resolve => require(['../components/page/columnManagement/index.vue'], resolve),
-                    meta: { title: '栏目管理列表',requireAuth:true }    
+                    meta: { title: '页面管理列表',requireAuth:true }    
                 },
                 {
                     path: '/hotManagement',
@@ -150,14 +180,49 @@ const router = new Router({
                     meta: { title: '活动列表',requireAuth:true }
                 },
                 {
-                    path: '/orderList',
+                    path: '/fullFold',
+                    component: resolve => require(['../components/page/activeList/fullFold.vue'], resolve),
+                    meta: { title: '满折活动详情',requireAuth:true }
+                },
+                {
+                    path: '/Markdown',
+                    component: resolve => require(['../components/page/activeList/Markdown.vue'], resolve),
+                    meta: { title: '降价活动详情',requireAuth:true }
+                },
+                {
+                    path: '/fullGift',
+                    component: resolve => require(['../components/page/activeList/fullGift.vue'], resolve),
+                    meta: { title: '满赠活动详情',requireAuth:true }
+                },
+                {
+                    path: '/littleGiftList',
+                    component: resolve => require(['../components/page/activeList/littleGiftList.vue'], resolve),
+                    meta: { title: '赠品列表',requireAuth:true }
+                },
+                {
+                    path: '/orderList',            
                     component: resolve => require(['../components/page/orderList/index.vue'], resolve),
                     meta: { title: '订单列表',requireAuth:true }
+                },
+                {
+                    path: '/Sorting',       
+                    component: resolve => require(['../components/page/orderList/Sorting.vue'], resolve),
+                    meta: { title: '分拣集货',requireAuth:true }
+                },
+                {
+                    path: '/ReturnGoods',       
+                    component: resolve => require(['../components/page/orderList/ReturnGoods.vue'], resolve),
+                    meta: { title: '退货列表',requireAuth:true }
                 },
                 {
                     path: '/orderDetail',
                     component: resolve => require(['../components/page/orderList/orderDetail.vue'], resolve),
                     meta: { title: '订单详情',requireAuth:true }
+                },
+                {
+                    path: '/changeOrder',
+                    component: resolve => require(['../components/page/orderList/changeOrder.vue'], resolve),
+                    meta: { title: '修改订单信息',requireAuth:true }
                 },
                 {
                     path: '/application',
@@ -194,14 +259,14 @@ const router = new Router({
                     component: resolve => require(['../components/page/competence/authority/index.vue'], resolve),
                     meta: { title: '权限列表',requireAuth:true }
                 },
-                {
-                    path: '/map1',
-                    component: resolve => require(['../components/page/goodsList/map1.vue'], resolve),
-                    meta: { title: '地图1',requireAuth:true }
-                },
-                {
+                /* {
                     path: '/place',
                     component: resolve => require(['../components/page/goodsList/place.vue'], resolve),
+                    meta: { title: '地图',requireAuth:true }
+                }, */
+                {
+                    path: '/test',
+                    component: resolve => require(['../components/page/Supplier/test.vue'], resolve),
                     meta: { title: '地图',requireAuth:true }
                 },
                 {

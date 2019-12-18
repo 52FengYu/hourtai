@@ -3,8 +3,9 @@
         <el-form ref="form" :model="form" label-width="120px">
             <el-form-item label="商品主图">
                 <el-upload
-                    action="/api/Image/UploadImage"
+                    action="/adminwebapi/api/Image/UploadImage"
                     class="table-td-HeadImageURL"
+                    accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                     :src="HeadImage.ImageURL"
                     :preview-src-list="[HeadImage]"
                     list-type="picture-card"
@@ -24,8 +25,9 @@
             </el-form-item>
              <el-form-item label="商品详情图">
                 <el-upload
-                    action="/api/Image/UploadImage"
+                    action="/adminwebapi/api/Image/UploadImage"
                     class="table-td-HeadImageURL"
+                    accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                     :src="ContentImage"
                     :preview-src-list="[ContentImage]"
                     list-type="picture-card"
@@ -44,105 +46,116 @@
             </el-form-item> 
         </el-form>
         基本信息
-        <el-form  :model="formInline" class="demo-form-inline" label-width="150px">
-            <el-form-item label="品牌编号">
-                <el-input v-model="formInline.BrandID" placeholder="品牌编号"></el-input>
+        <el-form  :model="tableData" class="demo-form-inline" label-width="150px">
+            <el-form-item label="品牌名">
+                <el-select v-model="tableData.BrandID" filterable  clearable placeholder="请选择">
+                    <el-option
+                        v-for="item in brands"
+                        :key="item.ID"
+                        :label="item.BrandName"
+                        :value="item.ID">
+                    </el-option>
+                </el-select>
             </el-form-item>
-            <el-form-item label="三级分类编号">
-                <el-input v-model="formInline.ClassID" placeholder="三级分类编号"></el-input>
+            <el-form-item label="分类名">
+                <el-input v-model="tableData.ClassID" placeholder="分类名"></el-input>
             </el-form-item>
                 <el-form-item label="显示名称">
-                <el-input v-model="formInline.DisplayName" placeholder="显示名称"></el-input>
+                <el-input v-model="tableData.DisplayName" placeholder="显示名称"></el-input>
             </el-form-item>
             <el-form-item label="是否允许退货">
-                <el-radio v-model="formInline.IsOrderBack" label="Y">是</el-radio>
-                <el-radio v-model="formInline.IsOrderBack" label="N">否</el-radio>
+                <el-radio v-model="tableData.IsOrderBack" label="Y">是</el-radio>
+                <el-radio v-model="tableData.IsOrderBack" label="N">否</el-radio>
             </el-form-item>
             <el-form-item label="是否能搜索">
-                <el-radio v-model="formInline.IsSearch" label="Y">是</el-radio>
-                <el-radio v-model="formInline.IsSearch" label="N">否</el-radio>
+                <el-radio v-model="tableData.IsSearch" label="Y">是</el-radio>
+                <el-radio v-model="tableData.IsSearch" label="N">否</el-radio>
             </el-form-item>
             <el-form-item label="是否显示500g价格">
-                <el-radio v-model="formInline.IsShow500gPrice" label="Y">是</el-radio>
-                <el-radio v-model="formInline.IsShow500gPrice" label="N">否</el-radio>
+                <el-radio v-model="tableData.IsShow500gPrice" label="Y">是</el-radio>
+                <el-radio v-model="tableData.IsShow500gPrice" label="N">否</el-radio>
             </el-form-item>
             <el-form-item label="是否同步价格">
-                <el-radio v-model="formInline.IsSyncPrice" label="Y">是</el-radio>
-                <el-radio v-model="formInline.IsSyncPrice" label="N">否</el-radio>
+                <el-radio v-model="tableData.IsSyncPrice" label="Y">是</el-radio>
+                <el-radio v-model="tableData.IsSyncPrice" label="N">否</el-radio>
             </el-form-item>
             <el-form-item label="是否称重商品">
-                <el-radio v-model="formInline.IsWeighing" label="Y">是</el-radio>
-                <el-radio v-model="formInline.IsWeighing" label="N">否</el-radio>
+                <el-radio v-model="tableData.IsWeighing" label="Y">是</el-radio>
+                <el-radio v-model="tableData.IsWeighing" label="N">否</el-radio>
+            </el-form-item>
+            <el-form-item label="是否必须自提">
+                <el-select v-model="tableData.IsMustSelfReceiver" clearable placeholder="请选择">
+                    <el-option label="是" value="Y"></el-option>
+                    <el-option label="否" value="N"></el-option>
+                </el-select>
             </el-form-item>
             <el-form-item label="关键字">
-                <el-input v-model="formInline.KeyWord" placeholder="关键字"></el-input>
+                <el-input v-model="tableData.KeyWord" placeholder="关键字"></el-input>
             </el-form-item>
             <el-form-item label="最大购买数量">
-                <el-input v-model="formInline.MaxQty" placeholder="最大购买数量"></el-input>
+                <el-input v-model="tableData.MaxQty" placeholder="最大购买数量"></el-input>
                 <i> 0 为不限</i>
             </el-form-item>
             <el-form-item label="最小购买数量">
-                <el-input v-model="formInline.MinQty" placeholder="最小购买数量"></el-input>
+                <el-input v-model="tableData.MinQty" placeholder="最小购买数量"></el-input>
                 <i> 0 为不限</i>
             </el-form-item>
             <el-form-item label="包装含量">
-                <el-input v-model="formInline.PackSize" placeholder="包装含量"></el-input>
+                <el-input v-model="tableData.PackSize" placeholder="包装含量"></el-input>
             </el-form-item>
             <el-form-item label="商品名称">
-                <el-input v-model="formInline.ProductName" placeholder="商品名称"></el-input>
+                <el-input v-model="tableData.ProductName" placeholder="商品名称"></el-input>
             </el-form-item>
             <el-form-item label="备注">
-                <el-input v-model="formInline.Remark" placeholder="备注"></el-input>
+                <el-input v-model="tableData.Remark" placeholder="备注"></el-input>
             </el-form-item>
             <el-form-item label="税率(%)">
-                <el-input v-model="formInline.TaxRate" placeholder="税率"></el-input>
+                <el-input v-model="tableData.TaxRate" placeholder="税率"></el-input>
             </el-form-item>
             <el-form-item label="副标题">
-                <el-input v-model="formInline.TitalInfo" placeholder="副标题"></el-input>
+                <el-input v-model="tableData.TitalInfo" placeholder="副标题"></el-input>
             </el-form-item>
-            <el-form-item label="单位编号">
-                <el-input v-model="formInline.UnitID" placeholder="单位编号"></el-input>
+            <el-form-item label="单位名称">
+                <el-input v-model="tableData.UnitID" placeholder="单位名称"></el-input>
             </el-form-item>
             <el-form-item label="重量">
-                <el-input v-model="formInline.Weight" placeholder="重量"></el-input>
+                <el-input v-model="tableData.Weight" placeholder="重量"></el-input>
+            </el-form-item>
+        </el-form>
+         <el-form  :model="LQInfo" class="demo-form-inline" label-width="150px">
+            <el-form-item label="门店码">
+                <el-input v-model="LQInfo.ShopCode" placeholder="门店码"></el-input>
+                <i> 利群内部商品必填</i>
+            </el-form-item>
+            <el-form-item label="统一分类">
+                <el-input v-model="LQInfo.UniTypeCode" placeholder="统一分类"></el-input>
+                <i>利群内部商品必填</i>
+            </el-form-item>
+            <el-form-item label="统一编码">
+                <el-input v-model="LQInfo.UniCode" placeholder="统一编码"></el-input>
+            </el-form-item>
+            <el-form-item label="物流编码">
+                <el-input v-model="LQInfo.FxxCode" placeholder="物流编码"></el-input>
+                <i>利群内部供应商存在的时候必填</i>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="onSubmit">提交</el-button>
                 <el-button type="primary" @click="clear">重置</el-button>
             </el-form-item>
-        </el-form>
+         </el-form>
     </div>
 </template>
 <script>
 import { changeProduct,getProductDetail,delPicture,delDetailMap,addPicture,AddDetailMap } from "@/api/goodsList"
+import { BaseBrandListGet } from '@/api/common'
 import qs from 'qs';    
     export default{
         data(){
             return{
-                formInline: {
-                    BrandID:'',
-                    ClassID:'',
-                    DisplayName:'',
-                    IsOrderBack:'',
-                    IsSearch:'',
-                    IsShow500gPrice:'',
-                    IsSyncPrice:'',
-                    IsWeighing:'',
-                    KeyWord:'',
-                    MaxQty:'',
-                    MinQty:'',
-                    PackSize:'',
-                    ProductName:'',
-                    Remark:'',
-                    TaxRate:'',
-                    TitalInfo:'',
-                    UnitID:'',
-                    Weight:'',
-                },
                 form:{
 
                 },
-                tableData:[],               /* 根据url里面的参数获取到的数据放在这里 */
+                tableData:[],               /* 商品相关 */
                 HeadImage:[],               /* 头图 */
                 ContentImage:[],             /* 详情图 */
                 dialogImageUrlH: '',
@@ -161,171 +174,141 @@ import qs from 'qs';
                     TokenID:sessionStorage.getItem('TokenID'),
                 },
                 HeadPictureUrl:'',                  /* 主图url */
+                brands:[],                          /* 品牌名 */
+                LQInfo:[]                           /* 利群内部相关 */
             }
-        },methods:{
+        },
+        methods:{
             getData(){
                 let params = {
                     ID:decodeURI(location.href).split('=')[1].split('&')[0],
                     MainSupplierID:decodeURI(location.href).split('&')[1].split('=')[1],
                 }
                 getProductDetail(qs.stringify(params)).then((res)=>{
-                    console.log(res.data.Result)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
+                        // console.log(JSON.parse(res.data.Result))
+                        this.LQInfo = JSON.parse(res.data.Result).LQInfo
                         this.tableData = JSON.parse(res.data.Result).Product
-                        console.log(this.tableData)
                         this.HeadImage = JSON.parse(res.data.Result).HeadImage
-                        console.log(this.HeadImage)
                         this.ContentImage = JSON.parse(res.data.Result).ContentImage
-                        console.log(this.ContentImage)
                         for( var i = 0; i < this.HeadImage.length ; i++){
-                            this.fileLists1.push({url: 'http://images.liqunshop.com/' + this.HeadImage[i].ImageURL})
-                        }
-                        console.log(this.fileLists1)
-                        if(this.ContentImage != null){
-                            for( var i = 0; i < this.ContentImage.length ; i++){
-                                this.fileLists2.push({url: 'http://images.liqunshop.com/' + this.ContentImage[i].ImageURL})
+                            let URLHead = this.HeadImage[i].ImageURL
+                            if(URLHead.substring(0,4) == 'http'){
+                                this.fileLists1.push({url:this.HeadImage[i].ImageURL})
+                            }else{
+                                this.fileLists1.push({url: 'http://images.liqunshop.com/' + this.HeadImage[i].ImageURL})
                             }
                         }
-                        console.log(this.fileLists2)
-                        for(var i = 0; i < this.ContentImage.length; i ++){
-                            for( var k = 0; k < this.fileLists2.length; k++){
-                                if(i == k){
-                                    this.fileLists2[k].ID = this.ContentImage[i].ID
-                                    console.log(this.fileLists2[k])
-                                    console.log(this.ContentImage[i].ID)
+                        if(this.ContentImage != null){
+                            for( var i = 0; i < this.ContentImage.length ; i++){
+                                let URLHead = this.ContentImage[i].ImageURL
+                                if(URLHead.substring(0,4) == 'http'){
+                                    this.fileLists2.push({url:this.ContentImage[i].ImageURL})
+                                }else{
+                                    this.fileLists2.push({url: 'http://images.liqunshop.com/' + this.ContentImage[i].ImageURL})
+                                }
+                            }
+                            for(var i = 0; i < this.ContentImage.length; i ++){
+                                for( var k = 0; k < this.fileLists2.length; k++){
+                                    if(i == k){
+                                        this.fileLists2[k].ID = this.ContentImage[i].ID
+                                    }
                                 }
                             }
                         }
-                        console.log(this.fileLists2)
-                        this.formInline.BrandID = this.tableData.BrandID
-                        this.formInline.ClassID = this.tableData.ClassID
-                        this.formInline.DisplayName = this.tableData.DisplayName
-                        this.formInline.IsOrderBack = this.tableData.IsOrderBack
-                        this.formInline.IsSearch = this.tableData.IsSearch
-                        this.formInline.IsShow500gPrice = this.tableData.IsShow500gPrice
-                        this.formInline.IsSyncPrice = this.tableData.IsSyncPrice
-                        this.formInline.IsWeighing = this.tableData.IsWeighing
-                        this.formInline.KeyWord = this.tableData.KeyWord
-                        this.formInline.MaxQty = this.tableData.MaxQty
-                        this.formInline.MinQty = this.tableData.MinQty
-                        this.formInline.PackSize = this.tableData.PackSize
-                        this.formInline.ProductName = this.tableData.ProductName
-                        this.formInline.Remark = this.tableData.Remark
-                        this.formInline.TaxRate = this.tableData.TaxRate
-                        this.formInline.TitalInfo = this.tableData.TitalInfov
-                        this.formInline.UnitID = this.tableData.UnitID
-                        this.formInline.Weight = this.tableData.Weight
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             onSubmit(){
                 let params = {
                     ID:decodeURI(location.href).split('=')[1].split('&')[0],
                     MainSupplierID:decodeURI(location.href).split('&')[1].split('=')[1],
-                    BrandID : this.formInline.BrandID,
-                    ClassID : this.formInline.ClassID,
-                    DisplayName : this.formInline.DisplayName,
-                    IsOrderBack : this.formInline.IsOrderBack,
-                    IsSearch : this.formInline.IsSearch,
-                    IsShow500gPrice : this.formInline.IsShow500gPrice,
-                    IsSyncPrice : this.formInline.IsSyncPrice,
-                    IsWeighing : this.formInline.IsWeighing,
-                    KeyWord : this.formInline.KeyWord,
-                    MaxQty : this.formInline.MaxQty,
-                    MinQty : this.formInline.MinQty,
-                    PackSize : this.formInline.PackSize,
-                    ProductName : this.formInline.ProductName,
-                    Remark : this.formInline.Remark,
-                    TaxRate : this.formInline.TaxRate,
-                    TitalInfo : this.formInline.TitalInfo,
-                    UnitID : this.formInline.UnitID,
-                    Weight : this.formInline.Weight,
+                    BrandID : this.tableData.BrandID,
+                    ClassID : this.tableData.ClassID,
+                    DisplayName : this.tableData.DisplayName,
+                    IsOrderBack : this.tableData.IsOrderBack,
+                    IsSearch : this.tableData.IsSearch,
+                    IsShow500gPrice : this.tableData.IsShow500gPrice,
+                    IsSyncPrice : this.tableData.IsSyncPrice,
+                    IsWeighing : this.tableData.IsWeighing,
+                    KeyWord : this.tableData.KeyWord,
+                    MaxQty : this.tableData.MaxQty,
+                    MinQty : this.tableData.MinQty,
+                    PackSize : this.tableData.PackSize,
+                    ProductName : this.tableData.ProductName,
+                    Remark : this.tableData.Remark,
+                    TaxRate : this.tableData.TaxRate,
+                    TitalInfo : this.tableData.TitalInfo,
+                    UnitID : this.tableData.UnitID,
+                    Weight : this.tableData.Weight,
+                    ShopCode:this.LQInfo.ShopCode,
+                    UniCode:this.LQInfo.UniCode,               
+                    UniType:this.LQInfo.UniTypeCode,
+                    Fxxcode:this.LQInfo.FxxCode,
+                    IsMustSelfReceiver:this.tableData.IsMustSelfReceiver
                 }
                 changeProduct(qs.stringify(params)).then((res)=>{
-                    console.log(res.data.Result)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('修改成功')
                         this.$router.push({
                             path:'/goodsList',
                         })
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             clear(){
-                this.formInline.BrandID = '',
-                this.formInline.ClassID = '',
-                this.formInline.DisplayName = '',
-                this.formInline.IsOrderBack = '',
-                this.formInline.IsSearch = '',
-                this.formInline.IsShow500gPrice = '',
-                this.formInline.IsSyncPrice = '',
-                this.formInline.IsWeighing = '',
-                this.formInline.KeyWord = '',
-                this.formInline.MaxQty = '',
-                this.formInline.MinQty = '',
-                this.formInline.PackSize = '',
-                this.formInline.ProductName = '',
-                this.formInline.Remark = '',
-                this.formInline.TaxRate = '',
-                this.formInline.TitalInfo = '',
-                this.formInline.UnitID = '',
-                this.formInline.Weight = ''
+                this.tableData.BrandID = '',
+                this.tableData.ClassID = '',
+                this.tableData.DisplayName = '',
+                this.tableData.IsOrderBack = '',
+                this.tableData.IsSearch = '',
+                this.tableData.IsShow500gPrice = '',
+                this.tableData.IsSyncPrice = '',
+                this.tableData.IsWeighing = '',
+                this.tableData.KeyWord = '',
+                this.tableData.MaxQty = '',
+                this.tableData.MinQty = '',
+                this.tableData.PackSize = '',
+                this.tableData.ProductName = '',
+                this.tableData.Remark = '',
+                this.tableData.TaxRate = '',
+                this.tableData.TitalInfo = '',
+                this.tableData.UnitID = '',
+                this.tableData.Weight = ''
             },
             handleRemoveH(res,file, fileList) {                  /* 移除主图时调用的钩子，删除图片 */
-                console.log(res,file, fileList);
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                     ID:this.HeadImage[0].ID
                 }
                 delPicture(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('主图删除成功')
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
 
             },
@@ -334,29 +317,22 @@ import qs from 'qs';
                 this.dialogVisible = true;
             },
             handleRemoveC(file, fileList) {                  /* 移除详情图时调用的钩子，删除图片 */
-                console.log(file);
-                console.log(fileList)
-                console.log(this.fileLists2)
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                     ID:file.ID
                 }
                 delDetailMap(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('详情图删除成功')
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                         this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             handlePictureCardPreviewC(file) {                /* 点击文件列表中已上传的文件时的钩子 */
@@ -364,70 +340,68 @@ import qs from 'qs';
                 this.dialogVisible = true;
             },
             HeadImageSuccess(res,file){
-                console.log(res)
-                console.log(JSON.parse(res.Result)[0])
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
-                    ImageURL:JSON.parse(res.Result)[0],
+                    ImageURL: JSON.parse(res.Result)[0],
                     ImageIndex:1
                 }
                 addPicture(qs.stringify(params)).then((res)=>{
-                    console.log(res.data.Result)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('主图添加成功')
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             ContentImageSuccess(res,file){
-                console.log(JSON.parse(res.Result)[0])
-                console.log(this.fileLists2.length)
-                console.log(res)
-                console.log(file)
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
-                    ImageURL:JSON.parse(res.Result)[0],
-                    ImageIndex:this.fileLists2.length
+                    ImageURL: JSON.parse(res.Result)[0],
+                    ImageIndex: this.fileLists2.length
                 }
                 AddDetailMap(qs.stringify(params)).then((res)=>{
-                    console.log(res.data.Result)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('上传成功')
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
+                })
+            },
+            getBrand(){
+                let params = {
+                   PageIndex:-1,
+                   PageSize:-1, 
+                }
+                BaseBrandListGet(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.brands = JSON.parse(res.data.Result).ModelList
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
                 })
             },
         },
         created(){
             this.getData()
+            this.getBrand()
         }
     }
 </script>  

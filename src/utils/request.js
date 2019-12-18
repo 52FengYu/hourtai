@@ -4,7 +4,7 @@ axios.interceptors.request.use(function (config) {
   　　// 在发送请求之前做些什么
   if (window.sessionStorage.getItem('TokenID')) {
       config.headers.TokenID = window.sessionStorage.getItem('TokenID');
-      console.log(window.sessionStorage.getItem('TokenID'));
+      // console.log(window.sessionStorage.getItem('TokenID'));
   }
   　　return config
   }, function (error) {
@@ -13,9 +13,9 @@ axios.interceptors.request.use(function (config) {
   });
    
   // 添加响应拦截器
-  axios.interceptors.response.use(function (response) {
+  axios.interceptors.response.use(function (res) {
   　　// 对响应数据做点什么
-  const code = response.data.Success;
+  const code = res.data.Success;
  /*  if(code == -999) { //未登录
     window.alert('请先登录', '提示', {
         confirmButtonText: '确定',
@@ -31,7 +31,7 @@ axios.interceptors.request.use(function (config) {
       window.sessionStorage.removeItem('TokenID')
       location.reload()
     }
-  　　return response
+  　　return res
   }, function (error) {
   　　// 对响应错误做点什么
   　　return Promise.reject(error)

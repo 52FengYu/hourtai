@@ -11,63 +11,69 @@
             <el-card class="box-card">
                 <el-form :inline="true" :model="formInline" class="demo-form-inline">
                         <!-- 订单号 -->
-                        <el-form-item>
+                        <el-form-item label="订单号" required>
                             <el-input
                                 placeholder="请输入订单号"
                                 v-model="formInline.orderNum"
-                                clearable>
+                                clearable
+                                @change="reset">
                             </el-input>
                         </el-form-item>
                         <!-- 活动类型 -->
-                        <el-form-item>
+                        <el-form-item label="会员号" required>
                             <!-- 会员号 -->
                             <el-input
                                 placeholder="会员号"
                                 v-model="formInline.memberID"
-                                clearable>
+                                clearable
+                                @change="reset">
                             </el-input>
                         </el-form-item>
                         <!-- 主供应商号 -->
-                        <el-form-item>
-                            <el-select v-model="formInline.MainSupplierID" placeholder="主供应商">
+                        <el-form-item label="主供应商号">
+                            <el-select v-model="formInline.MainSupplierID" placeholder="主供应商" clearable filterable @change="getSupplier">
                                 <el-option
                                 v-for="item in formInline.option1"
                                 :key="item.value"
                                 :label="item.label"
-                                :value="item.value">
+                                :value="item.value"
+                                >
                                 </el-option>
                             </el-select>
                         </el-form-item>
                         <!-- 供应商号 -->
-                        <el-form-item>
-                            <el-select v-model="formInline.SupplierID" placeholder="供应商">
+                        <el-form-item label="供应商">
+                            <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable>
                                 <el-option
                                 v-for="item in formInline.option2"
                                 :key="item.value"
                                 :label="item.label"
-                                :value="item.value">
+                                :value="item.value"
+                                >
                                 </el-option>
                             </el-select>
                         </el-form-item>
                         <!-- 收货人姓名 -->
-                        <el-form-item>
+                        <el-form-item label="收件人姓名">
                             <el-input
                                 placeholder="收件人姓名"
                                 v-model="formInline.recipientName"
+                                @change="reset"
                                 clearable>
                             </el-input>
                         </el-form-item>
                         <!-- 收件人手机号 -->
-                        <el-form-item>
+                        <el-form-item label="收货人手机号">
                             <el-input
                                 placeholder="收件人手机号"
                                 v-model="formInline.recipientMobile"
+                                @change="reset"
                                 clearable>
                             </el-input>
                         </el-form-item>
                         <!-- 配送方式 -->
-                        <el-form-item>
-                            <el-select v-model="formInline.distributionValue" clearable placeholder="配送方式">
+                        <el-form-item label="配送方式">
+                            <el-select v-model="formInline.distributionValue" clearable placeholder="配送方式" @change="reset">
                                 <el-option
                                 v-for="item in formInline.distribution"
                                 :key="item.value"
@@ -84,8 +90,6 @@
                             type="date"
                             placeholder="开始时间">
                         </el-date-picker>至
-                    </el-form-item>
-                    <el-form-item>
                         <el-date-picker
                             v-model="formInline.timeEnd"
                             type="date"
@@ -100,19 +104,20 @@
                             type="date"
                             placeholder="开始时间">
                         </el-date-picker>至
-                    </el-form-item>
-                    <el-form-item>
-                            <el-date-picker
-                                v-model="formInline.paymentTimeEnd"
-                                type="date"
-                                placeholder="结束时间">
-                            </el-date-picker>
+                        <el-date-picker
+                            v-model="formInline.paymentTimeEnd"
+                            type="date"
+                            placeholder="结束时间">
+                        </el-date-picker>
                     </el-form-item>
                     <el-form-item label="是否废弃">
-                        <el-switch v-model="formInline.DelFLag"></el-switch>
+                        <el-select v-model="formInline.DelFLag" clearable placeholder="请选择" @change="reset">
+                            <el-option value="Y" label="是"></el-option>
+                            <el-option value="N" label="否"></el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="订单状态">
-                        <el-select v-model="formInline.OrderState" clearable placeholder="请选择">
+                        <el-select v-model="formInline.OrderState" clearable placeholder="请选择" @change="reset">
                             <el-option
                             v-for="item in formInline.OrderStateList"
                             :key="item.value"
@@ -122,7 +127,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="分单类型">
-                        <el-select v-model="formInline.DeliveryType" clearable placeholder="请选择">
+                        <el-select v-model="formInline.DeliveryType" clearable placeholder="请选择" @change="reset">
                             <el-option
                             v-for="item in formInline.DeliveryTypeList"
                             :key="item.value"
@@ -134,37 +139,47 @@
                     <el-form-item>
                         <el-button type="primary" @click="getTableData">搜索</el-button>
                         <el-button type="primary" @click="clear">重置</el-button>
-                        <el-button type="primary" :disabled="true">导出</el-button>
                     </el-form-item>
                 </el-form>
                 <el-table :data="listData.ModelList" border class="table" ref="multipleTable">
-                    <el-table-column prop="ID" label="订单号"  width="80" align=center></el-table-column>
-                    <el-table-column prop="DeliveryType" label="分单结果" width="120" align=center></el-table-column>
+                    <el-table-column prop="ID" label="订单号" align=center></el-table-column>
                     <el-table-column prop="OrderState" label="订单状态"  align=center></el-table-column>
-                    <el-table-column prop="orderStatus" label="订单状态"  width="150" align=center></el-table-column>
-                    <el-table-column prop="MainSupplier" label="主供应商" width="120" align=center></el-table-column>
-                    <el-table-column prop="Supplier" label="供应商" width="150" align=center></el-table-column>
-                    <el-table-column prop="ReceiveMan" label="收货人"  width="150" align=center></el-table-column>
-                    <el-table-column prop="ReceiveMobile" label="收货人手机号" width="180" align=center></el-table-column>
-                    <el-table-column prop="CreateTime" label="下单时间"  align=center width="200"></el-table-column>
-                    <el-table-column prop="ProductPrice" label="订单商品金额"  width="150" align=center></el-table-column>
-                    <el-table-column prop="SendFee" label="运费" width="120" align=center></el-table-column>
+                    <el-table-column prop="DeliveryType" label="分单结果" align=center></el-table-column>
+                    <el-table-column prop="MainSupplier" label="主供应商" align=center></el-table-column>
+                    <el-table-column prop="Supplier" label="供应商" align=center></el-table-column>
+                    <el-table-column prop="ReceiveAddr" label="收货地址" align=center></el-table-column>
+                    <el-table-column prop="ReceiveMan" label="收货人"  align=center></el-table-column>
+                    <el-table-column prop="ReceiveMobile" label="收货人手机号" align=center></el-table-column>
+                    <el-table-column prop="CreateTime" label="下单时间"  align=center ></el-table-column>
+                    <el-table-column label="收货方式类型" align=center>
+                        <template slot-scope="scope">
+                            {{scope.row.ReceiverType === 'S' ? '门店自提' : '送货到家'}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="ProductPrice" label="订单商品金额"  align=center></el-table-column>
+                    <el-table-column label="是否废弃" align=center>
+                        <template slot-scope="scope">
+                            {{scope.row.DelFlag === 'N' ? '否' : '是'}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="SendFee" label="运费" align=center></el-table-column>
                     <el-table-column prop="GiftCardAmount" label="礼品卡使用金额"  align=center></el-table-column>
-                    <el-table-column prop="GiftTokenAmount" label="优惠券使用金额"  width="150" align=center></el-table-column>
-                    <el-table-column prop="PointMoney" label="积分金额" width="120" align=center></el-table-column>
+                    <el-table-column prop="GiftTokenAmount" label="优惠券使用金额"  align=center></el-table-column>
+                    <el-table-column prop="PointMoney" label="积分金额" align=center></el-table-column>
                     <el-table-column prop="PayMoney" label="在线支付金额"  align=center></el-table-column>
-                    <el-table-column prop="DiscountMoney" label="优惠金额"  width="150" align=center></el-table-column>
-                    <el-table-column prop="PayTime" label="支付时间" width="180" align=center></el-table-column>
+                    <el-table-column prop="DiscountMoney" label="优惠金额"  align=center></el-table-column>
+                    <el-table-column prop="PayTime" label="支付时间" align=center></el-table-column>
                     <el-table-column prop="OutStockAddPrice" label="出库增加金额"  align=center></el-table-column>
-                    <el-table-column label="出库增加金额是否支付" width="180" align=center>
+                    <el-table-column label="出库增加金额是否支付" align=center>
                         <template slot-scope="scope">
                             {{scope.row.IsOutStockAddPricePay === 'Y' ? '是' : '否'}}
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" width="180" align="center" fixed="right">
+                    <el-table-column label="操作" align="center" fixed="right">
                         <template slot-scope="scope">
                             <el-button type="text" icon="el-icon-edit" @click="print(scope.$index, scope.row);show()">打印</el-button>
-                            <el-button type="text" icon="el-icon-edit" @click="detail(scope.$index,scope.row);goPage()">详情</el-button>
+                            <el-button type="text" icon="el-icon-info" @click="detail(scope.$index,scope.row);goPage()">详情</el-button>
+                            <el-button type="text" icon="el-icon-check"  v-if="scope.row.ReceiverType == 'S' && scope.row.OrderState == '出库'" @click="checked(scope.row)">自提确认</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -180,6 +195,18 @@
             </el-card>
         </div>
 
+        <!-- 自提确认 -->
+        <el-dialog title="自提确认" :visible.sync="editVisible2" width="50%">
+            <el-form :inline="true" :model="checkedBox" class="demo-form-inline">
+                <el-form-item label="自提码">
+                    <el-input v-model="checkedBox.SelfReceiveCode" placeholder="请输入自提码"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible2 = false">取 消</el-button>
+                <el-button type="primary" @click="PickupConfirm">确 定</el-button>
+            </span>
+        </el-dialog>
         
         <!-- 打印弹出框 -->
         <el-dialog title="打印预览" :visible.sync="editVisible" width="75%">
@@ -259,12 +286,14 @@
         .el-dialog{
             .el-dialog__body{
                 border: 1px lightgreen dashed!important;
-                .el-form{
-                    border-bottom:1px dashed black;
-                    .el-form-item{
-                        margin:0!important;
-                        padding:0!important;
-                        width:30%;
+                #printRecord{
+                    .el-form{
+                        border-bottom:1px dashed black;
+                        .el-form-item{
+                            margin:0!important;
+                            padding:0!important;
+                            width:30%;
+                        }
                     }
                 }
             }
@@ -272,7 +301,7 @@
     }
 </style>
 <script>
-import { getOrderList,orderDetail,changePayMethod,changePayNum } from "@/api/orderList"
+import { getOrderList,orderDetail,changePayMethod,changePayNum,OrderSelfReceiveConfirm,OrderDeliverySetPS } from "@/api/orderList"
 import qs from 'qs';
 import { SupplierListGetByLevel } from '@/api/goodsList';
 import JsBarcode from 'jsbarcode'
@@ -283,6 +312,8 @@ import JsBarcode from 'jsbarcode'
                 time:'',            /* 转换完成后的时间 */
                 form:'',
                 editVisible:false,
+                editVisible2:false,            /* 自提确认 */
+                editVisible3:false, 
                 ID:'',                      /* 跳转详情时把 该条id存放与此 */
                 currentPage: 1,            /* 当前页数 */
                 currentSize:10,             /* 每页多少条数据 */
@@ -291,8 +322,7 @@ import JsBarcode from 'jsbarcode'
                 loading: false,     /* 是否有其他任务正在执行 */
                 listData:[],        /* 存放列表数据 */
                 printListData:[],       /* 打印数据 */
-                
-                
+                DelFLag:'',
                 formInline:{
                     option1:[],
                     option2:[],
@@ -302,7 +332,7 @@ import JsBarcode from 'jsbarcode'
                     SupplierID:'',          /* 供应商号 */
                     recipientName:"",       /* 收件人姓名 */
                     recipientMobile:'',     /* 收件人手机号 */
-                    DelFLag:false,         /* 是否废单 */
+                    DelFLag:'',         /* 是否废单 */
                     timeBegin: '',     /* 时间选择器（下单开始时间）的value */
                     timeEnd: '',     /* 时间选择器（下单开结束时间）的value */
                     paymentTimeBegin: '',     /* 时间选择器（支付开始时间）的value */
@@ -350,12 +380,16 @@ import JsBarcode from 'jsbarcode'
                         label:'门店自提'
                     }],
                     distributionValue:'',      /* 配送方式的value，也不能动哦 */
-                }
+                    row:[],                     /* 自提确认和订单配送的暂存数据 */
+                },
+                checkedBox:{                /* 自提确认 */
+                    SelfReceiveCode:"",         /* 自提码 */
+                },
             }
         },
-        methods:{
-            // 订单列表 获取   点击搜索
-            getTableData () {
+        methods:{           
+            // 订单列表 获取   点击搜索     
+            getTableData () {                                                                       /* formInline.OrderState */
                 let params = {
                     ID:this.formInline.orderNum,
                     MemberID:this.formInline.memberID,
@@ -368,28 +402,24 @@ import JsBarcode from 'jsbarcode'
                     ReceiveMobile:this.formInline.recipientMobile,
                     ReceiveMan:this.formInline.recipientName,
                     ReceiveType:this.formInline.distributionValue,
-                    DelFLag:this.formInline.DelFLag == false ? "N" :"Y",
-                   /*  OrderState:this,
-                    DeliveryType:this, */
+                    DelFLag:this.formInline.DelFLag,
+                    OrderState:this.formInline.OrderState,
+                    DeliveryType:this.formInline.DeliveryType,
                     PageIndex:this.currentPage,
                     PageSize:this.currentSize,
                 }
                 getOrderList(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.listData = JSON.parse(res.data.Result)
+                        console.log(this.listData)
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             clear(){
@@ -405,6 +435,10 @@ import JsBarcode from 'jsbarcode'
                     this.formInline.recipientName = '',
                     this.formInline.distributionValue = ''
             },
+            reset(){
+                this.currentPage = 1,
+                this.currentSize = 10
+            },
             print(index,row){
                 this.editVisible = true;
                 this.ID = row.ID;
@@ -412,26 +446,17 @@ import JsBarcode from 'jsbarcode'
                     ID:this.ID,
                 }
                 orderDetail(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.printListData = JSON.parse(res.data.Result)
-                        console.log(this.listData)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             show(){
@@ -447,22 +472,22 @@ import JsBarcode from 'jsbarcode'
             },
             detail(index,row){
                 this.ID = row.ID;
+                this.DelFLag = row.DelFLag
             },
             handleSizeChange(valSize) {
                 this.currentSize = valSize;
-                console.log(`每页 ${valSize} 条`);
                 this.getTableData()
             },
             handleCurrentChange(valPage) {
                 this.currentPage = valPage;
-                console.log(`当前页: ${valPage}`);
                 this.getTableData()
             },
             goPage(id){
                 this.$router.push({
                     path:'/orderDetail',
                     query:{
-                        ID:this.ID
+                        ID:this.ID,
+                        DelFLag:this.DelFLag	
                     }
                 })
             },
@@ -480,55 +505,72 @@ import JsBarcode from 'jsbarcode'
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.formInline.option1 = JSON.parse(res.data.Result)
-                        console.log(this.option1)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getSupplier(){
+                this.formInline.SupplierID = ''
                 let params = {
-                    Level:2
+                    Level:2,
+                    MainSupplierID:this.formInline.MainSupplierID
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.formInline.option2 = JSON.parse(res.data.Result)
-                        console.log(this.option2)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                    }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
+                })
+            },
+            checked(row){
+                this.row = row
+                this.editVisible2 = true 
+            },
+            Delivery(row){
+                this.row = row
+                this.editVisible3 = true
+            },
+            PickupConfirm(){
+                let params = {
+                    ID:this.row.ID,
+                    SelfReceiveCode:this.checkedBox.SelfReceiveCode
+                }
+                OrderSelfReceiveConfirm(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.editVisible2 = false
+                        this.getTableData()
+                        this.$message.success('自提确认成功')
+                        this.checkedBox.SelfReceiveCode =''
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
                 })
             },
         },
         created(){
             this.getTableData();
             this.getMainSupplier()
-            this.getSupplier()
         },
         mounted() {
 

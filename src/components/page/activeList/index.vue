@@ -6,7 +6,7 @@
                     <el-input v-model="formInline.ID" placeholder="活动号" clearable></el-input>
                 </el-form-item>
                 <el-form-item label="主供应商号">
-                    <el-select v-model="formInline.MainSupplierID" placeholder="主供应商" clearable >
+                    <el-select v-model="formInline.MainSupplierID" placeholder="主供应商" clearable filterable @change="getSupplier">
                         <el-option
                         v-for="item in formInline.option1"
                         :key="item.value"
@@ -16,7 +16,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="供应商号">
-                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable >
+                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable>
                         <el-option
                         v-for="item in formInline.option2"
                         :key="item.value"
@@ -69,6 +69,7 @@
                 </el-form-item>
             </el-form>
             <el-table :data="tableData.ModelList" border style="width: 100%">
+                <el-table-column prop="ID" label="活动编号" align="center"></el-table-column>
                 <el-table-column prop="PromotionName" label="活动名称" align="center"></el-table-column>
                 <el-table-column prop="PromotionShortName" label="活动简称" align="center"></el-table-column>
                 <el-table-column prop="PromotionState" label="活动状态" align="center">
@@ -96,7 +97,6 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="EndTime" label="活动结束时间" align="center"></el-table-column>
-                <el-table-column prop="ID" label="活动编号" align="center"></el-table-column>
                 <el-table-column prop="IsMastNewMember" label="是否只能新会员参与" align="center">
                     <template slot-scope="scope">  
                         {{scope.row.IsMastNewMember == 'N' ? '否' : '是'}}
@@ -109,12 +109,11 @@
                     <el-button @click="reductionDetail(scope.row)" type="text" size="small" v-if="scope.row.PromotionType === 'CP'">详情</el-button>        <!-- 降价-详情 -->
                     <el-button @click="foldDetail(scope.row)" type="text" size="small" v-if="scope.row.PromotionType === 'MZ'">详情</el-button>         <!-- 满折-详情 -->
                     <el-button @click="giftDetail(scope.row)" type="text" size="small" v-if="scope.row.PromotionType === 'MG'">详情</el-button>         <!-- 满赠-详情 -->
-                    <el-button @click="handle(scope.row)" type="text" size="small" v-if="scope.row.PromotionType === 'CP'">修改</el-button>      <!-- 降价-修改 -->
-                    <el-button @click="handle(scope.row)" type="text" size="small" v-if="scope.row.PromotionType === 'MZ'">修改</el-button>         <!-- 满折-修改 -->
-                    <el-button @click="handle(scope.row)" type="text" size="small" v-if="scope.row.PromotionType === 'MG'">修改</el-button>         <!-- 满赠-修改 -->
-                    <el-button @click="handle(scope.row);editVisible2 = true" type="text" size="small" v-if="scope.row.PromotionType === 'CP'">添加</el-button>      <!-- 降价-添加 -->
-                    <el-button @click="handle(scope.row);editVisible3 = true" type="text" size="small" v-if="scope.row.PromotionType === 'MZ'">添加</el-button>         <!-- 满折-添加 -->
-                    <el-button @click="handle(scope.row);editVisible4 = true" type="text" size="small" v-if="scope.row.PromotionType === 'MG'">添加</el-button>         <!-- 满赠-添加 -->
+                    <el-button @click="check(scope.row)" type="text" size="small" v-if="scope.row.PromotionState === 'N'">审核</el-button>      <!-- 审核 -->
+                    <el-button @click="stop(scope.row)" type="text" size="small" v-if="scope.row.PromotionState === 'O'">停止</el-button>      <!-- 停止 -->
+                    <el-button @click="handle(scope.row);editVisible2 = true" type="text" size="small" v-if="scope.row.PromotionType === 'CP' && scope.row.PromotionState === 'N'">添加</el-button>      <!-- 降价-添加 -->
+                    <el-button @click="handle(scope.row);editVisible3 = true" type="text" size="small" v-if="scope.row.PromotionType === 'MZ' && scope.row.PromotionState === 'N'">添加</el-button>         <!-- 满折-添加 -->
+                    <el-button @click="handle(scope.row);editVisible4 = true" type="text" size="small" v-if="scope.row.PromotionType === 'MG' && scope.row.PromotionState === 'N'">添加</el-button>         <!-- 满赠-添加 -->
                 </template>
                 </el-table-column>
             </el-table>
@@ -143,7 +142,7 @@
                         <el-radio v-model="form.IsMasterNewMember" label="N">否</el-radio>
                     </el-form-item>
                     <el-form-item label="主供应商号">
-                        <el-select v-model="form.MainSupplierID" placeholder="主供应商" clearable >
+                        <el-select v-model="form.MainSupplierID" placeholder="主供应商" clearable filterable @change="getSupplierList">
                             <el-option
                             v-for="item in formInline.option1"
                             :key="item.value"
@@ -153,7 +152,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="供应商号">
-                        <el-select v-model="form.SupplierID" placeholder="供应商" clearable >
+                        <el-select v-model="form.SupplierID" placeholder="供应商" clearable filterable >
                             <el-option
                             v-for="item in formInline.option2"
                             :key="item.value"
@@ -198,7 +197,7 @@
             </el-dialog>
             
             <!-- 添加促销降价活动弹出框 -->
-            <el-dialog title="促销降价活动" :visible.sync="editVisible2" width="40%">
+            <el-dialog title="促销降价活动添加" :visible.sync="editVisible2" width="40%">
                 <el-form ref="form" :model="Markdown" label-width="180px">
                     <el-form-item label="活动号">
                         <el-input v-model="this.ID" :disabled="true"></el-input>
@@ -211,7 +210,8 @@
                         <el-radio v-model="Markdown.IsAutoUse" label="N">否</el-radio>
                     </el-form-item>
                     <el-form-item label="当天最大数量">
-                        <el-input v-model="Markdown.IsDayMaxQty"></el-input>
+                        <el-radio v-model="Markdown.IsDayMaxQty" label="Y">是</el-radio>
+                        <el-radio v-model="Markdown.IsDayMaxQty" label="N">否</el-radio>
                     </el-form-item>
                     <el-form-item label="最大购买数量">
                         <el-input v-model="Markdown.MaxQty"></el-input>
@@ -236,7 +236,7 @@
             </el-dialog>
 
             <!-- 添加满折活动弹出框 -->
-            <el-dialog title="满折活动" :visible.sync="editVisible3" width="40%">
+            <el-dialog title="满折活动添加" :visible.sync="editVisible3" width="40%">
                 <el-form ref="form" :model="fullFold" label-width="180px">
                     <el-form-item label="活动号">
                         <el-input v-model="this.ID" :disabled="true"></el-input>
@@ -254,30 +254,34 @@
                     <el-form-item label="满足金额">
                         <el-input v-model="fullFold.UseAmount"></el-input>
                     </el-form-item>
-                    <el-form-item label="使用黑名单">
-                        <el-input v-model="fullFold.UseBlackRange"></el-input>
-                        <i> 不同ID之间用竖线隔开</i>
-                    </el-form-item>
-                    <el-form-item label="参与范围黑名单类型">
-                        <el-radio v-model="fullFold.UseBlackType" label="C1">一级品类</el-radio>
-                        <el-radio v-model="fullFold.UseBlackType" label="C2">二级品类</el-radio>
-                        <el-radio v-model="fullFold.UseBlackType" label="C3">三级品类</el-radio>
-                        <el-radio v-model="fullFold.UseBlackType" label="B">品牌</el-radio>
-                        <el-radio v-model="fullFold.UseBlackType" label="P">单品</el-radio>
-                    </el-form-item>
 
+                    <el-form-item label="活动参与范围">
+                        <el-select v-model="fullFold.UseType" clearable placeholder="请选择">
+                            <el-option value="A" label="全场"></el-option>
+                            <el-option value="C1" label="一级品类"></el-option>
+                            <el-option value="C2" label="二级品类"></el-option>
+                            <el-option value="C3" label="三级品类"></el-option>
+                            <el-option value="B" label="品类"></el-option>
+                            <el-option value="P" label="单品"></el-option>
+                        </el-select>
+                        <i>满足后可给赠品</i>
+                    </el-form-item>
                     <el-form-item label="使用范围">
                         <el-input v-model="fullFold.UseRange"></el-input>
                         <i> 不同ID之间用竖线隔开</i>
                     </el-form-item>
-                    <el-form-item label="活动参与范围">
-                        <el-radio v-model="fullFold.UseType" label="A">全场</el-radio>
-                        <el-radio v-model="fullFold.UseType" label="C1">一级品类</el-radio>
-                        <el-radio v-model="fullFold.UseType" label="C2">二级品类</el-radio>
-                        <el-radio v-model="fullFold.UseType" label="C3">三级品类</el-radio>
-                        <el-radio v-model="fullFold.UseType" label="B">品牌</el-radio>
-                        <el-radio v-model="fullFold.UseType" label="P">单品</el-radio>
-                        <i>满足后可给赠品</i>
+                    <el-form-item label="参与范围黑名单类型">
+                        <el-select v-model="fullFold.UseBlackType" clearable placeholder="请选择">
+                            <el-option value="C1" label="一级品类"></el-option>
+                            <el-option value="C2" label="二级品类"></el-option>
+                            <el-option value="C3" label="三级品类"></el-option>
+                            <el-option value="B" label="品类"></el-option>
+                            <el-option value="P" label="单品"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="使用黑名单">
+                        <el-input v-model="fullFold.UseBlackRange"></el-input>
+                        <i> 不同ID之间用竖线隔开</i>
                     </el-form-item>
                 </el-form>
                 <span slot="footer" class="dialog-footer">
@@ -285,10 +289,9 @@
                     <el-button type="primary" @click="addFullFold">确 定</el-button>
                 </span>
             </el-dialog>
-
             
             <!-- 添加满赠活动弹出框 -->
-            <el-dialog title="满折活动" :visible.sync="editVisible4" width="40%">
+            <el-dialog title="满赠活动添加" :visible.sync="editVisible4" width="37%">
                 <el-form ref="form" :model="addgift" label-width="180px">
                     <el-form-item label="活动号">
                         <el-input v-model="this.ID" :disabled="true"></el-input>
@@ -311,29 +314,33 @@
                     <el-form-item label="满足金额">
                         <el-input v-model="addgift.UseAmount"></el-input>
                     </el-form-item>
-                    <el-form-item label="黑名单 ">
-                        <el-input v-model="addgift.UseBlackRange"></el-input>
-                        <i> 不同ID之间用竖线分割</i>
-                    </el-form-item>
-                    <el-form-item label="参与范围黑名单类型">
-                        <el-radio v-model="addgift.UseBlackType" label="C1">一级品类</el-radio>
-                        <el-radio v-model="addgift.UseBlackType" label="C2">二级品类</el-radio>
-                        <el-radio v-model="addgift.UseBlackType" label="C3">三级品类</el-radio>
-                        <el-radio v-model="addgift.UseBlackType" label="B">品牌</el-radio>
-                        <el-radio v-model="addgift.UseBlackType" label="P">单品</el-radio>
+                    <el-form-item label="活动参与范围">
+                        <el-select v-model="addgift.UseType" clearable placeholder="请选择">
+                            <el-option value="A" label="全场"></el-option>
+                            <el-option value="C1" label="一级品类"></el-option>
+                            <el-option value="C2" label="二级品类"></el-option>
+                            <el-option value="C3" label="三级品类"></el-option>
+                            <el-option value="B" label="品类"></el-option>
+                            <el-option value="P" label="单品"></el-option>
+                        </el-select>
+                        <i>满足后可给赠品</i>
                     </el-form-item>
                     <el-form-item label="使用范围">
                         <el-input v-model="addgift.UseRange"></el-input>
                         <i> 不同ID之间用竖线隔开</i>
                     </el-form-item>
-                    <el-form-item label="活动参与范围">
-                        <el-radio v-model="addgift.UseType" label="A">全场</el-radio>
-                        <el-radio v-model="addgift.UseType" label="C1">一级品类</el-radio>
-                        <el-radio v-model="addgift.UseType" label="C2">二级品类</el-radio>
-                        <el-radio v-model="addgift.UseType" label="C3">三级品类</el-radio>
-                        <el-radio v-model="addgift.UseType" label="B">品牌</el-radio>
-                        <el-radio v-model="addgift.UseType" label="P">单品</el-radio>
-                        <i>满足后可给赠品</i>
+                    <el-form-item label="参与范围黑名单类型">
+                        <el-select v-model="addgift.UseBlackType" clearable placeholder="请选择">
+                            <el-option value="C1" label="一级品类"></el-option>
+                            <el-option value="C2" label="二级品类"></el-option>
+                            <el-option value="C3" label="三级品类"></el-option>
+                            <el-option value="B" label="品类"></el-option>
+                            <el-option value="P" label="单品"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="黑名单 ">
+                        <el-input v-model="addgift.UseBlackRange"></el-input>
+                        <i> 不同ID之间用竖线分割</i>
                     </el-form-item>
                 </el-form>
                 <span slot="footer" class="dialog-footer">
@@ -341,10 +348,36 @@
                     <el-button type="primary" @click="fullGift">确 定</el-button>
                 </span>
             </el-dialog>
+            
+            <!-- 审核弹出框 -->
+            <el-dialog title="活动审核" :visible.sync="editVisible5" width="40%">
+                <el-form ref="form" :model="AuditState" label-width="80px">
+                    <el-form-item label="审核结果">
+                        <el-radio v-model="AuditState.Audit" label="O">通过</el-radio>
+                        <el-radio v-model="AuditState.Audit" label="B">驳回</el-radio>
+                    </el-form-item>
+                    <el-form-item label="审核备注">
+                        <el-input v-model="AuditState.AuditRemark"></el-input>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="editVisible5 = false">取 消</el-button>
+                    <el-button type="primary" @click="AuditChecked">确 定</el-button>
+                </span>
+            </el-dialog>
+            
+            <!-- 删除弹出框 -->
+            <el-dialog title="活动审核" :visible.sync="editVisible6" width="20%">
+                <span>是否确认停止该活动</span>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="editVisible6 = false">否</el-button>
+                    <el-button type="primary" @click="delChecked">是</el-button>
+                </span>
+            </el-dialog>
     </div>
 </template>
 <script>
-import { PromotionListGet,PromotionAdd,PromotionProductAdd,PromotionProductUpdate,PromotionProductDiscountAdd,PromotionProductDiscountUpdate,PromotionGiftAdd } from '@/api/activeList'
+import { PromotionListGet,PromotionAdd,PromotionProductAdd,PromotionProductUpdate,PromotionProductDiscountAdd,PromotionProductDiscountUpdate,PromotionGiftAdd,MemberGiftTokenGiveOutMasterAudit,PromotiomStop,PromotionAudit } from '@/api/activeList'
 import { SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs'
 export default{
@@ -399,7 +432,9 @@ export default{
                 editVisible:false,              /* 添加活动 */
                 editVisible2:false,             /* 降价促销活动添加 */
                 editVisible3:false,             /* 满折活动修改 */
-                editVisible4:false,             /* 满赠活动修改 */
+                editVisible4:false,             /* 满赠活动添加 */
+                editVisible5:false,             /* 审核 */
+                editVisible6:false,             /* 删除 */
                 form:{                          /* 添加活动 */
                     PromotionName:'',
                     PromotionShortName:'',
@@ -446,6 +481,11 @@ export default{
                     UseBlackType:'',
                     UseRange:'',
                     UseType:''
+                },
+                AuditState:{
+                    ID:'',                      /* 活动编号 */
+                    Audit:'',                   /* 审核状态 */
+                    AuditRemark:''              /* 审核备注 */
                 }
             }
         },
@@ -495,7 +535,6 @@ export default{
                 }
                 PromotionAdd(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('活动新建成功')
                         this.editVisible = false
                         this.form.MainSupplierID = '',
@@ -505,11 +544,10 @@ export default{
                         this.form.PromotionEndTime = '',
                         this.form.PromotionName = '',
                         this.form.PromotionShortName = '',
-                        this.form.IsMasterNewMember = ''
+                        this.form.IsMasterNewMember = '',
+                        this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                         this.form.MainSupplierID = '',
                         this.form.SupplierID = '',
@@ -521,11 +559,10 @@ export default{
                         this.form.IsMasterNewMember = ''
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             save(){                                                         /* 新建降价促销活动 */
@@ -542,7 +579,6 @@ export default{
                 }
                 PromotionProductAdd(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('降价促销活动新建成功')
                         this.editVisible2 = false
                         this.Markdown.PromotionID = '',
@@ -556,8 +592,6 @@ export default{
                         this.Markdown.MinQty = ''
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                         this.Markdown.PromotionID = '',
                         this.Markdown.DisplayStock = '',
@@ -570,11 +604,10 @@ export default{
                         this.Markdown.MinQty = ''
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getMainSupplier(){
@@ -583,42 +616,55 @@ export default{
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.formInline.option1 = JSON.parse(res.data.Result)
                         this.form.option1 = JSON.parse(res.data.Result)
-                        console.log(this.formInline.option1)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getSupplier(){
+                this.formInline.SupplierID = ""
                 let params = {
-                    Level:2
+                    Level:2,
+                    MainSupplierID:this.formInline.MainSupplierID
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.formInline.option2 = JSON.parse(res.data.Result)
-                        this.form.option2 = JSON.parse(res.data.Result)
-                        console.log(this.formInline.option2)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            getSupplierList(){
+                this.formInline.option2 = ''
+                this.form.SupplierID = ""
+                let params = {
+                    Level:2,
+                    MainSupplierID:this.form.MainSupplierID
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.formInline.option2 = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -629,21 +675,19 @@ export default{
                 console.log("val:" + val)
                 this.formInline.timeStart = val + " 00:00:00"
                 this.form.PromotionBeginTime = val + " 00:00:00"
-                console.log("this.value1:" + this.value1)
             },
             updateDateEnd(val) {
                 console.log("val:" + val)
                 this.formInline.timeEnd = val + " 00:00:00"
                 this.form.PromotionEndTime = val + " 00:00:00"
-                console.log("this.value1:" + this.value1)
             },
             handleSizeChange(val) {             /* 分页用 */
                 this.PageSize = val
-                console.log(`每页 ${val} 条`);
+                // console.log(`每页 ${val} 条`);
                 this.getData()
             },
             handleCurrentChange(val) {              /* 分页用 */
-                console.log(`当前页: ${val}`);
+                // console.log(`当前页: ${val}`);
                 this.currentPage4 = val;
                 this.getData()
             },
@@ -658,25 +702,21 @@ export default{
                     PromotionName:this.fullFold.PromotionName,
                     PromotionDiscount:this.fullFold.PromotionDiscount,
                     PromotionID:this.fullFold.PromotionID,
-                    ID:this.ID
+                    PromotionID:this.ID
                 }
                 PromotionProductDiscountAdd(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('满折活动添加成功')
                         this.editVisible3 = false
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             fullGift(){                         /* 满赠活动添加 */
@@ -686,7 +726,7 @@ export default{
                     IsAllOne:this.addgift.IsAllOne,
                     IsDayOne:this.addgift.IsDayOne,
                     MaxStock:this.addgift.MaxStock,
-                    UseAmountv:this.addgift.UseAmount,
+                    UseAmount:this.addgift.UseAmount,
                     UseBlackRange:this.addgift.UseBlackRange,
                     UseBlackType:this.addgift.UseBlackType,
                     UseRange:this.addgift.UseRange,
@@ -694,50 +734,111 @@ export default{
                 }
                 PromotionGiftAdd(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('满折活动添加成功')
-                        this.editVisible3 = false
+                        this.editVisible4 = false
+                        this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             handle(row){
                 this.ID = row.ID
                 console.log(this.ID)
             },
-            reductionDetail(){                      /* 降价活动详情 */
-
+            reductionDetail(row){                      /* 降价活动详情 */
+                this.$router.push({
+                    path:'/Markdown',
+                    query:{
+                        ID:row.ID,
+                        PromotionState:row.PromotionState
+                    }
+                })
             },
-            foldDetail(){                           /* 满折活动详情 */
-
+            foldDetail(row){                           /* 满折活动详情 */
+                this.$router.push({
+                    path:'/fullFold',
+                    query:{
+                        ID:row.ID,
+                        PromotionState:row.PromotionState
+                    }
+                })
             },
-            giftDetail(){                           /* 满赠活动详情 */
-
+            giftDetail(row){                           /* 满赠活动详情 */
+                this.$router.push({
+                    path:'/fullGift',
+                    query:{
+                        ID:row.ID,
+                        PromotionState:row.PromotionState,
+                    }
+                })
             },
-            reductionChange(){                      /* 降价促销活动修改 */
-                
+            check(row){
+                this.AuditState.ID = row.ID
+                this.editVisible5 = true
+                this.AuditState.Audit = '',
+                this.AuditState.AuditRemark = ''
             },
-            foldChange(){                           /* 满折活动修改 */
-                
+            AuditChecked(){
+                let params = {
+                    ID:this.AuditState.ID,
+                    Audit:this.AuditState.Audit,
+                    AuditRemark:this.AuditState.AuditRemark
+                }
+                PromotionAudit(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.editVisible5 = false
+                        this.$message.success('审核成功')
+                        this.AuditState.ID = ''
+                        this.AuditState.Audit = ''
+                        this.AuditState.AuditRemark = ''
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
             },
-            giftChange(){                           /* 满赠活动修改 */
-
+            stop(row){
+                console.log(row)
+                this.AuditState.ID = row.ID
+                this.editVisible6 = true
+            },
+            delChecked(){
+                let params = {
+                    ID:this.AuditState.ID,
+                }
+                PromotiomStop(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.editVisible6 = false
+                        this.$message.success('已停止活动')
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
             }
-        },
+         },
         created(){
             this.getData()
             this.getMainSupplier()
-            this.getSupplier()
         }
     }
 </script>

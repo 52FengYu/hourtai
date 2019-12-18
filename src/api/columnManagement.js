@@ -86,7 +86,7 @@ export function changeItemInfo(params) {
     /* 修改页面内容 */
     export function changeItemContent(obj) {
       return axios({
-        url: '/api/Page/PageContentUpdated',
+        url: '/api/Page/PageContentUpdate',
         method: 'POST',
         headers:{
           'Content-Type':' application/x-www-form-urlencoded ',
@@ -196,6 +196,44 @@ export function changeItemInfo(params) {
       method: 'POST',
       headers:{
         TokenID : 'jd',
+        'Content-Type':' application/x-www-form-urlencoded ',
+      },
+      data: obj
+    })
+  }
+     
+ 
+  /* 热搜词获取 */
+  export function PageHotSearchGetFromMainSupplierID(obj) {
+    return axios({
+      url: '/api/Page/PageHotSearchGetFromMainSupplierID',
+      method: 'POST',
+      headers:{
+        'Content-Type':' application/x-www-form-urlencoded ',
+      },
+      data: obj
+    })
+  }
+
+
+  /* 增加热搜词 */
+  export function PageHotSearchAdd(obj) {
+    return axios({
+      url: '/api/Page/PageHotSearchAdd',
+      method: 'POST',
+      headers:{
+        'Content-Type':' application/x-www-form-urlencoded ',
+      },
+      data: obj
+    })
+  }
+  
+  /* 修改热热搜词 */
+  export function PageHotSearchUpdate(obj) {
+    return axios({
+      url: '/api/Page/PageHotSearchUpdate',
+      method: 'POST',
+      headers:{
         'Content-Type':' application/x-www-form-urlencoded ',
       },
       data: obj

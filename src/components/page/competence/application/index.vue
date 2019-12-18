@@ -68,9 +68,9 @@
         <!-- 修改弹出框 -->
         <el-dialog title="应用修改" :visible.sync="editVisible2" width="40%">
             <el-form ref="form" :model="fix" label-width="160px">
-                <el-form-item label="应用编号">
+                <!-- <el-form-item label="应用编号">
                     <el-input v-model="this.ID" :disabled="true"></el-input>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="应用名称">
                     <el-input v-model="fix.AppName"></el-input>
                 </el-form-item>
@@ -129,22 +129,17 @@ import qs from 'qs'
                     IsDisPlay:this.formInline.IsDisPlay
                 }
                 SysAppListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.tableData = JSON.parse(res.data.Result)
-                        console.log(this.tableData)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             handleSizeChange(val) {
@@ -165,29 +160,23 @@ import qs from 'qs'
                     IsDisPlay:this.form.IsDisPlay,
                 }
                 SysAppAdd(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.editVisible = false
                         this.$message.success('添加成功')
                         this.getLIst()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             change(row){
-                console.log(row)
                 this.ID = row.ID
-                console.log(this.ID)
                 this.editVisible2 = true
             },
             saveChange(){
@@ -199,27 +188,22 @@ import qs from 'qs'
                     IsDisPlay:this.fix.IsDisPlay,
                 }
                 SysAppUpdate(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.editVisible2 = false
                         this.$message.success('修改成功')
                         this.getLIst()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getDetail(row){
-                console.log(row)
                 this.ID = row.ID;
                 this.$router.push({
                     path:'/applicationDetail',

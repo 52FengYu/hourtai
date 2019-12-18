@@ -3,16 +3,26 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
-    <script language="javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=43b2dae85b7a78ed9ff10f40427c1d8b&plugin=AMap.ControlBar"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">  
+    <script src="http://api.map.baidu.com/api?v=3.0&ak=DD279b2a90afdf0ae7a3796787a0742e" type="text/javascript"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+    <link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+    <script src="ServiceURL.js"></script>
     <title>利群网商</title>
+    <script>
+        var ServiceURL={
+            Frame:ServiceURL.Frame,      /* 权限 */
+            Adminapi:ServiceURL.Adminapi,      /* 后台 */
+        }
+        /* var ImageURL={
+            ImageURL: ServiceURL.ImageURL
+        } */
+    </script>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but vms doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
-    <!-- built files will be auto injected -->
-        <script src='https://api.map.baidu.com/api?v=2.0&ak=nlUNnZNlnwH3NMxfOSFGQ6hpKVZw66EU&callback=init'></script>
   </body>
 </html>

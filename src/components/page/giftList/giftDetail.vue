@@ -62,14 +62,10 @@ import qs from 'qs';
         },
         methods:{
             updateDateStart(val) {
-                console.log("val:" + val)
                 this.formInline.timeStart = val + " 00:00:00"
-                console.log("this.value1:" + this.value1)
             },
             updateDateEnd(val) {
-                console.log("val:" + val)
                 this.formInline.timeEnd =val + " 00:00:00"
-                console.log("this.value1:" + this.value1)
             },
             getData(){
                 let params = {
@@ -79,26 +75,17 @@ import qs from 'qs';
                     timeEnd:this.formInline.timeEnd,
                 }
                 GiftListDetail(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(JSON.parse(res.data.Result))
                         this.tableData = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
-                        this.$message('修改失败');
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             }
         },

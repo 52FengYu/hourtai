@@ -104,21 +104,17 @@ import qs from 'qs'
                     PageSize:this.PageSize,
                 }
                 SysRoleListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.tableData = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             handleSizeChange(val) {
@@ -143,19 +139,16 @@ import qs from 'qs'
                     RoleName:this.changeRole.RoleName
                 }
                 SysRoleUpdate(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success("修改成功")
                         this.editVisible2 = false
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -167,23 +160,19 @@ import qs from 'qs'
                     RoleName:this.addRole.RoleName
                 }
                 SysRoleAdd(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success("角色新建成功")
                         this.editVisible = false
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             show(row){
@@ -193,32 +182,24 @@ import qs from 'qs'
                 this.AuthorityIDList = row.AuthorityIDList
                 let params = {}
                 AuthorityListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
-                        console.log(res.data.Result)
                         this.role = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             submit(){
-                console.log(this.$refs.tree.getCheckedKeys(true))
                 const tree = JSON.stringify(this.$refs.tree.getCheckedKeys(true))
                 let reg=new RegExp(',','g')//g代表全部
                 let newMsg=tree.replace(reg,'|');
-                console.log(newMsg)
                 var deleteY = newMsg.substring(1, newMsg.length - 1);
-                console.log(deleteY)
                 let reg1=new RegExp('"','g')//g代表全部
                 let newMsg1=deleteY.replace(reg1,'');
                 let params = {
@@ -226,23 +207,18 @@ import qs from 'qs'
                     AuthorityIDS:newMsg1,
                 }
                 SysRoleSetAuthority(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('提交成功')
                         this.editVisible3 = false
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
 

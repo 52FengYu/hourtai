@@ -50,7 +50,24 @@
                 <el-radio v-model="form.IsMemberLoginAutoSend" label="N">否</el-radio>
             </el-form-item>
             <el-form-item label="主供应商号(为空表示不限制)">
-                <el-input v-model="form.MainSupplierID"></el-input>
+                <el-select v-model="form.MainSupplierID" placeholder="主供应商" clearable filterable @change="getSupplier">
+                    <el-option
+                    v-for="item in option1"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="供应商号(为空表示不限制)">
+                <el-select v-model="form.SupplierID" placeholder="供应商" clearable filterable >
+                    <el-option
+                    v-for="item in option2"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                    </el-option>
+                </el-select>
             </el-form-item>
             <el-form-item label="最大发放数量 (-1 表示不限制)">
                 <el-input v-model="form.MaxNum"></el-input>
@@ -67,9 +84,6 @@
             <el-form-item label="备注">
                 <el-input v-model="form.Remark"></el-input>
             </el-form-item>
-            <el-form-item label="供应商号(为空表示不限制)">
-                <el-input v-model="form.SupplierID"></el-input>
-            </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submit">提交</el-button>
                 <el-button type="primary" @click="clear">重置</el-button>
@@ -79,6 +93,7 @@
 </template>
 <script>
 import { MemberGiftTokenGiveOutMasterUpdate,MemberGiftTokenGiveOutMasterListGet } from '@/api/coupon';
+import { SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs'
     export default{
         data(){
@@ -100,7 +115,9 @@ import qs from 'qs'
                     MemberMaxNum:'',                    /* 会员最大领券数量 */
                     Remark:'',                          /* 备注 */
                     SupplierID:'',                      /* 供应商号 */
-                }
+                },
+                option1:[],
+                option2:[]
             }
         },
         methods:{
@@ -141,28 +158,20 @@ import qs from 'qs'
                     SupplierID : this.form.SupplierID
                 }
                 MemberGiftTokenGiveOutMasterUpdate(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.$message.success('提交成功')
                         this.$router.push({
                             path:'/couponList',
                         })
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             getData(){
@@ -170,11 +179,8 @@ import qs from 'qs'
                     ID:decodeURI(location.href).split('?')[1].split('=')[1],
                 }
                 MemberGiftTokenGiveOutMasterListGet(qs.stringify(params)).then((res)=>{
-                    console.log(res.data)
                     if(res.data.Success == 1){
-                        console.log("数据请求成功")
                         this.tableData = JSON.parse(res.data.Result).ModelList[0]
-                        console.log(this.tableData)
                         this.form.IsLastRegTime = this.tableData.IsLastRegTime       
                         this.form.DayMaxNum = this.tableData.DayMaxNum ,           
                         this.form.GiftTokenGiveOutName = this.tableData.GiftTokenGiveOutName ,    
@@ -192,19 +198,13 @@ import qs from 'qs'
                         this.form.SupplierID = this.tableData.SupplierID
                     }
                     if(res.data.Success == 0){
-                        console.log("数据请求失败，请重试")
-                        console.log(res.data.Result)
-                    }
-                    if(res.data.Success == -999){
-                        console.log("用户未登录")
-                        console.log(res.data)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        console.log("请求错误")
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
-                    console.log('出错了')
                 })
             },
             IsLastRegTime(val) {
@@ -216,9 +216,48 @@ import qs from 'qs'
             updateDateEnd(val) {
                 this.form.GiveEndTime = val + " 00:00:00"
             },
+            getMainSupplier(){
+                let params = {
+                    Level:1
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.option1 = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            getSupplier(){
+                this.form.SupplierID = ''
+                let params = {
+                    Level:2,
+                    MainSupplierID:this.form.MainSupplierID
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.option2 = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
         },
         created(){
             this.getData()
+            this.getMainSupplier()
         }
     }
 </script>  
