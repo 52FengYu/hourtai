@@ -3,8 +3,8 @@
         <el-card>
             <el-form :inline="true" class="demo-form-inline">
                 <el-form-item label="是否包含废弃">
-                    <el-radio v-model="HasDelFlag" label="0">否</el-radio>
-                    <el-radio v-model="HasDelFlag" label="1">是</el-radio>
+                    <el-radio v-model="HasDelFlag" label="0" @change="reset">否</el-radio>
+                    <el-radio v-model="HasDelFlag" label="1" @change="reset">是</el-radio>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="getData">搜索</el-button>
@@ -53,7 +53,7 @@
 
         
         <!-- 添加用户信息 -->
-        <el-dialog title="添加用户信息" :visible.sync="editVisible" width="40%">
+        <el-dialog title="添加用户信息" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="addInfo" label-width="120px">
                 <el-form-item label="部门编号">
                     <el-cascader
@@ -89,7 +89,7 @@
         </el-dialog>
 
         <!-- 修改用户信息 -->
-        <el-dialog title="修改用户信息" :visible.sync="editVisible2" width="40%">
+        <el-dialog title="修改用户信息" :visible.sync="editVisible2" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="addInfo" label-width="120px">
                 <el-form-item label="部门编号">
                     <el-cascader
@@ -126,7 +126,7 @@
 
         
         <!-- 角色弹出框 -->
-        <el-dialog title="权限列表" :visible.sync="editVisible3" width="40%">
+        <el-dialog title="权限列表" :visible.sync="editVisible3" width="40%" :close-on-click-modal="false">
             <el-tree
                 :data="role"
                 ref="tree"
@@ -176,6 +176,10 @@ import qs from 'qs'
             }
         },
         methods:{
+            reset(){
+                this.PageIndex = 1,
+                this.PageSize = 10
+            },
             getData(){
                 let params = {
                     PageNo:this.PageIndex,

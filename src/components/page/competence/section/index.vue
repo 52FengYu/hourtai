@@ -24,7 +24,7 @@
         </el-card>
         
         <!-- 修改部门信息 -->
-        <el-dialog title="修改部门信息" :visible.sync="editVisible" width="40%">
+        <el-dialog title="修改部门信息" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="100px">
                 <!-- <el-form-item label="部门ID">
                     <el-input v-model="form.ID" :disabled="true"></el-input>
@@ -41,7 +41,7 @@
 
         
         <!-- 新增部门信息 -->
-        <el-dialog title="新增部门信息" :visible.sync="editVisible2" width="40%">
+        <el-dialog title="新增部门信息" :visible.sync="editVisible2" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="addInfo" label-width="100px">
                 <el-form-item label="部门名称">
                     <el-input v-model="addInfo.DeptName"></el-input>

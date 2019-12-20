@@ -17,7 +17,7 @@
         </el-card>
         
         <!-- 新建赠品弹出框 -->
-        <el-dialog title="新建赠品" :visible.sync="editVisible" width="50%">
+        <el-dialog title="新建赠品" :visible.sync="editVisible" width="50%" :close-on-click-modal="false">
             <el-form ref="form" :model="addGift" label-width="100px">
                 <el-form-item label="活动号">
                     <el-input :disabled="true" v-model="addGift.PromotionID"></el-input>
@@ -45,7 +45,7 @@
         </el-dialog>
         
         <!-- 修改赠品弹出框 -->
-        <el-dialog title="修改赠品" :visible.sync="editVisible2" width="50%">
+        <el-dialog title="修改赠品" :visible.sync="editVisible2" width="50%" :close-on-click-modal="false">
             <el-form ref="form" :model="row" label-width="100px">
                 <el-form-item label="活动号">
                     <el-input :disabled="true" v-model="row.PromotionID"></el-input>

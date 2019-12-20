@@ -12,18 +12,20 @@
                         <el-input
                             placeholder="门店列表"
                             v-model="formInline.shopList"
-                            clearable>
+                            clearable
+                             @change="reset">
                         </el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-input
                             placeholder="门店名称"
                             v-model="formInline.shopName"
-                            clearable>
+                            clearable
+                             @change="reset">
                         </el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-select v-model="formInline.value1" clearable placeholder="全部门店级别">
+                        <el-select v-model="formInline.value1" clearable placeholder="全部门店级别" @change="reset">
                             <el-option
                             v-for="item in formInline.options1"
                             :key="item.value"
@@ -33,7 +35,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-select v-model="formInline.value2" clearable placeholder="所有类型">
+                        <el-select v-model="formInline.value2" clearable placeholder="所有类型" @change="reset">
                             <el-option
                             v-for="item in formInline.options2"
                             :key="item.value"
@@ -68,8 +70,7 @@
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
                     :current-page="currentPage4"
-                    :page-sizes="[10, 20, 30, 40]"
-                    :page-size="10"
+                    :page-size= this.PageSize
                     layout="total, sizes, prev, pager, next, jumper"
                     :total="400">
                 </el-pagination>
@@ -81,7 +82,8 @@
     export default{
         data(){
             return{
-                currentPage4: 4,        /* 分页用 */
+                currentPage4:1,        /* 分页用 */
+                PageSize:10,
                 formInline:{
                     shopList:'',        /* 门店列表 */
                     shopName:'',        /* 门店名称 */
@@ -140,6 +142,8 @@
         methods:{
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
+                this.PageSize = val
+                this.getData()
             },
             handleCurrentChange(val) {
                 console.log(`当前页: ${val}`);

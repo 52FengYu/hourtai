@@ -13,7 +13,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="供应商">
-                    <el-select v-model="form.ID" placeholder="供应商" clearable filterable>
+                    <el-select v-model="form.ID" placeholder="供应商" clearable filterable @change="reset">
                         <el-option
                         v-for="item in form.option2"
                         :key="item.value"
@@ -23,7 +23,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="供应商状态">
-                    <el-select v-model="form.State" placeholder="供应商状态" clearable >
+                    <el-select v-model="form.State" placeholder="供应商状态" clearable @change="reset">
                         <el-option label="新建" value="N"></el-option>
                         <el-option label="审核通过" value="O"></el-option>
                         <el-option label="审核驳回" value="B"></el-option>
@@ -31,52 +31,52 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="供应商等级">
-                    <el-select v-model="form.Level" placeholder="供应商等级" clearable>
+                    <el-select v-model="form.Level" placeholder="供应商等级" clearable @change="reset">
                         <el-option label="一级" value="1"></el-option>
                         <el-option label="二级" value="2"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="供应商类型">
-                    <el-select v-model="form.SupplierType" placeholder="供应商类型" clearable>
+                    <el-select v-model="form.SupplierType" placeholder="供应商类型" clearable @change="reset">
                         <el-option label="内部门店" value="N"></el-option>
                         <el-option label="外部供应商" value="W"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="配送类型">
-                    <el-select v-model="form.StoreType" placeholder="配送类型" clearable>
+                    <el-select v-model="form.StoreType" placeholder="配送类型" clearable @change="reset">
                         <el-option label="纯门店自送" value="Z"></el-option>
                         <el-option label="统配" value="S"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="利群内部门店码">  
-                    <el-input v-model="form.SupplierCode" placeholder="利群内部门店码"></el-input>
+                    <el-input v-model="form.SupplierCode" placeholder="利群内部门店码" @change="reset"></el-input>
                 </el-form-item>
                 <el-form-item label="是否跨境供应商">
-                    <el-select v-model="form.IsImport" placeholder="是否跨境供应商" clearable>
+                    <el-select v-model="form.IsImport" placeholder="是否跨境供应商" clearable @change="reset">
                         <el-option label="是" value="Y"></el-option>
                         <el-option label="否" value="N"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="是否在门店列表显示">
-                    <el-select v-model="form.IsDisplay" placeholder="是否在门店列表显示" clearable>
+                    <el-select v-model="form.IsDisplay" placeholder="是否在门店列表显示" clearable @change="reset">
                         <el-option label="是" value="Y"></el-option>
                         <el-option label="否" value="N"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="是否必须在线支付">
-                    <el-select v-model="form.IsNeedLinkPay" placeholder="是否必须在线支付" clearable>
+                    <el-select v-model="form.IsNeedLinkPay" placeholder="是否必须在线支付" clearable @change="reset">
                         <el-option label="是" value="Y"></el-option>
                         <el-option label="否" value="N"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="是否支持自提">
-                    <el-select v-model="form.IsSupportPickUp" placeholder="是否支持自提" clearable>
+                    <el-select v-model="form.IsSupportPickUp" placeholder="是否支持自提" clearable @change="reset">
                         <el-option label="是" value="Y"></el-option>
                         <el-option label="否" value="N"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="是否废弃">
-                    <el-select v-model="form.DelFlag" placeholder="是否废弃" clearable>
+                    <el-select v-model="form.DelFlag" placeholder="是否废弃" clearable @change="reset">
                         <el-option label="是" value="Y"></el-option>
                         <el-option label="否" value="N"></el-option>
                     </el-select>
@@ -142,7 +142,7 @@
         </el-card>
         
         <!-- 审核供应商 -->
-        <el-dialog title="审核供应商" :visible.sync="editVisible2" width="30%">
+        <el-dialog title="审核供应商" :visible.sync="editVisible2" width="30%" :close-on-click-modal="false">
             <el-form ref="form" :model="formItem" label-width="80px">
                 <el-form-item>
                     <el-radio v-model="formItem.Audit" label="O">通过</el-radio>
@@ -227,6 +227,10 @@ export default{
         }
     },
     methods:{
+        reset(){
+            this.PageSize = 10,
+            this.PageIndex = 1
+        },
         getData(){
             let params = {
                 ID:this.form.ID,

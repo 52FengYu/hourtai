@@ -8,10 +8,10 @@
         <div class="container">
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
                 <el-form-item label="品牌名称">
-                    <el-input v-model="formInline.BrandName" placeholder="请输入品牌名称" clearable></el-input>
+                    <el-input v-model="formInline.BrandName" placeholder="请输入品牌名称" clearable @change="reset"></el-input>
                 </el-form-item>
                 <el-form-item label="品牌ID">
-                    <el-input v-model="formInline.ID" placeholder="请输入品牌ID" clearable></el-input>
+                    <el-input v-model="formInline.ID" placeholder="请输入品牌ID" clearable @change="reset"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="getData">搜索</el-button>
@@ -42,8 +42,8 @@
         </div>
 
         <!-- 修改品牌 -->
-         <el-dialog title="修改品牌" :visible.sync="editVisible" width="40%">
-                <el-form ref="form" :model="row" label-width="80px">
+         <el-dialog title="修改品牌" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
+                <el-form ref="form" :model="row" label-width="100px">
                     <el-form-item label="品牌名称">
                         <el-input v-model="row.BrandName"></el-input>
                     </el-form-item>
@@ -64,8 +64,8 @@
             </el-dialog>
             
             <!-- 添加品牌 -->
-            <el-dialog title="添加品牌" :visible.sync="addVisible" width="40%">
-                <el-form ref="form" :model="addBand" label-width="80px">
+            <el-dialog title="添加品牌" :visible.sync="addVisible" width="40%" :close-on-click-modal="false">
+                <el-form ref="form" :model="addBand" label-width="100px">
                     <el-form-item label="品牌名称">
                         <el-input v-model="addBand.BrandName"></el-input>
                     </el-form-item>
@@ -111,6 +111,10 @@ import qs from 'qs'
             }
         },
         methods:{
+            reset(){
+                this.currentPage4 = 1,
+                this.PageSize = 10
+            },
             handleSizeChange(val) {
                 this.PageSize = val
                 this.getData()

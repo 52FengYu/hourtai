@@ -29,6 +29,7 @@ axios.interceptors.request.use(function (config) {
 } */
     if (code == -999) {  // 这里根据自己接口返回状态进行判断是否需要登录
       window.sessionStorage.removeItem('TokenID')
+      window.localStorage.removeItem('role')
       location.reload()
     }
   　　return res

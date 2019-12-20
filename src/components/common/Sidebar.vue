@@ -209,16 +209,16 @@
                             }
                         ]
                     },
-                    /* {
-                        icon: 'el-icon-s-tools',
+                    {
+                        icon: 'el-icon-coin',
                         index: '9',
-                        title: '权限管理',
+                        title: '财务管理',
                         subs: [
                             {
-                                index: 'application',
-                                title: '应用'
+                                index: 'RefundMoney',
+                                title: '退款管理'
                             },
-                            {
+                            /* {
                                 index: 'section',
                                 title: '部门'
                             },
@@ -233,9 +233,9 @@
                             {
                                 index:'authority',
                                 title:'权限列表'
-                            }
+                            } */
                         ]
-                    } */
+                    }
                 ]
             }
         },

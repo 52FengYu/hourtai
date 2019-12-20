@@ -45,7 +45,7 @@
         </el-card>
         
             <!-- 修改满赠活动弹出框 -->
-            <el-dialog title="满赠活动修改" :visible.sync="editVisible" width="40%">
+            <el-dialog title="满赠活动修改" :visible.sync="editVisible" width="40%"  :close-on-click-modal="false">
                 <el-form ref="form" :model="row" label-width="180px">
                     <el-form-item label="活动号">
                         <el-input v-model="row.PromotionID" :disabled="true"></el-input>

@@ -28,7 +28,7 @@
 
         
         <!-- 新建角色弹出框 -->
-        <el-dialog title="新建角色" :visible.sync="editVisible" width="40%">
+        <el-dialog title="新建角色" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="addRole" label-width="100px">
                 <el-form-item label="角色名称">
                     <el-input v-model="addRole.RoleName"></el-input>
@@ -41,7 +41,7 @@
         </el-dialog>
 
         <!-- 修改角色弹出框 -->
-        <el-dialog title="修改角色" :visible.sync="editVisible2" width="40%">
+        <el-dialog title="修改角色" :visible.sync="editVisible2" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="changeRole" label-width="100px">
                 <el-form-item label="角色名称">
                     <el-input v-model="changeRole.RoleName"></el-input>
@@ -55,7 +55,7 @@
 
         
         <!-- 角色弹出框 -->
-        <el-dialog title="权限列表" :visible.sync="editVisible3" width="40%">
+        <el-dialog title="权限列表" :visible.sync="editVisible3" width="40%" :close-on-click-modal="false">
             <el-tree
                 :data="role"
                 ref="tree"

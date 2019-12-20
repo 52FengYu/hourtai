@@ -18,7 +18,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="供应商号">
-                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable>
+                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable @change="reset">
                         <el-option
                         v-for="item in option2"
                         :key="item.value"
@@ -28,7 +28,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="页面类型">
-                    <el-select v-model="formInline.PageTypeID" placeholder="请选择类型" clearable>
+                    <el-select v-model="formInline.PageTypeID" placeholder="请选择类型" clearable @change="reset">
                         <el-option
                             v-for="item in formInline.options"
                             :key="item.ID"
@@ -39,10 +39,10 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="页面编号">
-                    <el-input v-model="formInline.ID" placeholder="非必填"></el-input>
+                    <el-input v-model="formInline.ID" placeholder="非必填" @change="reset" clearable ></el-input>
                 </el-form-item>
                 <el-form-item label="页面名称">
-                    <el-input v-model="formInline.PageName" placeholder="非必填"></el-input>
+                    <el-input v-model="formInline.PageName" placeholder="非必填" @change="reset" clearable ></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="getData">搜索</el-button>
@@ -56,6 +56,7 @@
                 style="width: 100%"
                 class="table"
                 header-cell-class-name="table-header"
+                highlight-current-row
             >
                 <el-table-column prop="ID" label="ID" align="center"></el-table-column>
                 <el-table-column prop="PageName" label="页面名称" align="center"></el-table-column>
@@ -85,7 +86,7 @@
             </el-pagination>
         </div>
          <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="70px">
                 <!-- <el-form-item label="ID">
                     <el-input v-model="this.forms.ID" :disabled="true"></el-input>
@@ -103,7 +104,7 @@
             </span>
         </el-dialog>
          <!-- 新增页面弹出框 -->
-        <el-dialog title="新建" :visible.sync="editVisible2" width="45%">
+        <el-dialog title="新建" :visible.sync="editVisible2" width="45%" :close-on-click-modal="false">
             <el-form ref="form" :model="addPage" label-width="120px" :inline="true">
                 <el-form-item label="页面名称（必填）">
                     <el-input v-model="addPage.PageName"></el-input>
@@ -199,6 +200,10 @@ import qs from 'qs';
             }
         },
         methods:{
+            reset(){
+                this.PageIndex = 1,
+                this.PageSize = 10 
+            },
             getPageType(){      /* 下拉菜单 */
                 let params = {
                     PageIndex:1,

@@ -225,6 +225,11 @@ const router = new Router({
                     meta: { title: '修改订单信息',requireAuth:true }
                 },
                 {
+                    path:  '/RefundMoney',
+                    component:resolve =>  require(['../components/page/RefundMoney/index.vue'], resolve),
+                    meta: { title: '退款管理',requireAuth:true }
+                },
+                {
                     path: '/application',
                     component: resolve => require(['../components/page/competence/application/index.vue'], resolve),
                     meta: { title: '应用',requireAuth:true }

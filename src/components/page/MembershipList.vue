@@ -9,17 +9,18 @@
             <div class="head">
                 <el-form :inline="true" :model="formInline" class="demo-form-inline">
                     <el-form-item label="会员卡号">
-                        <el-input v-model="formInline.inputCard" placeholder="会员卡号(必填)" style="width:15rem;margin-right:2rem"></el-input>
+                        <el-input v-model="formInline.inputCard" placeholder="会员卡号(必填)" style="width:15rem;margin-right:2rem" @change="reset"></el-input>
                     </el-form-item>
                     <el-form-item label="手机号">
-                        <el-input v-model="formInline.inputMobile" placeholder="手机号(必填)" style="width:15rem;margin-right:2rem"></el-input>
+                        <el-input v-model="formInline.inputMobile" placeholder="手机号(必填)" style="width:15rem;margin-right:2rem" @change="reset"></el-input>
                     </el-form-item>
                     <el-form-item label="开始时间">
                         <div class="block">
                             <el-date-picker
                                 v-model="formInline.pickerDateCreate"
                                 type="date"
-                                placeholder="选择日期">
+                                placeholder="选择日期"
+                                 @change="reset">
                             </el-date-picker>
                         </div>
                     </el-form-item>
@@ -28,12 +29,13 @@
                             <el-date-picker
                                 v-model="formInline.pickerDateEnd"
                                 type="date"
-                                placeholder="选择日期">
+                                placeholder="选择日期"
+                                 @change="reset">
                             </el-date-picker>
                         </div>
                     </el-form-item>
                     <el-form-item label="是否废弃">
-                        <el-select v-model="formInline.delivery" clearable placeholder="请选择">
+                        <el-select v-model="formInline.delivery" clearable placeholder="请选择" @change="reset">
                             <el-option value="Y" label="是"></el-option>
                             <el-option value="N" label="否"></el-option>
                         </el-select>
@@ -60,7 +62,7 @@
                 <el-table-column prop="CreateTime" label="注册时间"  width="190" align="center" ></el-table-column>
                 <el-table-column prop="DelFlag" label="是否废弃" width="180" align="center" ></el-table-column>
                 <el-table-column prop="MemberCode" label="CRM系统会员号" width="120" align="center" ></el-table-column>
-                <el-table-column prop="Balance" label="零钱包金额" :formatter="formatter" align="center" ></el-table-column>
+                <el-table-column prop="Balance" label="零钱包金额" align="center" ></el-table-column>
                 <el-table-column label="操作" align="center" fixed="right" min-width="150">
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" plain @click="show(scope.$index, scope.row)">重置会员密码</el-button>
@@ -75,7 +77,7 @@
         </div>
 
         <!-- 重置弹出框 -->
-        <el-dialog title="重置密码" :visible.sync="editVisible" width="20%">
+        <el-dialog title="重置密码" :visible.sync="editVisible" width="20%" :close-on-click-modal="false">
             <div class="del-dialog-cnt">该操作不可逆，是否继续操作？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
@@ -84,7 +86,7 @@
         </el-dialog>
 
         <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
+        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center :close-on-click-modal="false">
             <div class="del-dialog-cnt">该操作不可逆，是否确定废弃？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delVisible = false">取 消</el-button>
@@ -140,6 +142,9 @@ import qs from 'qs';
         computed: {
          },
         methods: {
+            reset(){
+                this.cur_page = 1
+            },
             // 分页导航
             handleCurrentChange(val) {
                 this.cur_page = val;

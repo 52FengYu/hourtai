@@ -13,7 +13,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="供应商">
-                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable  @change = 'reset'>
+                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable  @change='reset'>
                         <el-option
                             v-for="item in formInline.option2"
                             :key="item.value"
@@ -23,7 +23,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="订单号">
-                    <el-input v-model="formInline.OrderID" placeholder="订单号" @change = 'reset'></el-input>
+                    <el-input v-model="formInline.OrderID" placeholder="订单号" @change='reset'></el-input>
                 </el-form-item>
                 <el-form-item label="开始时间" required>
                     <el-date-picker
@@ -42,7 +42,7 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="修改状态">
-                    <el-select v-model="formInline.State" clearable  placeholder="请选择" @change = 'reset'>
+                    <el-select v-model="formInline.State" clearable  placeholder="请选择" @change='reset'>
                         <el-option label="未分配" value="NE"></el-option>
                         <el-option label="已分配任务" value="FP"></el-option>
                         <el-option label="分拣完成" value="FJ"></el-option>
@@ -53,8 +53,8 @@
                     <el-button type="primary" @click="getData">查询</el-button>
                 </el-form-item>
             </el-form>
-            <el-table :data="tableData.ModelList" border style="width: 100%">
-                <el-table-column prop="ID" label="单号" align="center"></el-table-column>
+            <el-table :data="tableData.ModelList" border style="width: 100%"  highlight-current-row>
+                <el-table-column prop="ID" label="单号" align="center" fixed></el-table-column>
                 <el-table-column prop="DeliveryType" label="出库类型" align="center"></el-table-column>
                 <el-table-column prop="OrderState" label="订单状态" align="center">
                     <template slot-scope="scope">
@@ -86,8 +86,8 @@
 
                 <el-table-column label="操作" align="center" fixed="right">
                     <template slot-scope="scope">
-                        <el-button type="primary" icon="el-icon-edit" @click="getDetail(scope.row)" v-if="scope.row.OperatorState == 'NE'">分拣</el-button>
-                        <el-button type="primary" icon="el-icon-edit" @click="Review(scope.row)" v-if="scope.row.OperatorState == 'FJ'">复核</el-button>
+                        <el-button type="primary" icon="el-icon-edit" @click="editVisible = true;getDetail(scope.row)" v-if="scope.row.OperatorState == 'NE'">分拣</el-button>
+                        <el-button type="primary" icon="el-icon-edit" @click="ReChecked(scope.row)" v-if="scope.row.OperatorState == 'FJ'">复核</el-button>
                         <el-button type="primary" icon="el-icon-edit" @click="printing(scope.row)" v-if="scope.row.OrderState == 'O' && scope.row.DeliveryType == '纯门店'">打印</el-button>
                         <el-button type="primary" v-if="scope.row.OperatorState == 'FH'" @click="Delivery(scope.row)">订单配送</el-button>
                     </template>
@@ -105,7 +105,7 @@
         </el-card>
 
         <!-- 待分拣弹出框 -->
-        <el-dialog title="待分拣信息" :visible.sync="editVisible" width="50%">
+        <el-dialog title="待分拣信息" :visible.sync="editVisible" width="50%" :close-on-click-modal="false">
             <el-table :data="row" stripe style="width: 100%">
                 <el-table-column prop="ID" label="订单明细编号" width="180"></el-table-column>
                 <el-table-column prop="ProductName" label="商品名称"></el-table-column>
@@ -121,9 +121,23 @@
                 <el-button type="primary" @click="Outbound">确 定</el-button>
             </span>
         </el-dialog>
+
+        <!-- 复核弹出框 -->
+        <el-dialog title="复核" :visible.sync="editVisible4" width="50%" :close-on-click-modal="false">
+            <el-table :data="row" stripe style="width: 100%">
+                <el-table-column prop="ID" label="订单明细编号" width="180"></el-table-column>
+                <el-table-column prop="ProductName" label="商品名称"></el-table-column>
+                <el-table-column prop="Qty" label="下单数量"></el-table-column>
+                <el-table-column prop="RealQty" label="出库数量"></el-table-column>
+            </el-table>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="reject">驳回</el-button>
+                <el-button type="primary" @click="Review">通过</el-button><!-- Review -->
+            </span>
+        </el-dialog>
         
         <!-- 订单配送 -->
-        <el-dialog title="订单配送" :visible.sync="editVisible3" width="50%">
+        <el-dialog title="订单配送" :visible.sync="editVisible3" width="50%" :close-on-click-modal="false">
             <el-form :inline="true" :model="orderDelivery" class="demo-form-inline">
                 <el-form-item label="快递名称">
                     <el-input v-model="orderDelivery.ExpressName" placeholder="请输入快递名称"></el-input>
@@ -140,7 +154,7 @@
 
         
         <!-- 打印弹出框 -->
-        <el-dialog title="打印预览" :visible.sync="editVisible2" width="75%">
+        <el-dialog title="打印预览" :visible.sync="editVisible2" width="75%" :close-on-click-modal="false">
             <div ref="print" class="recordImg" id="printRecord">
                 <p style="font-size:18px;text-align:center;font-weight:900">利群网商购物出库单</p>
                 <el-form ref="form" :model="order" label-width="120px" class="demo-form-inline" :inline="true" style="width:100%;text-align:left">
@@ -206,7 +220,7 @@
 </template>
 <script>
 import { SupplierListGetByLevel } from "@/api/goodsList"
-import { OrderMasterOutStockList,OrderDeliveryInfoGet,OrderDetailDelivery,OrderDeliveryOK,OrderOutPrintInfoGet,OrderDeliverySetPS } from '@/api/orderList'
+import { OrderMasterOutStockList,OrderDeliveryInfoGet,OrderDetailDelivery,OrderDeliveryOK,OrderOutPrintInfoGet,OrderDeliverySetPS,OrderDeliveryReFJ } from '@/api/orderList'
 import qs from 'qs';
 import JsBarcode from 'jsbarcode'
     export default{
@@ -230,6 +244,7 @@ import JsBarcode from 'jsbarcode'
                 editVisible:false,          /* 获取分拣信息的弹窗 */
                 editVisible2:false, 
                 editVisible3:false,            /* 订单配送 */
+                editVisible4:false,
                 row:[],                     /* 点击分拣时的分拣信息都放在这 */
                 product1:[],                 /* 用户修改出库数量 把数据都放在这 */
                 product:'',                 /* 将product1数组转化为字符串 */
@@ -240,7 +255,8 @@ import JsBarcode from 'jsbarcode'
                 orderDelivery:{
                     ExpressName:'',
                     ExpressNo:'',
-                }
+                },
+                MakeSureReview:[],          /* 点击复核时，数据存放在这 */
             }
         },
         methods:{
@@ -309,7 +325,7 @@ import JsBarcode from 'jsbarcode'
                 })
             },
             getDetail(row){
-                this.editVisible = true
+                // this.editVisible = true
                 this.ID = row.ID
                 let params = {
                    OrderID:row.ID
@@ -317,6 +333,7 @@ import JsBarcode from 'jsbarcode'
                 OrderDeliveryInfoGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.row = JSON.parse(res.data.Result)
+                        console.log(row)
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -329,7 +346,7 @@ import JsBarcode from 'jsbarcode'
                 })
             },
             changeNum(row){                             /* 待分拣信息修改之后触发这个方法 */
-                this.product1.push({ID:row.ID,Qty:row.Qty})
+                this.product1.push({ID:row.ID,Qty:row.OutInfo})
                 console.log(this.product1)
             },
             Outbound(){                                 /* 订单明细出库 */
@@ -345,7 +362,7 @@ import JsBarcode from 'jsbarcode'
                         this.editVisible = false
                         this.getData()
                         this.ID = ''
-                        this.product = ''
+                        this.product1 = ''
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -371,13 +388,16 @@ import JsBarcode from 'jsbarcode'
                 this.PageIndex = 1,
                 this.PageSize = 10
             },
-            Review(row){       /* 复核 */
+            /* 复核 */          /* 当点击复核的时候要先调用 待分拣列表获取 接口 */
+            Review(){ 
+                this.editVisible4 = false 
                 let params = {
-                   OrderID:row.ID
+                   OrderID:this.MakeSureReview.ID
                 }
                 OrderDeliveryOK(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.$message.success('复核成功')
+                        this.editVisible4 = false
                         this.getData()
                     }
                     if(res.data.Success == 0){
@@ -389,6 +409,33 @@ import JsBarcode from 'jsbarcode'
                 }).catch(function(e){
                     console.log(e)
                 })
+            },
+            reject(){
+                this.editVisible4 = false
+                let params = {
+                   OrderID:this.MakeSureReview.ID
+                }
+                OrderDeliveryReFJ(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.$message.success('复核驳回')
+                        this.editVisible4 = false
+                        this.getData()
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            ReChecked(row){
+                this.editVisible4 = true
+                this.MakeSureReview = row;
+                this.getDetail(row)
+                console.log(row)
             },
             printing(row){              /* 点击打印获取到打印信息 */
                 this.row = row

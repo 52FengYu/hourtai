@@ -9,13 +9,13 @@
             <div class="head">
                 <el-form :inline="true" :model="formInline" class="demo-form-inline">
                     <el-form-item label="手机号">
-                        <el-input v-model="formInline.phone" placeholder="请输入用户手机号"></el-input>
+                        <el-input v-model="formInline.phone" placeholder="请输入用户手机号" @change="reset"></el-input>
                     </el-form-item>
                     <el-form-item label="用户名">
-                        <el-input v-model="formInline.MemberName" placeholder="请输入用户名"></el-input>
+                        <el-input v-model="formInline.MemberName" placeholder="请输入用户名" @change="reset"></el-input>
                     </el-form-item>
                     <el-form-item label="礼品卡编号">
-                        <el-input v-model="formInline.giftCardID" placeholder="礼品卡编号"></el-input>
+                        <el-input v-model="formInline.giftCardID" placeholder="礼品卡编号" @change="reset"></el-input>
                     </el-form-item>
                     <!-- <el-form-item>
                         <el-input v-model="formInline.giftCardTypeNum" placeholder="礼品卡类型编号"></el-input>
@@ -106,6 +106,10 @@ import qs from 'qs';
             this.getData()
         },
         methods:{
+            reset(){
+                this.currentPage4 = 1,
+                this.PageSize = 10
+            },
             handleClick(row) {
                 this.$router.push({
                     path:'/giftDetail',
@@ -148,9 +152,13 @@ import qs from 'qs';
             },
             updateDateStart(val) {
                 this.formInline.timeStart = val + " 00:00:00"
+                this.currentPage4 = 1,
+                this.PageSize = 10
             },
             updateDateEnd(val) {
                 this.formInline.timeEnd =val + " 00:00:00"
+                this.currentPage4 = 1,
+                this.PageSize = 10
             },
             DelFlag(row){
                 let params = {

@@ -39,7 +39,7 @@
             </el-table>
         </el-card>
         <!-- 增加供应运费信息 -->
-        <el-dialog title="增加供应运费信息" :visible.sync="editVisible" width="60%">
+        <el-dialog title="增加供应运费信息" :visible.sync="editVisible" width="60%" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="140px">
                 <el-form-item label="供应商" required>
                    <el-select v-model="form.SupplierID" placeholder="供应商" clearable filterable>
@@ -99,7 +99,7 @@
         </el-dialog>
 
          <!-- 修改供应运费信息 -->
-        <el-dialog title="修改供应运费信息" :visible.sync="editVisible2" width="60%">
+        <el-dialog title="修改供应运费信息" :visible.sync="editVisible2" width="60%" :close-on-click-modal="false">
             <el-form ref="form" :model="row" label-width="140px">
                 <el-form-item label="供应商" required>
                    <el-select v-model="row.SupplierID" placeholder="供应商" clearable filterable>

@@ -98,7 +98,7 @@
         </el-card>
 
         <!-- 审核弹出框 -->
-        <el-dialog title="审核" :visible.sync="editVisible" width="50%">
+        <el-dialog title="审核" :visible.sync="editVisible" width="50%" :close-on-click-modal="false">
             <el-form :inline="true" :model="checkedBox" class="demo-form-inline">
                 <el-form-item label="审核标记">
                     <el-select v-model="checkedBox.Audit" clearable placeholder="审核标记">
@@ -117,7 +117,7 @@
         </el-dialog>
         
         <!-- 确认收货弹出框 -->
-        <el-dialog title="确认收货" :visible.sync="editVisible2" width="50%">
+        <el-dialog title="确认收货" :visible.sync="editVisible2" width="50%" :close-on-click-modal="false">
             <el-form :inline="true" :model="confirm" class="demo-form-inline">
                 <el-form-item label="收货选项">
                     <el-select v-model="confirm.Audit" clearable>

@@ -22,7 +22,7 @@
                         </el-form-item>
                         <el-form-item label="供应商" required>
                             <!-- 供应商 -->
-                            <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable>
+                            <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable @change="reset">
                                 <el-option
                                 v-for="item in formInline.option2"
                                 :key="item.value"
@@ -38,22 +38,24 @@
                                 v-model="formInline.productName"
                                 clearable
                                 style="width:180px"
+                                 @change="reset"
                             >
                             </el-input>
                         </el-form-item>
                         <el-form-item label="商品编码">
                             <!-- 商品编码 -->
                             <el-input
-                                placeholder="统一编码"
+                                placeholder="商品编码"
                                 v-model="formInline.productCode"
                                 clearable
                                 style="width:200px"
+                                 @change="reset"
                             >
                             </el-input>
                         </el-form-item>
                         <el-form-item label="上下架状态">
                             <!-- 上下架状态 -->
-                            <el-select v-model="formInline.value1" placeholder="上下架状态" clearable>
+                            <el-select v-model="formInline.value1" placeholder="上下架状态" clearable @change="reset">
                                 <el-option
                                 v-for="item in stateOptions"
                                 :key="item.value1"
@@ -64,7 +66,7 @@
                         </el-form-item>
                         <el-form-item label="全部商品类型">
                             <!-- 全部商品类型 -->
-                            <el-select v-model="formInline.value2" placeholder="全部商品类型" clearable>
+                            <el-select v-model="formInline.value2" placeholder="全部商品类型" clearable @change="reset">
                                 <el-option
                                 v-for="item in productType"
                                 :key="item.value2"
@@ -75,7 +77,7 @@
                         </el-form-item>
                         <el-form-item label="全部审核状态">
                             <!-- 全部审核状态 -->
-                            <el-select v-model="formInline.value3" placeholder="全部审核状态" clearable>
+                            <el-select v-model="formInline.value3" placeholder="全部审核状态" clearable @change="reset">
                                 <el-option
                                 v-for="item in reviewState"
                                 :key="item.value3"
@@ -91,6 +93,7 @@
                                 v-model="formInline.StoreCode"
                                 clearable
                                 style="width:200px"
+                                 @change="reset"
                             >
                             </el-input>
                         </el-form-item>
@@ -100,6 +103,7 @@
                                 v-model="formInline.trafficCode"
                                 clearable
                                 style="width:200px"
+                                 @change="reset"
                             >
                             </el-input>
                         </el-form-item>
@@ -126,7 +130,7 @@
                     </el-form>
                 </div>
             </div>
-            <el-table :data="resData.List" border class="table" ref="multipleTable" v-loading="loading">
+            <el-table :data="resData.List" border class="table" ref="multipleTable" v-loading="loading" highlight-current-row>
                 <el-table-column prop="ID" label="商品编号"  width="80" align="center" ></el-table-column>
                 <el-table-column label="商品名称" align="center" >
                     <template slot-scope="scope">
@@ -194,7 +198,7 @@
         </div>    
 
             <!-- 审核 -->
-            <el-dialog title="修改库存" :visible.sync="editVisible" width="40%">
+            <el-dialog title="修改库存" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
                <el-form ref="form" :model="form" label-width="70px">
                 <el-form-item label="审核状态">
                     <el-radio v-model="form.AuditType" label="O">通过</el-radio>
@@ -211,7 +215,7 @@
             </el-dialog>
 
             <!-- 库存编辑弹出框 -->
-            <el-dialog title="修改库存" :visible.sync="editVisible2" width="40%">
+            <el-dialog title="修改库存" :visible.sync="editVisible2" width="40%" :close-on-click-modal="false">
                 <el-form ref="form" :model="form" label-width="50px">
                     <el-form-item label="商品名称">
                         <el-input v-model="form.ProductName" :disabled="true"></el-input>
@@ -227,7 +231,7 @@
             </el-dialog>
 
             <!-- 价格编辑弹出框 -->
-            <el-dialog title="修改价格" :visible.sync="editVisible3" width="40%">
+            <el-dialog title="修改价格" :visible.sync="editVisible3" width="40%" :close-on-click-modal="false">
                 <el-form ref="form" :model="form" label-width="100px">
                     <el-form-item label="调价商品名称">
                         <el-input v-model="form.ProductName" :disabled="true"></el-input>
@@ -357,6 +361,10 @@ import qs from 'qs';
             }
         },
         methods: {
+            reset(){
+                this.currentPage4 = 1,
+                this.PageSize = 10
+            },
             handleSizeChange(size) {
                 this.PageSize = size
                 this.getData()
@@ -452,17 +460,17 @@ import qs from 'qs';
                     }
                 })
             },
-            clear(){
-                this.SupplierID="",
-                this.MainSupplierID="",
-                this.productName="";
-                this.productCode="";
-                this.unifiedCode="";
-                this.StoreCode="";
-                this.trafficCode="";
-                this.value1="";
-                this.value2="";
-                this.value3=""
+            clear(){       
+                this.formInline.SupplierID="",
+                this.formInline.MainSupplierID="",
+                this.formInline.productName="";
+                this.formInline.productCode="";
+                this.formInline.StoreCode="";
+                this.formInline.trafficCode="";
+                this.formInline.value1="";
+                this.formInline.value2="";
+                this.formInline.value3=""
+                this.formInline.productValue = ''
             },
             productData(){
                 let params = {
@@ -490,6 +498,8 @@ import qs from 'qs';
                     }
                 }
                 this.formInline.productValue = rang[0]
+                this.currentPage4 = 1,
+                this.PageSize = 10
             },
             changeStock(){              /* 修改库存 */
                 let params = {
@@ -658,7 +668,8 @@ import qs from 'qs';
                 }).catch(function(e){
                     console.log(e)
                 })
-            }
+            },
+
         },
         created(){
             this.productData()

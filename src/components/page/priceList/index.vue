@@ -20,7 +20,7 @@
               </el-select>
         </el-form-item>
         <el-form-item label="供应商号">
-          <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable >
+          <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable @change="reset">
               <el-option
                   v-for="item in formInline.option2"
                   :key="item.value"
@@ -30,7 +30,7 @@
               </el-select>
         </el-form-item>
         <el-form-item label="全部审核状态">
-          <el-select v-model="formInline.region" placeholder="全部审核状态">
+          <el-select v-model="formInline.region" placeholder="全部审核状态" @change="reset" clearable>
             <el-option label="新建" value="N"></el-option>
             <el-option label="审核通过" value="O"></el-option>
             <el-option label="停止" value="S"></el-option>
@@ -42,7 +42,8 @@
               v-model="formInline.timeStart"
               type="datetime"
               value-format="yyyy-MM-dd HH:mm:ss"
-              placeholder="选择日期时间">
+              placeholder="选择日期时间"
+               @change="reset">
             </el-date-picker>
         </el-form-item>
         <el-form-item label="结束时间">
@@ -50,7 +51,8 @@
               v-model="formInline.timeEnd"
               type="datetime"
               value-format="yyyy-MM-dd HH:mm:ss"
-              placeholder="选择日期时间">
+              placeholder="选择日期时间"
+               @change="reset">
             </el-date-picker>
         </el-form-item>
         <el-form-item>
@@ -102,7 +104,7 @@
           </el-pagination>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="调价审核" :visible.sync="editVisible" width="40%">
+        <el-dialog title="调价审核" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="70px">
                 <el-form-item label="审核状态">
                     <el-radio v-model="form.radio" label="1">通过</el-radio>
@@ -119,7 +121,7 @@
         </el-dialog>
 
         <!-- 修改弹出框 -->
-        <el-dialog title="修改" :visible.sync="editVisible2" width="40%">
+        <el-dialog title="修改" :visible.sync="editVisible2" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="70px">
                 <el-form-item label="商品名称">
                     <el-input v-model="form.ProductName" :disabled="true"></el-input>
@@ -196,6 +198,10 @@ import qs from 'qs'
         }
       },
     methods: {
+      reset(){
+        this.currentPage2 = 1,
+        this.PageSize = 10
+      },
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },

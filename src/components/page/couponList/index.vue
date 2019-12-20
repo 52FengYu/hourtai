@@ -19,7 +19,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="供应商">
-                        <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable>
+                        <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable @change="reset">
                             <el-option
                             v-for="item in formInline.option2"
                             :key="item.value"
@@ -29,10 +29,10 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="活动ID">
-                        <el-input v-model="formInline.ID" placeholder="活动ID"></el-input>
+                        <el-input v-model="formInline.ID" placeholder="活动ID" @change="reset"></el-input>
                     </el-form-item>
                     <el-form-item label="活动名称">
-                        <el-input v-model="formInline.activityName" placeholder="活动名称"></el-input>
+                        <el-input v-model="formInline.activityName" placeholder="活动名称" @change="reset"></el-input>
                     </el-form-item>
                     <el-form-item label="起止时间">
                         <el-date-picker
@@ -53,7 +53,7 @@
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item label="审核状态">
-                        <el-select v-model="formInline.checkValue" clearable placeholder="请选择">
+                        <el-select v-model="formInline.checkValue" clearable placeholder="请选择" @change="reset">
                             <el-option
                                 v-for="item in formInline.checkOptions"
                                 :key="item.value"
@@ -63,7 +63,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" icon="el-icon-search">搜索</el-button>   
+                        <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>   
                     </el-form-item>
                     <el-form-item>
                         <el-button type="success" icon="el-icon-plus" @click="addCouponActivity">新建活动列表</el-button>   
@@ -129,7 +129,7 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="调价审核" :visible.sync="editVisible" width="40%">
+        <el-dialog title="调价审核" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="70px">
                 <el-form-item label="审核状态">
                     <el-radio v-model="form.radio" label="1">通过</el-radio>
@@ -167,6 +167,7 @@ import qs from 'qs'
                     option2:[],                 /* 供应商 */
                     MainSupplierID:'',              /* 主供应商 */
                     SupplierID:'',                  /* 供应商 */
+                    ID:'',
                     timeStart:'',                    /* 时间选择器开始 */
                     timeEnd:'',                     /* 时间选择器结束 */
                     checkValue:'',                      /* 审核状态 */
@@ -190,6 +191,10 @@ import qs from 'qs'
             }
         },
         methods:{
+            reset(){
+                this.currentPage4 = 1,
+                this.PageSize = 10
+            },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
                 this.PageSize = val;
@@ -202,15 +207,15 @@ import qs from 'qs'
             },
             getData(){
                 let params = {
-                    /* MainSupplierID:,
-                    SupplierID:,
-                    ID:,
-                    Name:,
-                    CreateBeginTime:,
-                    CreateEndTime:,
-                    Audit:, */
-                    PageIndex:1,
-                    PageSize:10,
+                    MainSupplierID:this.formInline.MainSupplierID,
+                    SupplierID:this.formInline.SupplierID,
+                    ID:this.formInline.ID,
+                    Name:this.formInline.activityName,
+                    CreateBeginTime:this.formInline.timeStart,
+                    CreateEndTime:this.formInline.timeEnd,
+                    Audit:this.formInline.checkValue,
+                    PageIndex:this.currentPage4,
+                    PageSize:this.PageSize,
                 }
                 MemberGiftTokenGiveOutMasterListGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -267,10 +272,14 @@ import qs from 'qs'
             updateDateStart(val) {
                 this.formInline.timeStart = val + " 00:00:00"
                 this.form.changeTimeStart = val + " 00:00:00"
+                this.PageSize = 10,
+                this.currentPage4 = 1
             },
             updateDateEnd(val) {
                 this.formInline.timeEnd = val + " 00:00:00"
                 this.form.changeTimeEnd = val + " 00:00:00"
+                this.PageSize = 10,
+                this.currentPage4 = 1
             },
             choose(row){
                 this.editVisible = true,

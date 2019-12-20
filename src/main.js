@@ -15,7 +15,6 @@ import Print from '@/utils/print.js'
 import './utils/request';
 
 Vue.prototype.$ajax = axios;
-// axios.defaults.baseURL = 'http://128.192.80.135';//配置你的接口请求地址
 Vue.config.productionTip = false
 
 Vue.prototype.$md5 = md5;
@@ -36,6 +35,9 @@ Vue.prototype.$axios = axios;
     messages
 }) */
 
+
+
+
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
     /* const role = localStorage.getItem('role');
@@ -47,7 +49,6 @@ router.beforeEach((to, from, next) => {
         this.$message('执行了')
     } */
     const role = localStorage.getItem('role');
-    // console.log(process.env.NODE_ENV)
     if (!role && to.path !== '/login') {
         next('/login');
     } else if (to.meta.permission) {
@@ -56,13 +57,23 @@ router.beforeEach((to, from, next) => {
     } else {
         // 简单的判断IE10及以下不进入富文本编辑器，该组件不兼容
         if (navigator.userAgent.indexOf('MSIE') > -1 && to.path === '/editor') {
-            Vue.prototype.$alert('vue-quill-editor组件不兼容IE10及以下浏览器，请使用更高版本的浏览器查看', '浏览器不兼容通知', {
+            Vue.prototype.$alert('跳转到这里说明错误', {
                 confirmButtonText: '确定'
             });
         } else {
             next();
         }
     }
+    if(to.path == "/login"){
+        // if(sessionStorage.getItem('TokenID' || !role)){
+        if(sessionStorage.getItem('TokenID') || !role){
+          next({
+            path:'/'
+          });
+        }else {
+          next();
+        }
+      }
 })
 
 

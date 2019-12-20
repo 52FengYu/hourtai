@@ -206,13 +206,25 @@ import qs from 'qs';
                             tableData.push(this.products[i]); //属性
                         }
                         this.HeadImage = JSON.parse(res.data.Result).HeadImage
+                        console.log(this.HeadImage)
                         this.ContentImage = JSON.parse(res.data.Result).ContentImage
+                        console.log(this.ContentImage)
                         for( var i = 0; i < this.HeadImage.length ; i++){
-                            this.fileLists1.push({url: 'http://images.liqunshop.com/' +  this.HeadImage[i].ImageURL})
+                            let URLHead = this.HeadImage[i].ImageURL
+                            if(URLHead.substring(0,4) == 'http'){
+                                this.fileLists1.push({url: this.HeadImage[i].ImageURL})
+                            }else{
+                                this.fileLists1.push({url: 'http://images.liqunshop.com/' +  this.HeadImage[i].ImageURL})
+                            }
                         }
                         if(this.ContentImage != null){
                             for( var i = 0; i < this.ContentImage.length ; i++){
-                                this.fileLists2.push({url: 'http://images.liqunshop.com/' +  this.ContentImage[i].ImageURL})
+                                let URLHead = this.ContentImage[i].ImageURL
+                                if(URLHead.splice(1,4) == 'http'){
+                                    this.fileLists2.push({url:  this.ContentImage[i].ImageURL})
+                                }else{
+                                    this.fileLists2.push({url: 'http://images.liqunshop.com/' +  this.ContentImage[i].ImageURL})
+                                }
                             }
                         }
                         for(var i = 0; i < this.ContentImage.length; i ++){

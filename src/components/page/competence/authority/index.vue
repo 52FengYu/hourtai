@@ -15,7 +15,7 @@
         
         
         <!-- 添加弹出框 -->
-        <el-dialog title="应用模块添加" :visible.sync="editVisible2" width="40%">
+        <el-dialog title="应用模块添加" :visible.sync="editVisible2" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="80px">
                 <el-form-item label="模块ID">
                     <el-input v-model="form.ModuleID"></el-input>
@@ -34,7 +34,7 @@
         </el-dialog>
 
         <!-- 修改弹出框 -->
-        <el-dialog title="应用模块修改" :visible.sync="editVisible" width="40%">
+        <el-dialog title="应用模块修改" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="row" label-width="80px">
                 <!-- <el-form-item label="ID">
                     <el-input v-model="row.ID" :disabled="true"></el-input>

@@ -129,7 +129,7 @@
         </el-card>
         
             <!-- 添加活动弹出框 -->
-            <el-dialog title="添加活动" :visible.sync="editVisible" width="40%">
+            <el-dialog title="添加活动" :visible.sync="editVisible" width="40%"  :close-on-click-modal="false">
                 <el-form ref="form" :model="form" label-width="100px">
                     <el-form-item label="活动名称">
                         <el-input v-model="form.PromotionName"></el-input>
@@ -197,7 +197,7 @@
             </el-dialog>
             
             <!-- 添加促销降价活动弹出框 -->
-            <el-dialog title="促销降价活动添加" :visible.sync="editVisible2" width="40%">
+            <el-dialog title="促销降价活动添加" :visible.sync="editVisible2" width="40%" :close-on-click-modal="false">
                 <el-form ref="form" :model="Markdown" label-width="180px">
                     <el-form-item label="活动号">
                         <el-input v-model="this.ID" :disabled="true"></el-input>
@@ -236,7 +236,7 @@
             </el-dialog>
 
             <!-- 添加满折活动弹出框 -->
-            <el-dialog title="满折活动添加" :visible.sync="editVisible3" width="40%">
+            <el-dialog title="满折活动添加" :visible.sync="editVisible3" width="40%" :close-on-click-modal="false">
                 <el-form ref="form" :model="fullFold" label-width="180px">
                     <el-form-item label="活动号">
                         <el-input v-model="this.ID" :disabled="true"></el-input>
@@ -291,7 +291,7 @@
             </el-dialog>
             
             <!-- 添加满赠活动弹出框 -->
-            <el-dialog title="满赠活动添加" :visible.sync="editVisible4" width="37%">
+            <el-dialog title="满赠活动添加" :visible.sync="editVisible4" width="37%" :close-on-click-modal="false">
                 <el-form ref="form" :model="addgift" label-width="180px">
                     <el-form-item label="活动号">
                         <el-input v-model="this.ID" :disabled="true"></el-input>
@@ -350,7 +350,7 @@
             </el-dialog>
             
             <!-- 审核弹出框 -->
-            <el-dialog title="活动审核" :visible.sync="editVisible5" width="40%">
+            <el-dialog title="活动审核" :visible.sync="editVisible5" width="40%" :close-on-click-modal="false">
                 <el-form ref="form" :model="AuditState" label-width="80px">
                     <el-form-item label="审核结果">
                         <el-radio v-model="AuditState.Audit" label="O">通过</el-radio>
@@ -367,7 +367,7 @@
             </el-dialog>
             
             <!-- 删除弹出框 -->
-            <el-dialog title="活动审核" :visible.sync="editVisible6" width="20%">
+            <el-dialog title="活动审核" :visible.sync="editVisible6" width="20%" :close-on-click-modal="false">
                 <span>是否确认停止该活动</span>
                 <span slot="footer" class="dialog-footer">
                     <el-button @click="editVisible6 = false">否</el-button>

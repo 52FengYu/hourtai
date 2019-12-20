@@ -34,7 +34,7 @@
                                 </el-scrollbar>
 
                                 <!-- 新增页面内容 -->
-                                 <el-dialog title="新增" :visible.sync="editVisible" width="50%">
+                                 <el-dialog title="新增" :visible.sync="editVisible" width="50%" :close-on-click-modal="false">
                                             <div slot="header" class="clearfix">
                                                 <span>选择模板类型</span>
                                             </div>
@@ -129,7 +129,7 @@
                                         </el-form>
 
                                         <!-- 右侧修改弹出框 -->
-                                        <el-dialog title="编辑" :visible.sync="editVisible2" width="50%">
+                                        <el-dialog title="编辑" :visible.sync="editVisible2" width="50%" :close-on-click-modal="false">
                                             <el-form ref="form" :model="InfoForm"  label-width="80px">
                                                 <el-form-item label="banner图">     <!-- /adminwebapi -->
                                                     <el-upload
@@ -181,7 +181,7 @@
         </div>
 
         <!-- 添加页面明细 -->
-        <el-dialog title="添加页面明细" :visible.sync="editVisible3" width="50%">
+        <el-dialog title="添加页面明细" :visible.sync="editVisible3" width="50%" :close-on-click-modal="false">
             <el-form ref="form" :model="addPageContentInfo"  label-width="110px">
                 <el-form-item label="banner图"><!-- /adminwebapi -->
                     <el-upload
@@ -234,7 +234,7 @@
         </el-dialog>
         
         <!-- 修改页面内容 -->
-            <el-dialog title="修改" :visible.sync="editVisible4" width="50%">
+            <el-dialog title="修改" :visible.sync="editVisible4" width="50%" :close-on-click-modal="false">
                     <div slot="header" class="clearfix">
                         <span>选择模板类型</span>
                     </div>
@@ -485,7 +485,6 @@ export default {
                     Note:''
                 },
                 PageContentID:'',
-                Flag:false
             }
         },
         created() {
@@ -629,18 +628,14 @@ export default {
                 })
             },
             edit(e){            /* 左侧编辑 */
-                /* console.log(e.target.parentElement.id)
-                console.log(e.srcElement.parentElement.attributes.id.value) */
-                if(e.target){
+                if(e){
                     this.PageContentID = e.target.parentElement.id
                 }
-                // this.PageContentID = e.target.parentElement.id
                 let params = {
                     PageContentId:this.PageContentID
                 }
                 getItemContentInfo(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        this.Flag != this.Flag
                         this.content = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){

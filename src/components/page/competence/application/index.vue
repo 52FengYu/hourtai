@@ -3,8 +3,8 @@
         <el-card>
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
                 <el-form-item label="是否在应用列表显示">
-                    <el-radio v-model="formInline.IsDisPlay" label="Y">是</el-radio>
-                    <el-radio v-model="formInline.IsDisPlay" label="N">否</el-radio>                
+                    <el-radio v-model="formInline.IsDisPlay" label="Y" @change="reset">是</el-radio>
+                    <el-radio v-model="formInline.IsDisPlay" label="N" @change="reset">否</el-radio>                
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="getLIst">搜索</el-button>
@@ -42,7 +42,7 @@
         </el-pagination>
 
         <!-- 添加弹出框 -->
-        <el-dialog title="应用添加" :visible.sync="editVisible" width="40%">
+        <el-dialog title="应用添加" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="160px">
                 <el-form-item label="应用名称">
                     <el-input v-model="form.AppName"></el-input>
@@ -66,7 +66,7 @@
 
         
         <!-- 修改弹出框 -->
-        <el-dialog title="应用修改" :visible.sync="editVisible2" width="40%">
+        <el-dialog title="应用修改" :visible.sync="editVisible2" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="fix" label-width="160px">
                 <!-- <el-form-item label="应用编号">
                     <el-input v-model="this.ID" :disabled="true"></el-input>
@@ -122,6 +122,10 @@ import qs from 'qs'
             }
         },
         methods:{
+            reset(){
+                this.PageSize = 10,
+                this.PageIndex = 1
+            },
             getLIst(){
                 let params = {
                     PageNo:this.PageIndex,

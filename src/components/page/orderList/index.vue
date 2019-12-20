@@ -43,7 +43,7 @@
                         </el-form-item>
                         <!-- 供应商号 -->
                         <el-form-item label="供应商">
-                            <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable>
+                            <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable @change="reset">
                                 <el-option
                                 v-for="item in formInline.option2"
                                 :key="item.value"
@@ -88,12 +88,14 @@
                         <el-date-picker
                             v-model="formInline.timeBegin"
                             type="date"
-                            placeholder="开始时间">
+                            placeholder="开始时间"
+                             @change="reset">
                         </el-date-picker>至
                         <el-date-picker
                             v-model="formInline.timeEnd"
                             type="date"
-                            placeholder="结束时间">
+                            placeholder="结束时间"
+                             @change="reset">
                         </el-date-picker>
                     </el-form-item>
                         <!-- 支付时间 -->
@@ -102,12 +104,14 @@
                         <el-date-picker
                             v-model="formInline.paymentTimeBegin"
                             type="date"
-                            placeholder="开始时间">
+                            placeholder="开始时间"
+                             @change="reset">
                         </el-date-picker>至
                         <el-date-picker
                             v-model="formInline.paymentTimeEnd"
                             type="date"
-                            placeholder="结束时间">
+                            placeholder="结束时间"
+                             @change="reset">
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item label="是否废弃">
@@ -141,8 +145,8 @@
                         <el-button type="primary" @click="clear">重置</el-button>
                     </el-form-item>
                 </el-form>
-                <el-table :data="listData.ModelList" border class="table" ref="multipleTable">
-                    <el-table-column prop="ID" label="订单号" align=center></el-table-column>
+                <el-table :data="listData.ModelList" border class="table" ref="multipleTable" highlight-current-row>            <!-- PayName -->
+                    <el-table-column prop="ID" label="订单号" align=center fixed></el-table-column>
                     <el-table-column prop="OrderState" label="订单状态"  align=center></el-table-column>
                     <el-table-column prop="DeliveryType" label="分单结果" align=center></el-table-column>
                     <el-table-column prop="MainSupplier" label="主供应商" align=center></el-table-column>
@@ -151,6 +155,7 @@
                     <el-table-column prop="ReceiveMan" label="收货人"  align=center></el-table-column>
                     <el-table-column prop="ReceiveMobile" label="收货人手机号" align=center></el-table-column>
                     <el-table-column prop="CreateTime" label="下单时间"  align=center ></el-table-column>
+                    <el-table-column prop="PayName" label="支付方式名称"  align=center ></el-table-column>
                     <el-table-column label="收货方式类型" align=center>
                         <template slot-scope="scope">
                             {{scope.row.ReceiverType === 'S' ? '门店自提' : '送货到家'}}
@@ -177,7 +182,7 @@
                     </el-table-column>
                     <el-table-column label="操作" align="center" fixed="right">
                         <template slot-scope="scope">
-                            <el-button type="text" icon="el-icon-edit" @click="print(scope.$index, scope.row);show()">打印</el-button>
+                            <el-button type="text" icon="el-icon-edit" v-if="scope.row.OrderState == '新建' || scope.row.OrderState == '审核'" @click="print(scope.$index, scope.row);show()">打印</el-button>
                             <el-button type="text" icon="el-icon-info" @click="detail(scope.$index,scope.row);goPage()">详情</el-button>
                             <el-button type="text" icon="el-icon-check"  v-if="scope.row.ReceiverType == 'S' && scope.row.OrderState == '出库'" @click="checked(scope.row)">自提确认</el-button>
                         </template>
@@ -196,7 +201,7 @@
         </div>
 
         <!-- 自提确认 -->
-        <el-dialog title="自提确认" :visible.sync="editVisible2" width="50%">
+        <el-dialog title="自提确认" :visible.sync="editVisible2" width="50%"  :close-on-click-modal="false">
             <el-form :inline="true" :model="checkedBox" class="demo-form-inline">
                 <el-form-item label="自提码">
                     <el-input v-model="checkedBox.SelfReceiveCode" placeholder="请输入自提码"></el-input>
@@ -209,9 +214,9 @@
         </el-dialog>
         
         <!-- 打印弹出框 -->
-        <el-dialog title="打印预览" :visible.sync="editVisible" width="75%">
+        <el-dialog title="打印预览" :visible.sync="editVisible" width="75%" :close-on-click-modal="false">
             <div ref="print" class="recordImg" id="printRecord">
-                <p style="font-size:18px;text-align:center;font-weight:900">利群网商购物送货单</p>
+                <p style="font-size:18px;text-align:center;font-weight:900">利群网商购物分拣单</p>
                 <el-form ref="form" :model="form" label-width="90px" class="demo-form-inline" :inline="true" style="width:100%;text-align:left">
                     <el-form-item label="订单号">
                         <span>{{this.printListData.ID}}</span>

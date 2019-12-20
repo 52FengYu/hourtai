@@ -2,7 +2,7 @@
     <div>
         <el-card>
                 <h4>订单详情</h4>
-                <el-form ref="form" :model="form" label-width="100px">
+                <el-form ref="form" :model="form" label-width="170px"  align="left">
                     <el-form-item label="订单号">
                         <span>{{this.listData.ID}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <el-button type="primary" plain @click="show()">打印</el-button>
@@ -23,7 +23,6 @@
                         <span>{{this.listData.PlanReceiveTime}}</span>
                     </el-form-item>
 
-                    <h5>订单信息</h5>
                     <h6 style="margin-left:1%">收件人信息</h6>
 
                     <el-form-item label="收货人">
@@ -74,7 +73,7 @@
                         <span>{{this.listData.OutStockAddPrice}}</span>
                     </el-form-item>
                     <el-form-item label="出库增加金额是否支付">
-                        <span>{{this.listData.IsOutStockAddPricePay}}</span>
+                        <span>{{this.listData.IsOutStockAddPricePay == 'N'?'否':'是'}}</span>
                     </el-form-item>
                     <h6>订单商品</h6>
                     <el-form-item>
@@ -100,7 +99,7 @@
         </el-card>
         
         <!-- 打印弹出框 -->
-        <el-dialog title="打印预览" :visible.sync="editVisible" width="75%">
+        <el-dialog title="打印预览" :visible.sync="editVisible" width="75%" :close-on-click-modal="false">
             <div ref="print" class="recordImg" id="printRecord">
                 <p style="font-size:18px;text-align:center;font-weight:900">利群网商购物送货单</p>
                 <el-form ref="form" :model="form" label-width="90px" class="demo-form-inline" :inline="true" style="width:100%;text-align:left" id="form">
@@ -174,7 +173,7 @@
         </el-dialog>
 
         <!-- 修改弹出框 -->
-            <el-dialog title="修改" :visible.sync="editVisible2" width="30%">
+            <el-dialog title="修改" :visible.sync="editVisible2" width="30%" :close-on-click-modal="false">
                 <el-form ref="form" :model="form" label-width="80px">
                     <!-- <el-form-item label="订单号">
                         <el-input v-model="this.listData.ID" :disabled="true"></el-input>
@@ -229,17 +228,26 @@ inject:['reload'];
                 },
                 // editVisible3:false,
                 PayMethodsLIst:[],                                      /* 所有支付方式 */
-                ID:''
+                ID:'',
+                ReceiverType:'',        /* 点击切换的时候，把状态存到这边，方便带着参数去支付修改页 */
             }
         },
         methods:{
             getData(){
                 let params = {
-                    ID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    ID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                 }
                 orderDetail(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.listData = JSON.parse(res.data.Result)
+                        console.log(this.listData)
+                        if(this.listData.ReceiverType == '送货上门'){
+                            this.ReceiverType = 'R'
+                        }
+                        if(this.listData.ReceiverType == '自提'){
+                            this.ReceiverType = 'S'
+                        }
+                        console.log(this.ReceiverType)
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -254,12 +262,12 @@ inject:['reload'];
                 this.editVisible=true;
                 this.timestamp = Date.parse(new Date());
                 this.time = this.disposeDate(this.timestamp)
-                JsBarcode("#barcode", this.ID, {
+                JsBarcode("#barcode", this.listData.ID, {
                     format: "CODE39",  //条形码的格式
                     lineColor: "black",  //线条颜色
                     width:1, //线宽
                     height:30,  //条码高度
-                    displayValue: false //是否显示文字信息
+                    displayValue: true //是否显示文字信息
                 });
             },
             disposeDate(dateTime) {
@@ -306,6 +314,7 @@ inject:['reload'];
                     path:'/changeOrder',
                     query:{
                         ID:decodeURI(location.href).split('?')[1].split('=')[1],
+                        ReceiverType:this.ReceiverType
                     }
                 })
             }

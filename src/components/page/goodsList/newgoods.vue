@@ -59,19 +59,13 @@
                 <span>基础信息</span>
                 <div>
                     <el-form :model="formInline" class="demo-form-inline">
-                        <el-form-item label="品牌名">
-                            <el-select v-model="formInline.BrandID" filterable  clearable placeholder="请选择">
-                                <el-option
-                                    v-for="item in brands"
-                                    :key="item.ID"
-                                    :label="item.BrandName"
-                                    :value="item.ID">
-                                </el-option>
-                            </el-select>
+                        <el-form-item label="品牌名" class="BrandName">
+                            <el-input v-model="formInline.BrandName" class="BrandNameInput" clearable></el-input>
+                            <!-- <span>{{formInline.BrandID}}</span> -->
+                            <el-button type="primary" @click="getBrand">搜索</el-button><i class="el-icon-check" v-if="this.formInline.BrandID"></i>
                         </el-form-item>
                         <el-form-item label="三级分类名">
-                            <!-- <el-cascader :options="productOptions"  clearable v-model="formInline.ClassID" @change="handleChange" placeholder="请选择类目"></el-cascader> -->
-                            <el-cascader :options="productOptions" :show-all-levels="false" @change="cascaderChange" value="formInline.ClassID"></el-cascader>
+                            <el-cascader :options="productOptions" :show-all-levels="false" @change="cascaderChange" value="formInline.ClassID" clearable></el-cascader>
                         </el-form-item>
                             <el-form-item label="显示名称">
                             <el-input v-model="formInline.DisplayName" placeholder="显示名称"></el-input>
@@ -145,6 +139,12 @@
                                 </el-option>
                             </el-select>
                         </el-form-item>
+                        <el-form-item label="是否必须自提">
+                            <el-select v-model="formInline.IsMustSelfReceiver" clearable placeholder="请选择">
+                                <el-option label="是" value="Y"></el-option>
+                                <el-option label="否" value="N"></el-option>
+                            </el-select>
+                        </el-form-item>
                         <el-form-item label="门店码">
                             <el-input v-model="formInline.ShopCode" placeholder="门店码"></el-input>
                             <el-button type="primary" plain @click="Inquire">查询</el-button>
@@ -163,12 +163,6 @@
                         </el-form-item>
                         <el-form-item label="统一分类">
                             <el-input v-model="formInline.UniType" placeholder="统一分类"></el-input>
-                        </el-form-item>
-                        <el-form-item label="是否必须自提">
-                            <el-select v-model="formInline.IsMustSelfReceiver" clearable placeholder="请选择">
-                                <el-option label="是" value="Y"></el-option>
-                                <el-option label="否" value="N"></el-option>
-                            </el-select>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="onSubmit">提交</el-button>
@@ -195,6 +189,7 @@ import qs from 'qs';
                 fileLists2: [],      /* 详情图 */
                 formInline: {
                     BrandID:'',
+                    BrandName:'',
                     ClassID:'',
                     DisplayName:'',
                     IsOrderBack:'',
@@ -485,12 +480,14 @@ import qs from 'qs';
             },
             getBrand(){
                 let params = {
-                   PageIndex:-1,
-                   PageSize:-1, 
+                    BrandName:this.formInline.BrandName,
+                    PageIndex:-1,
+                    PageSize:-1, 
                 }
                 BaseBrandListGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        this.brands = JSON.parse(res.data.Result).ModelList
+                        this.formInline.BrandID = JSON.parse(res.data.Result).ModelList[0].ID
+                        console.log(this.formInline.BrandID)
                     }
                     if(res.data.Success == 0){
                        this.$message(res.data.Result)
@@ -528,7 +525,6 @@ import qs from 'qs';
         mounted(){
             this.getSupplier()
             this.productData()
-            this.getBrand()
             this.unit()
         }
     }
@@ -564,5 +560,9 @@ import qs from 'qs';
             }
         }
     }
-    
+    .BrandName{
+        .BrandNameInput{
+            width:30%!important;
+        }
+    }
 </style>

@@ -74,6 +74,8 @@ export default{
                 orderDetail(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.PayMethods = JSON.parse(res.data.Result)
+                        this.PayMethods.ReceiverType = decodeURI(location.href).split('&')[1].split('=')[1]
+                        console.log(this.PayMethods.ReceiverType)
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -81,7 +83,7 @@ export default{
             },
         onSubmit(){
             let params = {
-                ID:decodeURI(location.href).split('?')[1].split('=')[1],
+                ID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                 PayID:this.PayMethods.PayID,
                 ReceiveAreaID:this.PayMethods.ReceiveAreaID,
                 ReceiveAddr:this.PayMethods.ReceiveAddr,
@@ -110,7 +112,7 @@ export default{
             this.$router.push({
                 path:'/orderDetail',
                 query:{
-                    ID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    ID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                 }
             })
         }

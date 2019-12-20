@@ -291,6 +291,8 @@ import qs from 'qs'
                     ProductName:'',
                     PageIndex:1,
                     PageSize:20,
+                    MainSupplierID:'',
+                    SupplierID:''
                 }
             }
         },
@@ -556,6 +558,8 @@ import qs from 'qs'
                     })
                 }
                 if(this.form.UseBlackType === 'P'){   
+                    this.P.MainSupplierID = this.form.MainSupplierID
+                    this.P.SupplierID = this.form.SupplierID
                     getProductList(qs.stringify(this.P)).then((res)=>{
                         if(res.data.Success == 1){
                             this.option3 = JSON.parse(res.data.Result).List
@@ -620,6 +624,8 @@ import qs from 'qs'
                     })
                 }
                 if(this.form.UseType === 'P'){   
+                    this.P.MainSupplierID = this.form.MainSupplierID
+                    this.P.SupplierID = this.form.SupplierID
                     getProductList(qs.stringify(this.P)).then((res)=>{
                         if(res.data.Success == 1){
                             this.option4 = JSON.parse(res.data.Result).List

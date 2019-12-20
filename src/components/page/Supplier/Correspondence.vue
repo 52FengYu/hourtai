@@ -3,10 +3,10 @@
         <el-card>
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
                 <el-form-item label="用户编号">
-                    <el-input v-model="formInline.UserID" placeholder="用户编号"></el-input>
+                    <el-input v-model="formInline.UserID" placeholder="用户编号" clearable @change="reset"></el-input>
                 </el-form-item>
                 <el-form-item label="供应商编号">
-                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable>
+                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable @change="reset">
                         <el-option
                             v-for="item in formInline.option2"
                             :key="item.value"
@@ -16,15 +16,15 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="getData">搜索</el-button>
+                    <el-button type="primary" @click="getData()">搜索</el-button>
                     <el-button type="primary" @click="editVisible = true">对应关系添加</el-button>
                 </el-form-item>
             </el-form>
             <el-table :data="tableData.ModelList" border style="width: 100%">
                 <el-table-column prop="UserName" label="用户信息" align="center"></el-table-column>
-                <el-table-column prop="UserID" label="用户ID" align="center"></el-table-column>
+                <!-- <el-table-column prop="UserID" label="用户ID" align="center"></el-table-column> -->
                 <el-table-column prop="SupplierName" label="供应商名称" align="center"></el-table-column>
-                <el-table-column prop="SupplierID" label="供应商ID" align="center"></el-table-column>
+                <!-- <el-table-column prop="SupplierID" label="供应商ID" align="center"></el-table-column> -->
                 <el-table-column label="操作" align="center" fixed="right" min-width="150">
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" @click="handleChange(scope.row)">修改</el-button>
@@ -43,10 +43,10 @@
             </el-pagination>
         </el-card>
         <!-- 供应商与用户对应关系添加 -->
-        <el-dialog title="供应商与用户对应关系添加" :visible.sync="editVisible" width="50%">
+        <el-dialog title="供应商与用户对应关系添加" :visible.sync="editVisible" width="50%" :close-on-click-modal="false">
             <el-form ref="form" :model="addRelationship" label-width="100px" :inline="true" >
                 <el-form-item label="用户编号">
-                    <el-select v-model="addRelationship.UserID" clearable placeholder="请选择用户编号">
+                    <el-select v-model="addRelationship.UserID" clearable placeholder="请选择用户编号" filterable>
                         <el-option
                             v-for="item in addRelationship.users"
                             :key="item.UserID"
@@ -73,7 +73,7 @@
         </el-dialog>
 
         <!-- 供应商与用户对应关系修改 -->
-        <el-dialog title="供应商与用户对应关系修改" :visible.sync="editVisible2" width="50%">
+        <el-dialog title="供应商与用户对应关系修改" :visible.sync="editVisible2" width="50%" :close-on-click-modal="false">
             <el-form ref="form" :model="changeRelationship" label-width="100px" :inline="true" >
                 <el-form-item label="用户编号">
                     <el-input v-model="changeRelationship.UserID" :disabled="true"></el-input>
@@ -130,6 +130,10 @@ import qs from 'qs'
             }
         },
         methods:{
+            reset(){
+                this.PageIndex = 1,
+                this.PageSize = 10
+            },
             getSupplier(){
                 let params = {
                     Level:2,
@@ -149,6 +153,10 @@ import qs from 'qs'
                 }).catch(function(e){
                     console.log(e)
                 })
+            },
+            reset(){
+                this.PageIndex = 1,
+                this.PageSize = 10
             },
             getData(){
                 let params = {
