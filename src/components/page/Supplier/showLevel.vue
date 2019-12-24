@@ -94,20 +94,25 @@ import qs from 'qs'
                 })
             },
             getLevel(){             /* 获取所有的三级类目 */
-                let params = {}
-                getIDclass(qs.stringify(params)).then((res)=>{
-                    if(res.data.Success == 1){
-                        this.BaseClass = JSON.parse(res.data.Result)
-                    }
-                    if(res.data.Success == 0){
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        this.$message(res.data.Result)
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                })
+                if(localStorage.productIdClass == null) {
+                    let params = {}
+                    getIDclass(qs.stringify(params)).then((res)=>{
+                        if(res.data.Success == 1){
+                            this.BaseClass = JSON.parse(res.data.Result)
+                            localStorage['productIdClass']=res.data.Result;
+                        }
+                        if(res.data.Success == 0){
+                            this.$message(res.data.Result)
+                        }
+                        if(res.data.Success == -998){
+                            this.$message(res.data.Result)
+                        }
+                    }).catch(function(e){
+                        console.log(e)
+                    })
+                }else{
+                    this.BaseClass = JSON.parse(localStorage['productIdClass'])
+                }
             },
             getCheckedKeys() {
                 this.checkedKeys = this.$refs.tree.getCheckedKeys()

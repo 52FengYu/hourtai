@@ -3,10 +3,10 @@
         <el-card>
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
                 <el-form-item label="退货单号">
-                    <el-input v-model="formInline.ID" placeholder="退货单号" clearable @change="reset"></el-input>
+                    <el-input v-model="formInline.ID" placeholder="退货单号" clearable></el-input>
                 </el-form-item>
                 <el-form-item label="订单号">
-                    <el-input v-model="formInline.OrderID" placeholder="订单号" clearable @change="reset"></el-input>
+                    <el-input v-model="formInline.OrderID" placeholder="订单号" clearable></el-input>
                 </el-form-item>
                 <el-form-item label="主供应商">
                     <el-select v-model="formInline.MainSupplierID" placeholder="主供应商" clearable filterable  @change="getSupplier">
@@ -29,10 +29,10 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="会员号">
-                    <el-input v-model="formInline.MemberID" placeholder="会员号" clearable @change="reset"></el-input>
+                    <el-input v-model="formInline.MemberID" placeholder="会员号" clearable></el-input>
                 </el-form-item>
                 <el-form-item label="是否在线支付">
-                    <el-select v-model="formInline.IsLinkPay" clearable placeholder="请选择" @change="reset">
+                    <el-select v-model="formInline.IsLinkPay" clearable placeholder="请选择">
                         <el-option label="是" value="Y"></el-option>
                         <el-option label="否" value="N"></el-option>
                     </el-select>
@@ -41,6 +41,7 @@
                     <el-date-picker
                         v-model="formInline.BeginTime"
                         type="datetime"
+                        
                         value-format="yyyy-MM-dd hh:mm:ss"
                         placeholder="选择日期时间">
                     </el-date-picker>
@@ -50,11 +51,12 @@
                         v-model="formInline.EndTime"
                         value-format="yyyy-MM-dd hh:mm:ss"
                         type="datetime"
+                        
                         placeholder="结束时间">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="getData">提交</el-button>
+                    <el-button type="primary" @click="reset();getData()">提交</el-button>
                 </el-form-item>
             </el-form>
             <el-table :data="tableData.ModelList" border style="width: 100%">

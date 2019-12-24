@@ -65,8 +65,7 @@ router.beforeEach((to, from, next) => {
         }
     }
     if(to.path == "/login"){
-        // if(sessionStorage.getItem('TokenID' || !role)){
-        if(sessionStorage.getItem('TokenID') || !role){
+        if(sessionStorage.getItem('TokenID')){
           next({
             path:'/'
           });

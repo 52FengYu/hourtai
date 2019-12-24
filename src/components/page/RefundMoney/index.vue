@@ -66,7 +66,7 @@
                     </el-checkbox-group>
                 </el-form-item>
             </el-form>
-            <el-table :data="tableData" border style="width: 100%" highlight-current-row>
+            <!-- <el-table :data="tableData" border style="width: 100%" highlight-current-row>
                 <el-table-column fixed prop="date" label="日期" width="150"></el-table-column>
                 <el-table-column prop="name" label="姓名" width="120"></el-table-column>
                 <el-table-column prop="province" label="省份" width="120"></el-table-column>
@@ -79,7 +79,7 @@
                         <el-button type="text" size="small">编辑</el-button>
                     </template>
                 </el-table-column>
-            </el-table>
+            </el-table> -->
         </el-card>
     </div>
 </template>

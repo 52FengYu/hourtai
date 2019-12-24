@@ -132,7 +132,7 @@
 import { SupplierListGetByLevel } from "@/api/goodsList"
 import { SupplierAdd } from '@/api/SupplierList'
 import $ from 'jquery'
-import loadBMap from '@/api/LoadBMap' 
+// import loadBMap from '@/api/LoadBMap' 
 import qs from 'qs'
     export default{
         data(){

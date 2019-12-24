@@ -39,7 +39,7 @@
             </el-table>
         </el-card>
         <!-- 增加供应运费信息 -->
-        <el-dialog title="增加供应运费信息" :visible.sync="editVisible" width="60%" :close-on-click-modal="false">
+        <el-dialog title="增加供应运费信息" :visible.sync="editVisible" width="60%" modal='false'>
             <el-form ref="form" :model="form" label-width="140px">
                 <el-form-item label="供应商" required>
                    <el-select v-model="form.SupplierID" placeholder="供应商" clearable filterable>
@@ -67,7 +67,7 @@
                     </el-cascader>
                 </el-form-item>
                 <el-form-item label="坐标范围" v-if="form.SendFeeType === 'SmallArea'">
-                    <el-button type="primary"><router-link to="/test">划定区域</router-link></el-button>
+                    <el-button type="primary" plain><router-link to="/test">划定区域</router-link></el-button>
                     <el-button type="primary" @click="getAreaXY">获取数据</el-button>
                     <el-input
                         type="textarea"
@@ -97,9 +97,8 @@
                 <el-button type="primary" @click="addFee">确 定</el-button>
             </span>
         </el-dialog>
-
          <!-- 修改供应运费信息 -->
-        <el-dialog title="修改供应运费信息" :visible.sync="editVisible2" width="60%" :close-on-click-modal="false">
+        <el-dialog title="修改供应运费信息" :visible.sync="editVisible2" width="60%" :close-on-click-modal="false"  modal='false'>
             <el-form ref="form" :model="row" label-width="140px">
                 <el-form-item label="供应商" required>
                    <el-select v-model="row.SupplierID" placeholder="供应商" clearable filterable>
@@ -120,7 +119,7 @@
                     </el-cascader>
                 </el-form-item>
                 <el-form-item label="坐标范围" v-else>
-                    <el-button type="primary"><router-link to="/test">划定区域</router-link></el-button>
+                    <el-button type="primary" plain><router-link to="/test">划定区域</router-link></el-button>
                     <el-button type="primary" @click="getAreaXY">获取数据</el-button>
                     <el-input
                         type="textarea"
@@ -284,6 +283,7 @@ import qs from 'qs'
                 })
             },
             getAreaXY(){
+                this.AreaXY = ''
                 this.AreaXY = sessionStorage.getItem('map')
                 var str = this.AreaXY
                 str=str.replace(/"lng":/g,"").replace(/"lat":/g,"").replace(/{/g,"").replace(/},/g,";").replace(/\[/g,"").replace(/\]/g,"").replace(/\}/,'')

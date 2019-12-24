@@ -251,9 +251,11 @@ import qs from 'qs';
                 })
             },
             handleEdit(index, row) {
+                console.log(row)
                 this.idx = index;
                 this.forms = row;
                 this.editVisible = true;
+                this.form.pageName = row.pageName
             },
             changeItemInfo(){       /* 点击确定 修改页面信息 */
                 let params = {
@@ -299,10 +301,10 @@ import qs from 'qs';
                         this.getData()
                     }
                     if(res.data.Success == 0){
-                        this.$$message(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
-                        this.$$message(res.data.Result)
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)

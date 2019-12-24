@@ -14,20 +14,20 @@ import $ from 'jquery'
 import loadBMap from '@/api/LoadBMap' 
 export default {
   name: 'dbmap',
- 
   data () {
     return {
       map: null,
-	  drawingManager: null,
-	  overlays: []
-    }
+      drawingManager: null,
+      overlays: [],
+      object : []
+      }
   },
  
   mounted(){
     this.map = new BMap.Map("dbmap", {
 		enableMapClick: false // 禁止底图点击事件
 	});
-    this.map.centerAndZoom(new BMap.Point(117.06 ,36.67), 17);
+    this.map.centerAndZoom(new BMap.Point(120.415249,36.088384), 17);
 	this.map.enableScrollWheelZoom();
 	this.map.enableMapClick = false;
     
@@ -45,8 +45,8 @@ export default {
         enableDrawingTool: true, //是否显示工具栏
         drawingToolOptions: {
             anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
-			offset: new BMap.Size(5, 5), //偏离值
-			drawingModes : [ // 可见的操作选项
+            offset: new BMap.Size(5, 5), //偏离值
+            drawingModes : [ // 可见的操作选项
                 // BMAP_DRAWING_MARKER,
                 BMAP_DRAWING_CIRCLE,
                 // BMAP_DRAWING_POLYLINE,
@@ -65,12 +65,14 @@ export default {
   
   methods: {
     clearAll() {
+      this.object = []
       for(var i = 0; i < this.overlays.length; i++){
 			this.map.removeOverlay(this.overlays[i]);
 		}
           this.overlays.length = 0;   
 	},
 	overlaycomplete(e) {
+    this.overlays = []
 		this.overlays.push(e.overlay);
 	},
 	al() {
@@ -78,13 +80,23 @@ export default {
 			// console.log(this.overlays[0]);
             let obj = this.overlays[0];
             // 获取每个点的信息
-			let points = obj.Qn;
+			      let points = obj.Qn;
             console.log(points);
-            sessionStorage.setItem('map',JSON.stringify(points))
+            for(var i  = 0;i<points.length; i++){
+              this.object.push({lat:points[i].lat-0.006267421,lng:points[i].lng-0.0064341118})
+            }
+            console.log(this.object)
+            sessionStorage.setItem('map',JSON.stringify(this.object))
 		}
     },
     back(){
-        this.$router.go(-1);//返回上一层
+        //this.$router.go(-1);//返回上一页
+        this.$router.push({
+        path:'/SupplierFeeList',
+        query:{
+            Flag:true
+        }
+      })
     },
   }
 }

@@ -14,13 +14,13 @@
                 </div>
             </div>
             <div class="second">
-                <span>商品图</span>
+                <span>商品图</span><!--  -->
                 <div>
                     <el-upload
-                        action= '/adminwebapi/api/Product/ProductHeadImageAdd'
+                        action= '/adminwebapi/api/Image/UploadImage'
                         list-type="picture-card"
                         :on-preview="handlePictureCardPreview1"
-                        :on-success="handleAvatarSuccess"
+                        :on-success="handleAvatarSuccessH"
                         :on-error="imgUploadError"
                         accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                         :file-list="fileLists1"
@@ -37,17 +37,18 @@
                 </div>
             </div>
             <div class="three">
-                <span>商品详情图</span>
+                <span>商品详情图</span><!--  -->
                 <el-upload
-                    action= '/adminwebapi/api/Product/ProductContentImageAdd'
+                    action= '/adminwebapi/api/Image/UploadImage'
                     list-type="picture-card"
                     :on-preview="handlePictureCardPreview2"
-                    :on-success="handleAvatarSuccess"
+                    :on-success="handleAvatarSuccessC"
                     :on-error="imgUploadError"
                     accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                     :file-list="fileLists2"
                     :on-progress="upLoadC"
-                    :data="upLoadData"
+                    :headers="TokenID"
+                    :data="upData"
                     :on-remove="handleRemoveC">
                     <i class="el-icon-plus"></i>
                 </el-upload>
@@ -213,6 +214,7 @@ import qs from 'qs';
                     Unicode:'',
                     Fxxcode:'',
                     ShopCode:'',
+                    UniType:'',
                     IsMustSelfReceiver:"",          /* 是否必须自提 N 否 Y 是 */
                 },
                  /* 动态添加的数据存放在这里 */
@@ -235,6 +237,9 @@ import qs from 'qs';
                 productOptions:[],           /* 全部分类 */
                 upLoadData:{
                     ImageUseType:'ProductHead'           /*  Page，ProductContent，ProductHead */
+                },
+                upData:{
+                    ImageUseType:'ProductContent'           /*  Page，ProductContent，ProductHead */
                 },
                 TokenID:{
                     TokenID:sessionStorage.getItem('TokenID'),
@@ -270,6 +275,8 @@ import qs from 'qs';
                 this.formInline.Fxxcode = ''
                 this.formInline.ShopCode = ''
                 this.formInline.UniType = ''
+                this.fileLists2 = [],
+                this.fileLists1 = []
             },
             handle(row,column,event,cell){
                 this.brand = row.chinese;
@@ -280,11 +287,22 @@ import qs from 'qs';
             handleCurrentChange(val) {
                 this.currentRow = val;
             },
-            handleRemoveH(file, index) {                 /* 删除主图 */
-                console.log(file, index);
+            handleRemoveH(file, fileList1) {                 /* 删除主图 */
+                console.log(file, fileList1);
+                this.fileLists1 = fileList1
+                console.log(file)
+                console.log(fileList)
             },
             handleRemoveC(file, fileList) {                 /* 删除详情图 */
                 console.log(file, fileList);
+                console.log(file)
+                console.log(fileList)
+                this.fileLists2 =  []
+                for(var i = 0; i < fileList.length; i++){
+                    this.fileLists2.push('http://images.liqunshop.com/' + fileList[i].response.Result.replace(/\[/g,'').replace(/\]/g,'').replace(/\"/g,''))
+                    console.log('删除了')
+                }
+                // this.fileLists2 = fileList
             },
             handlePictureCardPreview1(file) {
                 this.dialogImageUrl = file.url;
@@ -294,13 +312,25 @@ import qs from 'qs';
                 this.dialogImageUrl = file.url;
                 this.dialogVisible2 = true;
             },
-            handleAvatarSuccess(res, file) {                        //图片上传成功调用的方法
-                this.HeadPictureUrl = JSON.parse(res.Result)[0]
+            handleAvatarSuccessH(res, file) {                        //图片上传成功调用的方法
+                this.fileLists1.push('http://images.liqunshop.com/' + JSON.parse(res.Result)[0])
+            },
+            handleAvatarSuccessC(res, file) {                        //图片上传成功调用的方法
+                this.fileLists2.push( 'http://images.liqunshop.com/' + JSON.parse(res.Result)[0])
+                console.log(this.fileLists2)
             },
             imgUploadError(err, file, fileList){                    //图片上传失败调用
                 this.$message.error('上传图片失败!');
             },
             onSubmit() {
+                for(var q = 0;q < this.fileLists1.length; q++){
+                    delete this.fileLists1[q].uid
+                    delete this.fileLists1[q].status
+                }
+                for(var p = 0;p < this.fileLists2.length; p++){
+                    delete this.fileLists2[p].uid
+                    delete this.fileLists2[p].status
+                }
                 let params = {
                     BrandID : this.formInline.BrandID,
                     ClassID : this.formInline.ClassID,
@@ -327,9 +357,9 @@ import qs from 'qs';
                     Fxxcode : this.formInline.Fxxcode,
                     ShopCode : this.formInline.ShopCode,
                     UniType : this.formInline.UniType,
-                    HeadImage : this.fileLists1,
-                    ContentImage : this.fileLists2,
-                    IsMustSelfReceiver: this.formInline.IsMustSelfReceiver
+                    IsMustSelfReceiver: this.formInline.IsMustSelfReceiver,
+                    HeadImage : JSON.stringify(this.fileLists1),
+                    ContentImage : JSON.stringify(this.fileLists2),
                 }
                 addProduct(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -381,15 +411,16 @@ import qs from 'qs';
                             if(URLHead.substr(0,4) == 'http'){
                                 this.fileLists1.push({url: this.result.HeadImageList})
                             }else{
-                                this.fileLists1.push({url:  'http://images.liqunshop.com/' + this.result.HeadImageList})
+                                this.fileLists1.push({url: 'http://images.liqunshop.com/' + this.result.HeadImageList})
                             }
+                            console.log(this.fileLists1)
                         }
                         for( var i = 0; i < this.result.ContentImageList.length ; i++){
                             let URLHead = this.result.ContentImageList[i]
                             if(URLHead.substr(0,4) == 'http'){
                                 this.fileLists2.push({url: this.result.ContentImageList[i]})
                             }else{
-                                this.fileLists2.push({url:  'http://images.liqunshop.com/' + this.result.ContentImageList[i]})
+                                this.fileLists2.push({url: 'http://images.liqunshop.com/' + this.result.ContentImageList[i]})
                             }
                         }
                         this.formInline.UniType = this.result.UNITYPE
@@ -446,22 +477,25 @@ import qs from 'qs';
                 })
             },
             productData(){
-                let params = {
-                    
+                if(localStorage.productIdClass == null) {
+                    let params = {}
+                    getIDclass(qs.stringify(params)).then((res)=>{
+                        if(res.data.Success == 1){
+                            this.productOptions = JSON.parse(res.data.Result)
+                            localStorage['productIdClass']=res.data.Result;
+                        }
+                        if(res.data.Success == 0){
+                            this.$message(res.data.Result)
+                        }
+                        if(res.data.Success == -998){
+                            this.$message(res.data.Result)
+                        }
+                    }).catch(function(e){
+                        console.log(e)
+                    })
+                }else{
+                    this.productOptions = JSON.parse(localStorage['productIdClass'])
                 }
-                getIDclass(qs.stringify(params)).then((res)=>{
-                    if(res.data.Success == 1){
-                        this.productOptions = JSON.parse(res.data.Result)
-                    }
-                    if(res.data.Success == 0){
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        this.$message(res.data.Result)
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                })
             },
             cascaderChange(value) {
               let rang = []

@@ -50,7 +50,7 @@
                         <span>{{tableData.Remark}}</span>
                     </el-form-item>
                     <el-form-item label="配送类别">
-                        {{tableData.StoreType === ' Z'?'纯自送':'仓库统配'}}
+                        {{tableData.StoreType === 'Z'?'纯自送':'仓库统配'}}
                     </el-form-item>
                     <el-form-item label="供应商地址">
                         <span>{{tableData.SupplierAddr}}</span>
@@ -123,10 +123,22 @@
                         <el-input v-model="row.LinkTel" clearable></el-input>
                     </el-form-item>
                     <el-form-item label="营业开始时间">
-                        <el-input v-model="row.OpenTime" clearable></el-input>
+                        <el-time-picker
+                            v-model="row.OpenTime"
+                            :picker-options="{
+                                selectableRange: '00:30:00 - 23:30:00'
+                            }"
+                            placeholder="任意时间点">
+                        </el-time-picker>
                     </el-form-item>
                     <el-form-item label="营业结束时间">
-                        <el-input v-model="row.EndTime" clearable></el-input>
+                        <el-time-picker
+                            v-model="row.EndTime"
+                            :picker-options="{
+                                selectableRange: '00:30:00 - 23:30:00'
+                            }"
+                            placeholder="任意时间点">
+                        </el-time-picker>
                     </el-form-item>
                     <el-form-item label="备注">
                         <el-input v-model="row.Remark" clearable></el-input>
@@ -164,7 +176,7 @@
                     <el-form-item label="指定送货时间最大小时数">
                         <el-input v-model="row.DeliveryEndHours" clearable></el-input>
                     </el-form-item>
-                    <el-form-item label="供应商图片">
+                    <el-form-item label="供应商图片"><!--  -->
                         <el-upload
                             class="avatar-uploader"
                             action="/adminwebapi/api/Image/UploadImage"
@@ -223,10 +235,11 @@ import qs from 'qs'
             },
             handleAvatarSuccess(res,file){
                 let URLHead = JSON.parse(res.Result)[0]    
+                console.log(JSON.parse(res.Result)[0])
                 if(URLHead.substr(0,4) == "http"){
                     this.row.SupplierImageURL =  JSON.parse(res.Result)[0]                   /* 启明星原地址 */
                 }else{
-                    this.row.SupplierImageURL = ImageURL.ImageURL + JSON.parse(res.Result)[0]
+                    this.row.SupplierImageURL = 'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]
                 }
             },
             onSubmit(){

@@ -68,9 +68,9 @@
                                                         <el-option label="否" value="N"></el-option>
                                                     </el-select>
                                                 </el-form-item>
-                                                <el-form-item label="背景图"><!-- /adminwebapi -->
+                                                <el-form-item label="背景图"><!--  -->
                                                     <el-upload
-                                                        action= '/api/Image/UploadImage'
+                                                        action= '/adminwebapi/api/Image/UploadImage'
                                                         list-type="picture-card"
                                                         :on-success="handleAvatarSuccess2"
                                                         accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
@@ -131,9 +131,9 @@
                                         <!-- 右侧修改弹出框 -->
                                         <el-dialog title="编辑" :visible.sync="editVisible2" width="50%" :close-on-click-modal="false">
                                             <el-form ref="form" :model="InfoForm"  label-width="80px">
-                                                <el-form-item label="banner图">     <!-- /adminwebapi -->
+                                                <el-form-item label="banner图">     <!--  -->
                                                     <el-upload
-                                                        action= '/api/Image/UploadImage'
+                                                        action= '/adminwebapi/api/Image/UploadImage'
                                                         list-type="picture-card"
                                                         :on-success="handleAvatarSuccess"
                                                         :on-error="imgUploadError"
@@ -183,9 +183,9 @@
         <!-- 添加页面明细 -->
         <el-dialog title="添加页面明细" :visible.sync="editVisible3" width="50%" :close-on-click-modal="false">
             <el-form ref="form" :model="addPageContentInfo"  label-width="110px">
-                <el-form-item label="banner图"><!-- /adminwebapi -->
+                <el-form-item label="banner图"><!--  -->
                     <el-upload
-                        action= '/api/Image/UploadImage'
+                        action= '/adminwebapi/api/Image/UploadImage'
                         list-type="picture-card"
                         :on-success="handleAvatarSuccess3"
                         :on-error="imgUploadError"
@@ -254,9 +254,9 @@
                                 <el-option label="否" value="N"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="背景图">   <!-- /adminwebapi -->
+                        <el-form-item label="背景图">   <!--  -->
                             <el-upload
-                                action= '/api/Image/UploadImage'
+                                action= '/adminwebapi/api/Image/UploadImage'
                                 list-type="picture-card"
                                 :on-success="handleAvatarSuccess4"
                                 accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
@@ -504,7 +504,7 @@ export default {
                 getPageJS(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
-                        window.open(`https://o2o.liqunshop.com/view/page/index.html?pageid=${res.data.Result}&PageOpenType=Share `)
+                        setTimeout(window.open(`https://o2o.liqunshop.com/view/page/Index.html?pageid=${res.data.Result}&PageOpenType=Share&t=${Date.parse(new Date())/1000} `),500)
                     }
                     if(res.data.Success == 0){
                         this.$message('生成页面信息失败');
@@ -548,7 +548,7 @@ export default {
                 getPageJS(qs.stringify(params)).then((res)=>{
                     console.log(res.data)
                     if(res.data.Success == 1){
-                        window.open(`https://o2o.liqunshop.com/view/page/index.html?pageid=${res.data.Result}&PageOpenType=Share `)
+                        setTimeout(window.open(`https://o2o.liqunshop.com/view/page/Index.html?pageid=${res.data.Result}&PageOpenType=Share&t=${Date.parse(new Date())/1000} `),500)
                     }
                     if(res.data.Success == 0){
                         this.$message('生成页面信息失败');

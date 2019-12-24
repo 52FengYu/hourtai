@@ -151,10 +151,14 @@
                     <el-table-column prop="DeliveryType" label="分单结果" align=center></el-table-column>
                     <el-table-column prop="MainSupplier" label="主供应商" align=center></el-table-column>
                     <el-table-column prop="Supplier" label="供应商" align=center></el-table-column>
-                    <el-table-column prop="ReceiveAddr" label="收货地址" align=center></el-table-column>
+                    <el-table-column prop="ReceiveAddr" label="收货地址" align=center width="183px"></el-table-column>
                     <el-table-column prop="ReceiveMan" label="收货人"  align=center></el-table-column>
                     <el-table-column prop="ReceiveMobile" label="收货人手机号" align=center></el-table-column>
-                    <el-table-column prop="CreateTime" label="下单时间"  align=center ></el-table-column>
+                    <el-table-column prop="CreateTime" label="下单时间"  align=center width="140px">
+                        <template slot-scope="scope">
+                            {{scope.row.CreateTime.substring(0,scope.row.CreateTime.length-4)}}
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="PayName" label="支付方式名称"  align=center ></el-table-column>
                     <el-table-column label="收货方式类型" align=center>
                         <template slot-scope="scope">
@@ -167,24 +171,24 @@
                             {{scope.row.DelFlag === 'N' ? '否' : '是'}}
                         </template>
                     </el-table-column>
+                    <el-table-column label="出库增加金额是否支付" align=center>
+                        <template slot-scope="scope">
+                            {{scope.row.IsOutStockAddPricePay === 'Y' ? '是' : '否'}}
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="SendFee" label="运费" align=center></el-table-column>
                     <el-table-column prop="GiftCardAmount" label="礼品卡使用金额"  align=center></el-table-column>
                     <el-table-column prop="GiftTokenAmount" label="优惠券使用金额"  align=center></el-table-column>
                     <el-table-column prop="PointMoney" label="积分金额" align=center></el-table-column>
                     <el-table-column prop="PayMoney" label="在线支付金额"  align=center></el-table-column>
                     <el-table-column prop="DiscountMoney" label="优惠金额"  align=center></el-table-column>
-                    <el-table-column prop="PayTime" label="支付时间" align=center></el-table-column>
-                    <el-table-column prop="OutStockAddPrice" label="出库增加金额"  align=center></el-table-column>
-                    <el-table-column label="出库增加金额是否支付" align=center>
-                        <template slot-scope="scope">
-                            {{scope.row.IsOutStockAddPricePay === 'Y' ? '是' : '否'}}
-                        </template>
+                    <el-table-column prop="PayTime" label="支付时间" align=center>
+                        
                     </el-table-column>
+                    <el-table-column prop="OutStockAddPrice" label="出库增加金额"  align=center></el-table-column>
                     <el-table-column label="操作" align="center" fixed="right">
                         <template slot-scope="scope">
-                            <el-button type="text" icon="el-icon-edit" v-if="scope.row.OrderState == '新建' || scope.row.OrderState == '审核'" @click="print(scope.$index, scope.row);show()">打印</el-button>
                             <el-button type="text" icon="el-icon-info" @click="detail(scope.$index,scope.row);goPage()">详情</el-button>
-                            <el-button type="text" icon="el-icon-check"  v-if="scope.row.ReceiverType == 'S' && scope.row.OrderState == '出库'" @click="checked(scope.row)">自提确认</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -199,105 +203,42 @@
                 </el-pagination>
             </el-card>
         </div>
-
-        <!-- 自提确认 -->
-        <el-dialog title="自提确认" :visible.sync="editVisible2" width="50%"  :close-on-click-modal="false">
-            <el-form :inline="true" :model="checkedBox" class="demo-form-inline">
-                <el-form-item label="自提码">
-                    <el-input v-model="checkedBox.SelfReceiveCode" placeholder="请输入自提码"></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible2 = false">取 消</el-button>
-                <el-button type="primary" @click="PickupConfirm">确 定</el-button>
-            </span>
-        </el-dialog>
-        
-        <!-- 打印弹出框 -->
-        <el-dialog title="打印预览" :visible.sync="editVisible" width="75%" :close-on-click-modal="false">
-            <div ref="print" class="recordImg" id="printRecord">
-                <p style="font-size:18px;text-align:center;font-weight:900">利群网商购物分拣单</p>
-                <el-form ref="form" :model="form" label-width="90px" class="demo-form-inline" :inline="true" style="width:100%;text-align:left">
-                    <el-form-item label="订单号">
-                        <span>{{this.printListData.ID}}</span>
-                    </el-form-item>
-                    <el-form-item label="支付时间">
-                        <span>{{this.printListData.PayTime}}</span>
-                    </el-form-item>
-                    <el-form-item label="支付方式">
-                        <span>{{this.printListData.PayType}}</span>
-                    </el-form-item>
-                    <el-form-item label="收货人">
-                        <span>{{this.printListData.ReceiveMan}}</span>
-                    </el-form-item>
-                    <el-form-item label="收货人手机">
-                        <span>{{this.printListData.ReceiveMobile}}</span>
-                    </el-form-item>
-                    <el-form-item label="备注">
-                        <span>{{this.printListData.MemberRemark}}</span>
-                    </el-form-item>
-                    <template v-if="this.printListData.ReceiverType === '送货上门'">
-                        <el-form-item label="预约配送">
-                            <span>{{this.printListData.PlanReceiveTime}}</span>
-                        </el-form-item>
-                        <el-form-item label="收货人地址">
-                        </el-form-item>
-                        <el-form-item>
-                            <span>{{this.printListData.ReceiveAddr}}</span>
-                        </el-form-item>
-                    </template>
-                    <template v-if="this.printListData.ReceiverType === '到店自提'">
-                        <el-form-item label="提货时间">
-                            <span>{{this.printListData.PlanReceiveTime}}</span>
-                        </el-form-item>
-                    </template>
-                </el-form>
-                <el-table ref="singleTable" :data="this.printListData.Detail" highlight-current-row @current-change="handleCurrentChange" style="max-width: 750px">
-                    <el-table-column type="index"></el-table-column>
-                    <el-table-column property="ProductID" label="商品编码"></el-table-column>
-                    <el-table-column property="ShopCode" label="门店码" width="100px"></el-table-column>
-                    <el-table-column property="ProductName" label="商品名称"></el-table-column>
-                    <el-table-column property="Qty" label="数量" width="80px"></el-table-column>
-                    <el-table-column property="MemberPrice" label="单价" width="80px"></el-table-column>
-                    <el-table-column property="Amount" label="总价"></el-table-column>
-                </el-table>
-                <div style="display:flex; justify-content:space-around">
-                    <span>商品金额：{{this.printListData.ProductPrice}}</span>
-                    <span>运费：{{this.printListData.SendFee}}</span>
-                    <span>优惠券：{{this.printListData.GiftTokenAmount}}</span>
-                    <span>礼品卡：{{this.printListData.GiftCardAmount}}</span>
-                    <span>积分：{{this.printListData.PointMoney}}</span>
-                </div>
-                <p style="text-align:right;margin:10px 0">支付金额：{{this.printListData.PayMoney}}</p>
-                <div style="display:flex; justify-content:space-around">
-                    <span>打印时间:{{this.time}}</span>
-                    <span>拣货员：</span>
-                    <span>复核员：</span>
-                </div>
-                <div style="border-top:1px dashed black;margin-top:20px;padding-top:20px;display:flex;justify-content:space-between">
-                    如果您对商品的品质和服务不满意，可拨打客服电话：4006888688；我们将认真对待并改正！
-                    <svg id="barcode"></svg>
-                </div>
-            </div>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="PrintRow()">确 定</el-button>
-            </span>
-        </el-dialog>
     </div>
 </template>
 <style lang="scss" scoped>
-     .el-dialog__wrapper{
-        .el-dialog{
-            .el-dialog__body{
-                border: 1px lightgreen dashed!important;
-                #printRecord{
-                    .el-form{
-                        border-bottom:1px dashed black;
-                        .el-form-item{
-                            margin:0!important;
-                            padding:0!important;
-                            width:30%;
+    #printRecord{
+        font-family: '宋体';
+        font-size: 13px!important;
+            .print-base{
+                padding: 0 10px;
+                display: flex;
+                flex-flow: row wrap;
+                align-items: center;
+                align-content: center;
+                justify-content: space-between;
+                text-align: center;
+                > * { margin: 0; min-width: 28%; height: 25px; text-align: left; }
+                .base-item{
+                    display:inline-block;
+                    min-width: 15%;
+                    // float: left;
+                    height: 30px;
+                    margin-right: 30px;
+                    height:auto!important;
+                    span{
+                        font-size:12px
+                    }
+                }
+            }
+        .el-table{
+            .el-table__body-wrapper,.is-scrolling-none{
+                .el-table__body{
+                    tbody{
+                        .el-table__row{
+                            td{
+                                margin:0;
+                                padding:0
+                            }
                         }
                     }
                 }
@@ -306,7 +247,7 @@
     }
 </style>
 <script>
-import { getOrderList,orderDetail,changePayMethod,changePayNum,OrderSelfReceiveConfirm,OrderDeliverySetPS } from "@/api/orderList"
+import { getOrderList,orderDetail,changePayMethod,changePayNum,OrderSelfReceiveConfirm,OrderDeliverySetPS,OrderFJPrintInfoGet } from "@/api/orderList"
 import qs from 'qs';
 import { SupplierListGetByLevel } from '@/api/goodsList';
 import JsBarcode from 'jsbarcode'
@@ -422,6 +363,7 @@ import JsBarcode from 'jsbarcode'
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
+                        this.$message(res.data.Result)
                     }
                 }).catch(function(e){
                     console.log(e)
@@ -443,37 +385,6 @@ import JsBarcode from 'jsbarcode'
             reset(){
                 this.currentPage = 1,
                 this.currentSize = 10
-            },
-            print(index,row){
-                this.editVisible = true;
-                this.ID = row.ID;
-                let params = {
-                    ID:this.ID,
-                }
-                orderDetail(qs.stringify(params)).then((res)=>{
-                    if(res.data.Success == 1){
-                        this.printListData = JSON.parse(res.data.Result)
-                    }
-                    if(res.data.Success == 0){
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        this.$message(res.data.Result)
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                })
-            },
-            show(){
-                this.timestamp = Date.parse(new Date());
-                this.time = this.disposeDate(this.timestamp)
-                JsBarcode("#barcode", this.ID, {
-                    format: "CODE39",  //条形码的格式
-                    lineColor: "black",  //线条颜色
-                    width:1, //线宽
-                    height:30,  //条码高度
-                    displayValue: true //是否显示文字信息
-                });
             },
             detail(index,row){
                 this.ID = row.ID;
@@ -542,40 +453,13 @@ import JsBarcode from 'jsbarcode'
                     console.log(e)
                 })
             },
-            checked(row){
-                this.row = row
-                this.editVisible2 = true 
-            },
-            Delivery(row){
-                this.row = row
-                this.editVisible3 = true
-            },
-            PickupConfirm(){
-                let params = {
-                    ID:this.row.ID,
-                    SelfReceiveCode:this.checkedBox.SelfReceiveCode
-                }
-                OrderSelfReceiveConfirm(qs.stringify(params)).then((res)=>{
-                    if(res.data.Success == 1){
-                        this.editVisible2 = false
-                        this.getTableData()
-                        this.$message.success('自提确认成功')
-                        this.checkedBox.SelfReceiveCode =''
-                    }
-                    if(res.data.Success == 0){
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        this.$message(res.data.Result)
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                })
-            },
         },
         created(){
             this.getTableData();
             this.getMainSupplier()
+            window.setInterval(() => {
+                setTimeout(this.getMainSupplier(), 0)
+            }, 600000)
         },
         mounted() {
 

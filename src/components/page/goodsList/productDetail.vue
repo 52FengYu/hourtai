@@ -79,19 +79,18 @@
             <el-form-item label="是否废弃">
                 <span >{{this.products.Product.DelFlag === 'N'  ? '否' : '是'}}</span>
             </el-form-item>
-            <el-form-item label="物流码">
+            <el-form-item label="物流码" v-if="this.products.LQInfo">
                 <span >{{this.products.LQInfo.FxxCode}}</span>
             </el-form-item>
-            <el-form-item label="门店码">
+            <el-form-item label="门店码" v-if="this.products.LQInfo">
                 <span >{{this.products.LQInfo.ShopCode}}</span>
             </el-form-item>
-            <el-form-item label="统一编码">
+            <el-form-item label="统一编码" v-if="this.products.LQInfo">
                 <span >{{this.products.LQInfo.UniCode}}</span>
             </el-form-item>
-            <el-form-item label="统一分类">
+            <el-form-item label="统一分类" v-if="this.products.LQInfo">
                 <span >{{this.products.LQInfo.UniTypeCode}}</span>
             </el-form-item>
-
             <el-form-item label="是否是组合商品">
                 <span >{{this.products.Product.IsGroupProduct == 'N' ? '否' : '是'}}</span>
             </el-form-item>
@@ -200,7 +199,9 @@ import qs from 'qs';
                 getProductDetail(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.products = JSON.parse(res.data.Result)
-                        this.shopCode = this.products.LQInfo.ShopCode
+                        if(this.products.LQInfo !== null){
+                            this.shopCode = this.products.LQInfo.ShopCode
+                        }
                         var tableData = []
                         for (let i in this.products) {
                             tableData.push(this.products[i]); //属性
@@ -247,7 +248,7 @@ import qs from 'qs';
                     console.log(e)
                 })
             },
-            getDetailByShopCode(){
+            /* getDetailByShopCode(){
                 let params = {
                     ShopCode:this.products.LQInfo.ShopCode
                 }
@@ -265,7 +266,7 @@ import qs from 'qs';
                 }).catch(function(e){
                     console.log(e)
                 })
-            },
+            }, */
 
             handleRemoveH(res,file, fileList) {                  /* 移除主图时调用的钩子，删除图片 */
                 let params = {

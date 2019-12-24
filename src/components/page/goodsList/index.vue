@@ -120,10 +120,12 @@
                         <el-form-item>
                             <!-- 搜索 -->
                             <el-button type="primary" @click="getData">搜索</el-button>
+                        </el-form-item>
+                        <el-form-item>
                             <!-- 重置 -->
                             <el-button type="primary" @click="clear">重置</el-button>
-                            <!-- 导出 -->
-                            <el-button type="primary">导出</el-button>
+                        </el-form-item>
+                        <el-form-item>
                             <!-- 新增 -->
                             <el-button type="primary"><router-link to="newgoods">新增商品</router-link></el-button>
                         </el-form-item>
@@ -176,7 +178,7 @@
                 <el-table-column prop="ShopCode" label="门店码"  width="90" align="center" ></el-table-column>
                 <el-table-column prop="UniCode" label="统一编码" width="100" align="center" ></el-table-column>
                 <el-table-column prop="FxxCode" label="物流码" width="100" align="center" ></el-table-column> 
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="操作" width="180" align="center" fixed="right">
                     <template slot-scope="scope" >        <!-- 未审核/驳回 -->
                         <el-button type="warning" icon="el-icon-star-off" @click="handleEdit(scope.$index, scope.row)" v-if="scope.row.ProductState != 'O'">审核</el-button>
                         <el-button type="primary" icon="el-icon-star-off" @click="down(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'Y'">下架</el-button>
@@ -404,6 +406,7 @@ import qs from 'qs';
                     if(res.data.Success == 1){
                         this.resData = JSON.parse(res.data.Result)
                         this.total = this.resData.TotalCount
+                        console.log(this.resData)
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)                    }
@@ -473,22 +476,26 @@ import qs from 'qs';
                 this.formInline.productValue = ''
             },
             productData(){
-                let params = {
-                    
+                if(localStorage.productIdClass == null) {
+                    console.log(localStorage.productIdClass)
+                    let params = {}
+                    getIDclass(qs.stringify(params)).then((res)=>{
+                        if(res.data.Success == 1){
+                            this.formInline.productOptions = JSON.parse(res.data.Result)
+                            localStorage['productIdClass']=res.data.Result;
+                        }
+                        if(res.data.Success == 0){
+                            this.$message(res.data.Result)
+                        }
+                        if(res.data.Success == -998){
+                            this.$message(res.data.Result)
+                        }
+                    }).catch(function(e){
+                        console.log(e)
+                    })
+                }else{
+                    this.formInline.productOptions = JSON.parse(localStorage['productIdClass'])
                 }
-                getIDclass(qs.stringify(params)).then((res)=>{
-                    if(res.data.Success == 1){
-                        this.formInline.productOptions = JSON.parse(res.data.Result)
-                    }
-                    if(res.data.Success == 0){
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        this.$message(res.data.Result)
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                })
             },
             handleChange(value){         /* 商品选择的方法 */
                 let rang = []

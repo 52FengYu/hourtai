@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-form ref="form" :model="form" label-width="120px">
-            <el-form-item label="商品主图">
+            <el-form-item label="商品主图"><!--  -->
                 <el-upload
                     action="/adminwebapi/api/Image/UploadImage"
                     class="table-td-HeadImageURL"
@@ -16,14 +16,14 @@
                     :headers="TokenID"
                     :data="upLoadData"
                     :limit="1"
-                    >
+                    ><!--  -->
                     <i class="el-icon-plus"></i>
                 </el-upload>
                 <el-dialog :visible.sync="dialogVisibleH">
                     <img width="100%" :src="dialogImageUrlH" alt="">
                 </el-dialog>
             </el-form-item>
-             <el-form-item label="商品详情图">
+             <el-form-item label="商品详情图"><!--  -->
                 <el-upload
                     action="/adminwebapi/api/Image/UploadImage"
                     class="table-td-HeadImageURL"
@@ -122,19 +122,19 @@
                 <el-input v-model="tableData.Weight" placeholder="重量"></el-input>
             </el-form-item>
         </el-form>
-         <el-form  :model="LQInfo" class="demo-form-inline" label-width="150px">
-            <el-form-item label="门店码">
+        <el-form  :model="LQInfo" class="demo-form-inline" label-width="150px" v-if="this.LQInfo !== null">
+            <el-form-item label="门店码" v-if="LQInfo.ShopCode">
                 <el-input v-model="LQInfo.ShopCode" placeholder="门店码"></el-input>
                 <i> 利群内部商品必填</i>
             </el-form-item>
-            <el-form-item label="统一分类">
+            <el-form-item label="统一分类" v-if="LQInfo.UniTypeCode">
                 <el-input v-model="LQInfo.UniTypeCode" placeholder="统一分类"></el-input>
                 <i>利群内部商品必填</i>
             </el-form-item>
-            <el-form-item label="统一编码">
+            <el-form-item label="统一编码" v-if="LQInfo.UniCode">
                 <el-input v-model="LQInfo.UniCode" placeholder="统一编码"></el-input>
             </el-form-item>
-            <el-form-item label="物流编码">
+            <el-form-item label="物流编码" v-if="LQInfo.FxxCode">
                 <el-input v-model="LQInfo.FxxCode" placeholder="物流编码"></el-input>
                 <i>利群内部供应商存在的时候必填</i>
             </el-form-item>
@@ -152,10 +152,8 @@ import qs from 'qs';
     export default{
         data(){
             return{
-                form:{
-
-                },
-                tableData:[],               /* 商品相关 */
+                form:{},
+                tableData:{},               /* 商品相关 */
                 HeadImage:[],               /* 头图 */
                 ContentImage:[],             /* 详情图 */
                 dialogImageUrlH: '',
@@ -186,11 +184,15 @@ import qs from 'qs';
                 }
                 getProductDetail(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        // console.log(JSON.parse(res.data.Result))
-                        this.LQInfo = JSON.parse(res.data.Result).LQInfo
+                        console.log(res.data.Result)
+                        console.log(JSON.parse(res.data.Result))
+                        // this.LQInfo = JSON.parse(res.data.Result).LQInfo
                         this.tableData = JSON.parse(res.data.Result).Product
+                        // console.log(this.tableData)
                         this.HeadImage = JSON.parse(res.data.Result).HeadImage
+                        console.log(this.HeadImage)
                         this.ContentImage = JSON.parse(res.data.Result).ContentImage
+                        this.fileLists1 = []
                         for( var i = 0; i < this.HeadImage.length ; i++){
                             let URLHead = this.HeadImage[i].ImageURL
                             if(URLHead.substring(0,4) == 'http'){
@@ -200,6 +202,7 @@ import qs from 'qs';
                             }
                         }
                         if(this.ContentImage != null){
+                            this.fileLists2 = []
                             for( var i = 0; i < this.ContentImage.length ; i++){
                                 let URLHead = this.ContentImage[i].ImageURL
                                 if(URLHead.substring(0,4) == 'http'){
@@ -209,12 +212,14 @@ import qs from 'qs';
                                 }
                             }
                             for(var i = 0; i < this.ContentImage.length; i ++){
-                                for( var k = 0; k < this.fileLists2.length; k++){
+                                for(var k = 0; k < this.fileLists2.length; k++){
                                     if(i == k){
                                         this.fileLists2[k].ID = this.ContentImage[i].ID
                                     }
                                 }
                             }
+                            console.log(this.fileLists2)
+                            console.log(this.ContentImage)
                         }
                     }
                     if(res.data.Success == 0){
@@ -249,10 +254,10 @@ import qs from 'qs';
                     TitalInfo : this.tableData.TitalInfo,
                     UnitID : this.tableData.UnitID,
                     Weight : this.tableData.Weight,
-                    ShopCode:this.LQInfo.ShopCode,
-                    UniCode:this.LQInfo.UniCode,               
-                    UniType:this.LQInfo.UniTypeCode,
-                    Fxxcode:this.LQInfo.FxxCode,
+                    ShopCode:this.LQInfo.ShopCode?this.LQInfo.ShopCode:'',
+                    UniCode:this.LQInfo.UniCode?this.LQInfo.UniCode:'',               
+                    UniType:this.LQInfo.UniTypeCode?this.LQInfo.UniTypeCode:'',
+                    Fxxcode:this.LQInfo.FxxCode?this.LQInfo.FxxCode:'',
                     IsMustSelfReceiver:this.tableData.IsMustSelfReceiver
                 }
                 changeProduct(qs.stringify(params)).then((res)=>{
@@ -292,10 +297,11 @@ import qs from 'qs';
                 this.tableData.UnitID = '',
                 this.tableData.Weight = ''
             },
-            handleRemoveH(res,file, fileList) {                  /* 移除主图时调用的钩子，删除图片 */
+            handleRemoveH(file, fileList,index) {                  /* 移除主图时调用的钩子，删除图片 */
+                console.log(this.HeadImage[0].ID)
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
-                    ID:this.HeadImage[0].ID
+                    ID:file.ID
                 }
                 delPicture(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -310,13 +316,15 @@ import qs from 'qs';
                 }).catch(function(e){
                     console.log(e)
                 })
-
             },
             handlePictureCardPreviewH(file) {                /* 点击文件列表中已上传的文件时的钩子 */
                 this.dialogImageUrl = file.url;
                 this.dialogVisible = true;
             },
-            handleRemoveC(file, fileList) {                  /* 移除详情图时调用的钩子，删除图片 */
+            handleRemoveC(file, fileList,index) {                  /* 移除详情图时调用的钩子，删除图片 */
+                console.log(file.ID)
+                console.log(fileList)
+                console.log(index)
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                     ID:file.ID
@@ -342,12 +350,14 @@ import qs from 'qs';
             HeadImageSuccess(res,file){
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
-                    ImageURL: JSON.parse(res.Result)[0],
+                    ImageURL: 'http://images.liqunshop.com/' + JSON.parse(res.Result)[0],
                     ImageIndex:1
                 }
                 addPicture(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
+                        console.log(res.data.Result)
                         this.$message.success('主图添加成功')
+                        this.getData()
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -367,7 +377,9 @@ import qs from 'qs';
                 }
                 AddDetailMap(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
+                        console.log(res.data.Result)
                         this.$message.success('上传成功')
+                        this.getData()
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -380,23 +392,28 @@ import qs from 'qs';
                 })
             },
             getBrand(){
-                let params = {
-                   PageIndex:-1,
-                   PageSize:-1, 
+                if(localStorage['BrandID'] == null){
+                    let params = {
+                       PageIndex:-1,
+                       PageSize:-1, 
+                    }
+                    BaseBrandListGet(qs.stringify(params)).then((res)=>{
+                        if(res.data.Success == 1){
+                            this.brands = JSON.parse(res.data.Result).ModelList
+                            localStorage['BrandID']=res.data.Result; 
+                        }
+                        if(res.data.Success == 0){
+                            this.$message(res.data.Result)
+                        }
+                        if(res.data.Success == -998){
+                            this.$message(res.data.Result)
+                        }
+                    }).catch(function(e){
+                        console.log(e)
+                    })
+                }else{
+                    this.brands = JSON.parse(localStorage['BrandID']).ModelList
                 }
-                BaseBrandListGet(qs.stringify(params)).then((res)=>{
-                    if(res.data.Success == 1){
-                        this.brands = JSON.parse(res.data.Result).ModelList
-                    }
-                    if(res.data.Success == 0){
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        this.$message(res.data.Result)
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                })
             },
         },
         created(){

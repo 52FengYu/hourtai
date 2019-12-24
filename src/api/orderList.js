@@ -186,3 +186,39 @@ export function OrderDeliverySetPS(obj) {
     data: obj
   })
 }
+
+/* 订单复核驳回 */
+export function OrderDeliveryReFJ(obj) {
+  return axios({
+    url: '/api/Order/OrderDeliveryReFJ',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 集货订单打印 */
+export function OrderJHPrintInfoGet(obj) {
+  return axios({
+    url: '/api/Order/OrderJHPrintInfoGet',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 分拣单打印 */
+export function OrderFJPrintInfoGet(obj) {
+  return axios({
+    url: '/api/Order/OrderFJPrintInfoGet',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}

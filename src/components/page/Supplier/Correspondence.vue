@@ -5,7 +5,17 @@
                 <el-form-item label="用户编号">
                     <el-input v-model="formInline.UserID" placeholder="用户编号" clearable @change="reset"></el-input>
                 </el-form-item>
-                <el-form-item label="供应商编号">
+                <el-form-item label="主供应商号">
+                    <el-select v-model="formInline.MainSupplierID" placeholder="主供应商"  clearable filterable @change="getSupplier">
+                        <el-option
+                            v-for="item in formInline.option1"
+                            :key="item.value"
+                            :label="item.label"     
+                            :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="供应商">
                     <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable @change="reset">
                         <el-option
                             v-for="item in formInline.option2"
@@ -20,7 +30,7 @@
                     <el-button type="primary" @click="editVisible = true">对应关系添加</el-button>
                 </el-form-item>
             </el-form>
-            <el-table :data="tableData.ModelList" border style="width: 100%">
+            <el-table :data="tableData.ModelList" border style="width: 100%" highlight-current-row>
                 <el-table-column prop="UserName" label="用户信息" align="center"></el-table-column>
                 <!-- <el-table-column prop="UserID" label="用户ID" align="center"></el-table-column> -->
                 <el-table-column prop="SupplierName" label="供应商名称" align="center"></el-table-column>
@@ -55,7 +65,17 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="供应商号">
+                <el-form-item label="主供应商号">
+                    <el-select v-model="addRelationship.MainSupplierID" placeholder="主供应商"  clearable filterable @change="getSupplierAdd">
+                        <el-option
+                            v-for="item in addRelationship.option1"
+                            :key="item.value"
+                            :label="item.label"     
+                            :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="供应商">
                     <el-select v-model="addRelationship.SupplierID" placeholder="供应商" clearable filterable>
                         <el-option
                             v-for="item in addRelationship.Suppliers"
@@ -78,7 +98,17 @@
                 <el-form-item label="用户编号">
                     <el-input v-model="changeRelationship.UserID" :disabled="true"></el-input>
                 </el-form-item>
-                <el-form-item label="供应商号">
+                <el-form-item label="主供应商号">
+                    <el-select v-model="changeRelationship.MainSupplierID" placeholder="主供应商"  clearable filterable @change="getSupplierChange">
+                        <el-option
+                            v-for="item in changeRelationship.option1"
+                            :key="item.value"
+                            :label="item.label"     
+                            :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="供应商">
                     <el-select v-model="changeRelationship.SupplierID" placeholder="供应商" clearable filterable>
                         <el-option
                             v-for="item in changeRelationship.Suppliers"
@@ -106,7 +136,9 @@ import qs from 'qs'
             return{
                 formInline:{
                     UserID:'',
+                    MainSupplierID:'',
                     SupplierID:'',
+                    option1:[],         /* 主供应商候选 */
                     option2:[],         /* 供应商备选 */
                 },
                 PageIndex:1,
@@ -117,14 +149,18 @@ import qs from 'qs'
                 addRelationship:{          /* 添加 */
                     UserID:'',          /* 用户编号value */
                     users:[],           /* 用户列表的候选 */
+                    MainSupplierID:'',
                     SupplierID:'',      /* 供应商value */
+                    option1:[],            /* 主供应商候选 */
                     Suppliers:[],       /* 供应商的候选 */
                 },
                 row:[],
                 changeRelationship:{    /* 修改 */
                     UserID:'',          /* 用户编号value */
                     users:[],           /* 用户列表的候选 */
+                    MainSupplierID:'',
                     SupplierID:'',      /* 供应商value */
+                    option1:[],
                     Suppliers:[],       /* 供应商的候选 */
                 },
             }
@@ -134,14 +170,75 @@ import qs from 'qs'
                 this.PageIndex = 1,
                 this.PageSize = 10
             },
+            getMainSupplier(){
+                let params = {
+                    Level:1,
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.formInline.option1 = JSON.parse(res.data.Result)
+                        this.addRelationship.option1 = JSON.parse(res.data.Result)
+                        this.changeRelationship.option1 = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
             getSupplier(){
+                this.formInline.SupplierID = ''
                 let params = {
                     Level:2,
+                    MainSupplierID:this.formInline.MainSupplierID
                 }
                 SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.formInline.option2 = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            getSupplierAdd(){
+                this.addRelationship.SupplierID = ''
+                let params = {
+                    Level:2,
+                    MainSupplierID:this.addRelationship.MainSupplierID
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
                         this.addRelationship.Suppliers = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        console.log("请求错误")
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            getSupplierChange(){
+                this.changeRelationship.SupplierID = ''
+                let params = {
+                    Level:2,
+                    MainSupplierID:this.changeRelationship.MainSupplierID
+                }
+                SupplierListGetByLevel(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
                         this.changeRelationship.Suppliers = JSON.parse(res.data.Result)
                     }
                     if(res.data.Success == 0){
@@ -161,13 +258,14 @@ import qs from 'qs'
             getData(){
                 let params = {
                     UserID:this.formInline.UserID,
-                    SupplierID:this.formInline.SupplierID,
+                    SupplierID:this.formInline.SupplierID?this.formInline.SupplierID:this.formInline.MainSupplierID,
                     PageIndex:this.PageIndex,
                     PageSize:this.PageSize
                 }
                 SupplierOpUserListGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.tableData = JSON.parse(res.data.Result)
+                        console.log(this.tableData)
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -211,7 +309,7 @@ import qs from 'qs'
             addCorrespondence(){        /* 供应商与用户对应关系添加 */
                 let params = {
                     UserID:this.addRelationship.UserID,
-                    SupplierID:this.addRelationship.SupplierID
+                    SupplierID:this.addRelationship.SupplierID?this.addRelationship.SupplierID:this.addRelationship.MainSupplierID
                 }
                 SupplierOpUserAdd(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -237,7 +335,7 @@ import qs from 'qs'
             changeCorrespondence(){             /* 修改供应商与用户的对应关系 */
                 let params = {
                     UserID:this.changeRelationship.UserID,
-                    SupplierID:this.changeRelationship.SupplierID
+                    SupplierID:this.changeRelationship.SupplierID?this.changeRelationship.SupplierID:this.changeRelationship.MainSupplierID
                 }
                 SupplierOpUserUpdate(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -262,11 +360,12 @@ import qs from 'qs'
                 }
                 SupplierOpUserDelete(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
+                        this.getData()
                         this.$message.success('废弃成功')
                         this.editVisible2 = false
-                        this.getData()
                     }
                     if(res.data.Success == 0){
+                        this.getData()
                         this.$message(res.data.Result)
                     }
                     if(res.data.Success == -998){
@@ -293,7 +392,7 @@ import qs from 'qs'
             }
         },
         created(){
-            this.getSupplier()
+            this.getMainSupplier()
             this.getData()
         },
         mounted(){
