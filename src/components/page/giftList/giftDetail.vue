@@ -49,7 +49,8 @@
 import { GiftListDetail } from '@/api/giftList';
 import qs from 'qs';
     export default{
-        data(){                 GiftListDetail
+        nmae:'giftDetail',
+        data(){                 /* GiftListDetail */
             return{
                 formInline:{
                     ID:decodeURI(location.href).split('?')[1].split('=')[1],

@@ -96,6 +96,7 @@ import { MemberGiftTokenGiveOutMasterAdd } from '@/api/coupon';
 import { SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs'
     export default{
+        name:'addCouponActivity',
         data(){
             return{
                 form:{

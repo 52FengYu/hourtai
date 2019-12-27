@@ -96,6 +96,7 @@
 import { SysAppListGet,SysAppAdd,SysAppUpdate } from '@/api/competence'
 import qs from 'qs'
     export default{
+        name:'application',
         data(){
             return{
                 editVisible:false,                      /* 应用添加 */

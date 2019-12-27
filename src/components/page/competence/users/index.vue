@@ -144,6 +144,7 @@
 import { SysUserListGet,SysUserAdd,SysDeptListGet,SysUserUpdate,SysUserDelete,SysUserStop,SysUserSetEnable,SysRoleListGet,SysUserSetRole } from '@/api/competence'
 import qs from 'qs'
     export default{
+        name:'users',
         data(){
             return{
                 editVisible:false,      /* 添加用户信息 */

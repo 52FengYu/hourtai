@@ -132,6 +132,7 @@ import { SupplierOpUserListGet,SupplierOpUserAdd,SupplierOpUserUpdate,SupplierOp
 import { SysUserListGet } from '@/api/competence'
 import qs from 'qs'
     export default{
+        name:'Correspondence',
         data(){
             return{
                 formInline:{

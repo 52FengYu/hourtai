@@ -88,6 +88,7 @@ import { PageHotSearchGetFromMainSupplierID,PageHotSearchUpdate } from '@/api/co
 import { SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs'
     export default{
+        name:'hotManagement',
         data(){
             return{
                 formInline:{

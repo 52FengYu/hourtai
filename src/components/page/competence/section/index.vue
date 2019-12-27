@@ -58,6 +58,7 @@
 import { SysDeptListGet,SysDeptUpdate,SysDeptAdd } from '@/api/competence'
 import qs from 'qs'
     export default{
+        name:'section',
         data(){
             return{
                 tableData:[],                    /* 列表数据 */

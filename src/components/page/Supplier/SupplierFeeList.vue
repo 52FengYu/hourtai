@@ -3,7 +3,7 @@
         <el-card>
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
                 <el-form-item label="供应商号">
-                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable>
+                    <el-select v-model="formInline.SupplierID" placeholder="供应商" clearable filterable @change='reset()'>
                         <el-option
                             v-for="item in formInline.Suppliers"
                             :key="item.value"
@@ -13,7 +13,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="区域号">
-                    <el-input v-model="formInline.AreaID" placeholder="区域号"></el-input>
+                    <el-input v-model="formInline.AreaID" placeholder="区域号" @change='reset()'></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="getData">搜索</el-button>
@@ -37,6 +37,15 @@
                     </template>
                 </el-table-column>
             </el-table>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="PageIndex"
+                :page-size= PageSize
+                align="right"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total= this.tableData.TotalCount>
+                </el-pagination>
         </el-card>
         <!-- 增加供应运费信息 -->
         <el-dialog title="增加供应运费信息" :visible.sync="editVisible" width="60%" modal='false'>
@@ -159,7 +168,7 @@ import $ from 'jquery'
 import loadBMap from '@/api/LoadBMap' 
 import qs from 'qs'
     export default{
-        name: "ChinaArea",
+        name: "SupplierFeeList",
         data(){
             return{
                 formInline:{
@@ -191,6 +200,10 @@ import qs from 'qs'
             }
         },
         methods:{
+            reset(){
+                this.PageIndex = 1;
+                this.PageSize = 10
+            },
             getSupplier(){
                 let params = {
                     Level:2,
@@ -368,6 +381,16 @@ import qs from 'qs'
                 }).catch(function(e){
                     console.log(e)
                 })
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+                this.PageSize = val;
+                this.getData()
+            },
+            handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+                this.PageIndex = val;
+                this.getData()
             }
         },
         mounted(){

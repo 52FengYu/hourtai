@@ -65,6 +65,10 @@
                 <el-table-column prop="ID" label="调价单号" align="center"></el-table-column>
                 <el-table-column prop="ProductID" label="商品编码" align="center"></el-table-column>
                 <el-table-column prop="ProductName" label="商品名称" align="center"></el-table-column>
+
+                <el-table-column prop="NewMemberPrice" label="新价格(元)" align="center"></el-table-column>
+                <el-table-column prop="OldMemberPrice" label="原价格(元)" align="center"></el-table-column>
+
                 <el-table-column prop="ChangeType" label="调价类型" align="center">
                   <template slot-scope="scope">
                     {{scope.row.ChangeType === 'Y' ? '永久调价' : '区间调价'}}     
@@ -107,8 +111,8 @@
         <el-dialog title="调价审核" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="70px">
                 <el-form-item label="审核状态">
-                    <el-radio v-model="form.radio" label="1">通过</el-radio>
-                    <el-radio v-model="form.radio" label="2">不通过</el-radio>
+                    <el-radio v-model="form.Audit" label="O">通过</el-radio>
+                    <el-radio v-model="form.Audit" label="B">不通过</el-radio>
                 </el-form-item>
                 <el-form-item label="审核备注">
                     <el-input v-model="form.AuditRemark"></el-input>
@@ -139,14 +143,18 @@
                         <el-date-picker
                           v-model="form.changeTimeStart"
                           type="datetime"
-                          placeholder="选择日期时间">
+                          value-format="yyyy-MM-dd HH:mm:ss"
+                          placeholder="选择日期时间"
+                          >
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item label="调价结束时间">
                         <el-date-picker
                           v-model="form.changeTimeEnd"
                           type="datetime"
-                          placeholder="选择日期时间">
+                          value-format="yyyy-MM-dd HH:mm:ss"
+                          placeholder="选择日期时间"
+                          >
                         </el-date-picker>
                     </el-form-item>
                   </template>
@@ -166,6 +174,7 @@
 import { changePriceList,PriceAdjustmentReview,ProductPriceAdjustment,ProductPriceChange,StopPriceAdjustment,PriceAdjustment,SupplierListGetByLevel } from '@/api/goodsList';
 import qs from 'qs'
   export default {
+    name:'priceList',
     data() {
       return {
         editVisible:false,
@@ -190,7 +199,7 @@ import qs from 'qs'
           changeTimeStart:'',
           changeTimeEnd:'',
           Remark:'',
-          radio:'',
+          Audit:'',
           ProductName:'',
         },
         tableData: [],
@@ -238,9 +247,10 @@ import qs from 'qs'
         })
       },
       saveEdit(){           /* 调价审核 */
+          // console.log(this.form.Audit)
           let params = {
             ID:this.ID,            /* 调价单号 */
-            Audit:this.radio === '1' ? 'O' : 'B',             /* 审核状态 */
+            Audit:this.form.Audit,             /* 审核状态 */
             AuditRemark:this.form.AuditRemark,       /* 审核备注 */
         }
         PriceAdjustmentReview(qs.stringify(params)).then((res)=>{
@@ -250,6 +260,7 @@ import qs from 'qs'
                   message: '修改成功',
                   type: 'success'
                 });
+                this.getData()
             }
             if(res.data.Success == 0){
                 this.$message(res.data.Result)
@@ -283,6 +294,10 @@ import qs from 'qs'
         this.getData()
       },
       saveAdd(){          /* 修改 */
+        console.log(JSON.stringify(this.form.changeTimeStart))
+        console.log(this.form.changeTimeStart)
+        console.log(JSON.stringify(this.form.changeTimeEnd))
+        console.log(this.form.changeTimeEnd)
         let params = {
             ID:this.form.ProductID,
             NewPrice:this.form.NewPrice,
@@ -298,6 +313,7 @@ import qs from 'qs'
                   message: '修改成功',
                   type: 'success'
                 });
+                this.getData()
                 this.editVisible2 = false,
                 this.form.ProductID = '',
                 this.form.NewPrice = '',
@@ -323,6 +339,7 @@ import qs from 'qs'
       StopPriceAdjustment(qs.stringify(params)).then((res)=>{
           if(res.data.Success == 1){
               this.$message.success('删除成功');
+              this.getData()
           }
           if(res.data.Success == 0){
               this.$message(res.data.Result)
@@ -351,6 +368,7 @@ import qs from 'qs'
       PriceAdjustment(qs.stringify(params)).then((res)=>{
           if(res.data.Success == 1){
               this.$message.success('废弃成功');
+              this.getData()
           }
           if(res.data.Success == 0){
               this.$message(res.data.Result)
@@ -413,7 +431,7 @@ import qs from 'qs'
             }
     },
     created(){
-      this.getData()
+      // this.getData()
       this.getMainSupplier()
     }
   }

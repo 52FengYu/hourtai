@@ -162,6 +162,7 @@ import { SupplierListGet,SupplierAdd,SupplierAudit } from "@/api/SupplierList"
 import { SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs';
 export default{
+    name:'Supplier',
     data(){
         return{
             form:{

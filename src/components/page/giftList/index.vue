@@ -86,6 +86,7 @@
 import { getGiftList,changeGiftList,GiftListDetail } from '@/api/giftList';
 import qs from 'qs';
     export default{
+        name:'giftList',
         data(){
             return{
                 currentPage4: 1,                /* 分页器 */

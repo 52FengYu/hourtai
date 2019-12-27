@@ -83,6 +83,7 @@
 import { PromotionProductGetFromPromotionID,PromotionProductUpdate } from '@/api/activeList'
 import qs from 'qs'
     export default{
+        name:'Markdown',
         data(){
             return{
                 tableData:[],               /* 列表信息存在这 */

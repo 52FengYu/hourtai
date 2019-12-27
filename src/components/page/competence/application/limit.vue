@@ -75,6 +75,7 @@
 import { SysAuthorityListGetFromModuleID,SysAuthorityAdd,SysAuthorityUpdate,SysAuthorityModuleRelevant,AuthorityListGet,SysRoleSetAuthority } from '@/api/competence'
 import qs from 'qs'
     export default{
+        name:'limit',
         data(){
             return{
                 tableData:[],           /* 获取到的列表信息 */

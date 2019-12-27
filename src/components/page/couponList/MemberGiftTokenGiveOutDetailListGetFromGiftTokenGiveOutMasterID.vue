@@ -215,6 +215,7 @@ import { SupplierListGetByLevel,getIDclass,getProductList } from '@/api/goodsLis
 import { BaseBrandListGet } from '@/api/common'
 import qs from 'qs'
     export default{
+        name:'MemberGiftTokenGiveOutDetailListGetFromGiftTokenGiveOutMasterID',
         directives: {
         'el-select-loadmore': {
             bind(el, binding) {

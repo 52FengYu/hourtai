@@ -74,26 +74,24 @@
                     <el-form-item label="出库增加金额是否支付">
                         <span>{{this.listData.IsOutStockAddPricePay == 'N'?'否':'是'}}</span>
                     </el-form-item>
-                    <h6>订单商品</h6>
-                    <el-form-item>
-                        <el-table :data="this.listData.Detail" style="width: 80%" border>
-                            <el-table-column prop="ProductID" label="商品编码" align="center"></el-table-column>
-                            <el-table-column prop="ProductName" label="商品名称" align="center" width="180"></el-table-column>
-                            <el-table-column prop="ShopCode" label="门店码" align="center"></el-table-column>
-                            <el-table-column prop="Qty" label="数量" align="center"></el-table-column>
-                            <el-table-column prop="BackQty" label="退货数量" align="center"></el-table-column>
-                            <el-table-column prop="PreBackQty" label="预退数量" align="center"></el-table-column>
-                            <el-table-column prop="MemberPrice" label="会员价" align="center"></el-table-column>
-                            <el-table-column prop="Amount" label="金额小计" align="center"></el-table-column>
-                            <el-table-column prop="UnitName" label="单位" align="center"></el-table-column>
-                            <el-table-column label="操作" align="center">
-                                <template slot-scope="scope">
-                                    <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                    </el-form-item>
                 </el-form>
+                    <h6>订单商品</h6>
+                    <el-table :data="this.listData.Detail" style="width: 80%" border>
+                        <el-table-column prop="ProductID" label="商品编码" align="center"></el-table-column>
+                        <el-table-column prop="ProductName" label="商品名称" align="center" width="180"></el-table-column>
+                        <el-table-column prop="ShopCode" label="门店码" align="center"></el-table-column>
+                        <el-table-column prop="Qty" label="数量" align="center"></el-table-column>
+                        <el-table-column prop="BackQty" label="退货数量" align="center"></el-table-column>
+                        <el-table-column prop="PreBackQty" label="预退数量" align="center"></el-table-column>
+                        <el-table-column prop="MemberPrice" label="会员价" align="center"></el-table-column>
+                        <el-table-column prop="Amount" label="金额小计" align="center"></el-table-column>
+                        <el-table-column prop="UnitName" label="单位" align="center"></el-table-column>
+                        <el-table-column label="操作" align="center">
+                            <template slot-scope="scope">
+                                <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="DelFlag == 'N' && listData.OrderState == '新建'">修改</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
             <el-button type="primary" @click="goPage()">返回</el-button>
         </el-card>
 
@@ -107,10 +105,10 @@
                         <el-input v-model="this.ProductID" :disabled="true"></el-input>
                     </el-form-item>
                     <el-form-item label="数量">
-                        <el-input v-model="form.Qty"></el-input>
+                        <el-input v-model="form.Qty" @change="push123"></el-input>
                     </el-form-item>
                     <el-form-item label="价格">
-                        <el-input v-model="form.MemberPrice"></el-input>
+                        <el-input v-model="form.MemberPrice" @change="push123"></el-input>
                     </el-form-item>
                 </el-form>
                 <span slot="footer" class="dialog-footer">
@@ -127,6 +125,7 @@ import qs from 'qs';
 import JsBarcode from 'jsbarcode';
 inject:['reload'];
     export default{
+        name:'orderDetail',
         data(){
             return{
                 listData:'',       /* 获取到的数据放在这 */
@@ -155,6 +154,9 @@ inject:['reload'];
                 PayMethodsLIst:[],                                      /* 所有支付方式 */
                 ID:'',
                 ReceiverType:'',        /* 点击切换的时候，把状态存到这边，方便带着参数去支付修改页 */
+                DelFlag:'',
+                DetailList:[],
+                DetailList1:'',         /* 保留DetailList中同ID的最后一个，并将DetailList转化为字符串 */
             }
         },
         methods:{
@@ -165,6 +167,7 @@ inject:['reload'];
                 orderDetail(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.listData = JSON.parse(res.data.Result)
+                        this.DelFlag = decodeURI(location.href).split('&')[1].split('=')[1]
                         console.log(this.listData)
                         if(this.listData.ReceiverType == '送货上门'){
                             this.ReceiverType = 'R'
@@ -191,12 +194,18 @@ inject:['reload'];
                 this.form.ID = row.ProductID
                 this.form.MemberPrice   =   row.MemberPrice
             },
+            push123(){
+                this.DetailList.push({'ID':this.ID,'Qty':this.form.Qty,'MemberPrice':this.form.MemberPrice})
+                let hash = {}; 
+                this.DetailList1 = this.DetailList.reduce((preVal, curVal) => {
+                    hash[curVal.ID] ? '' : hash[curVal.ID] = true && preVal.push(curVal); 
+                    return curVal 
+                }, [])
+            },
             saveEdit(){                     /* 修改订单支付数量 */
                 let params = {
-                    OrderID:decodeURI(location.href).split('?')[1].split('=')[1],           /* 订单号 */
-                    ID: this.ID,
-                    Qty : this.form.Qty,
-                    MemberPrice : this.form.MemberPrice
+                    OrderID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],           /* 订单号 */
+                    DetailList:JSON.stringify([this.DetailList1])
                 }
                 changePayNum(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){

@@ -65,7 +65,11 @@
                 <el-table-column prop="PageTypeID" label="所属类型" align="center"></el-table-column>
                 <el-table-column prop="BackgroundColor" label="背景色" align="center"></el-table-column>
                 <el-table-column prop="CreateManID" label="创建人" align="center"></el-table-column>
-                <el-table-column prop="CreateTime" label="创建时间" align="center"></el-table-column>
+                <el-table-column prop="CreateTime" label="创建时间" align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.CreateTime.substring(0,scope.row.CreateTime.length-4)}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="LastUpdateManID" label="修改人" align="center"></el-table-column>
                 <el-table-column prop="LastUpdateTime" label="修改时间" align="center"></el-table-column>
                 <el-table-column label="操作" align="center" fixed="right">
@@ -106,10 +110,10 @@
          <!-- 新增页面弹出框 -->
         <el-dialog title="新建" :visible.sync="editVisible2" width="45%" :close-on-click-modal="false">
             <el-form ref="form" :model="addPage" label-width="120px" :inline="true">
-                <el-form-item label="页面名称（必填）">
+                <el-form-item label="页面名称" required>
                     <el-input v-model="addPage.PageName"></el-input>
                 </el-form-item>
-                <el-form-item label="页面类型编号（必填）">
+                <el-form-item label="页面类型编号" required>
                     <el-select v-model="addPage.PageTypeID" placeholder="请选择类型" clearable>
                         <el-option
                             v-for="item in formInline.options"
@@ -158,6 +162,7 @@ import {getPageList,getAddItemType,changeItemInfo,move,addPage} from "@/api/colu
 import { SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs';
     export default{
+        name:'columnManagementList',
         data(){
             return{
                 PageIndex:1,
@@ -321,6 +326,7 @@ import qs from 'qs';
             changeColu(index, row){       /* 修改栏目 */
                 this.PageTypeID = row.PageTypeID;
                 this.ID = row.ID
+                this.PageName = row.PageName
             },
             goPage(id){
                 this.$router.push({
@@ -328,6 +334,7 @@ import qs from 'qs';
                     query:{
                         PageTypeID:this.PageTypeID,
                         ID:this.ID,
+                        PageName:this.PageName
                     }
                 })
             },

@@ -112,6 +112,7 @@
 import { PromotionGiftListGetFromPromotionID,PromotionGiftUpdate } from '@/api/activeList'
 import qs from 'qs'
     export default{
+        name:'fullGift',
         data(){
             return{
                 tableData:[],

@@ -381,6 +381,7 @@ import { PromotionListGet,PromotionAdd,PromotionProductAdd,PromotionProductUpdat
 import { SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs'
 export default{
+    name:'activeList',
         data(){
             return{
                 formInline: {                   /* form输入框的value */

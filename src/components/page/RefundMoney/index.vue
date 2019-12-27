@@ -85,6 +85,7 @@
 </template>
 <script>
     export default{
+        name:'RefundMoney',
         data(){
             return{
                 formInline:{            /* 顶部输入框 */

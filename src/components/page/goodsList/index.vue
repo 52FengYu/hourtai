@@ -46,7 +46,7 @@
                             <!-- 商品编码 -->
                             <el-input
                                 placeholder="商品编码"
-                                v-model="formInline.productCode"
+                                v-model="formInline.ID"
                                 clearable
                                 style="width:200px"
                                  @change="reset"
@@ -86,6 +86,17 @@
                                 </el-option>
                             </el-select>
                         </el-form-item>
+                        <el-form-item label="统一编码">
+                            <!-- 商品编码 -->
+                            <el-input
+                                placeholder="统一编码"
+                                v-model="formInline.productCode"
+                                clearable
+                                style="width:200px"
+                                 @change="reset"
+                            >
+                            </el-input>
+                        </el-form-item>
                         <el-form-item label="门店码">
                             <!-- 门店码 -->
                             <el-input
@@ -118,10 +129,10 @@
                             </el-cascader>
                         </el-form-item>
                         <el-form-item>
-                            <!-- 搜索 -->
-                            <el-button type="primary" @click="getData">搜索</el-button>
                         </el-form-item>
                         <el-form-item>
+                            <!-- 搜索 -->
+                            <el-button type="primary" @click="getData">搜索</el-button>
                             <!-- 重置 -->
                             <el-button type="primary" @click="clear">重置</el-button>
                         </el-form-item>
@@ -136,15 +147,13 @@
                 <el-table-column prop="ID" label="商品编号"  width="80" align="center" ></el-table-column>
                 <el-table-column label="商品名称" align="center" >
                     <template slot-scope="scope">
-                        <a @click="jump(scope.$index, scope.row)">{{scope.row.ProductName}}</a>
+                        <a @click="jump(scope.$index, scope.row)" style="color:#436EEE">{{scope.row.ProductName}}</a>
                     </template>
                 </el-table-column>
                 <el-table-column label="商品图片"  width="100" align="center" >
                     <template slot-scope="scope">
-                        <el-image
-                            class="table-td-HeadImageURL"
-                            :src="scope.row.HeadImageURL"
-                            :preview-src-list="[scope.row.HeadImageURL]"
+                        <el-image      
+                            :src="scope.row.HeadImageURL"                  
                         ></el-image>
                     </template>
                 </el-table-column>
@@ -251,21 +260,19 @@
                         <el-form-item label="调价开始时间">
                             <el-date-picker
                                 v-model="form.changeTimeStart"
-                                type="date"
-                                format="yyyy-MM-dd"
-                                value-format="yyyy-MM-dd"
-                                placeholder="开始时间"
-                                @change="updateDateStart">
+                                type="datetime"
+                                value-format="yyyy-MM-dd HH:mm:ss"
+                                placeholder="选择日期时间"
+                                >
                             </el-date-picker>
                         </el-form-item>
                         <el-form-item label="调价结束时间">
                             <el-date-picker
                                 v-model="form.changeTimeEnd"
-                                type="date"
-                                format="yyyy-MM-dd"
-                                value-format="yyyy-MM-dd"
-                                placeholder="结束时间"
-                                @change="updateDateEnd">
+                                type="datetime"
+                                value-format="yyyy-MM-dd HH:mm:ss"
+                                placeholder="选择日期时间"
+                                >
                             </el-date-picker>
                         </el-form-item>
                     </template>
@@ -284,7 +291,8 @@
 import { getProductList,getIDclass,changeProductStock,ProductPriceAdjustment,ProductPriceChange,ProductState,SupplierListGetByLevel,ProductReview } from "@/api/goodsList"
 import qs from 'qs';
     export default{
-        data() {
+        name: 'goodsList',
+        data:function() {
             return {
                 loading: false,          /* 加载 */
                 currentPage4: 1,    /* 分页 */
@@ -297,6 +305,7 @@ import qs from 'qs';
                     productName:'',     /* 商品名称输入框 */
                     MainSupplierID:'',  /* 主供应商号 */
                     SupplierID:'',      /* 供应商号 */
+                    ID:'',              /* 商品编码 */
                     productCode:'',     /* 统一编码输入框 */
                     StoreCode:'',       /* 店内码 */
                     trafficCode:'',     /* 物流码 */
@@ -391,14 +400,15 @@ import qs from 'qs';
                     PageIndex:this.currentPage4,
                     PageSize:this.PageSize,
                     ProductName:this.formInline.productName,
+                    ID:this.formInline.ID.replace(/ /g,''),                      /* 商品编码 */
                     MainSupplierID:this.formInline.MainSupplierID,
                     SupplierID:this.formInline.SupplierID,
-                    Unicode:this.formInline.productCode,               /* 统一编码 */
+                    Unicode:this.formInline.productCode.replace(/ /g,''),               /* 统一编码 */
                     IsSell:this.formInline.value1,
                     AuditState:this.formInline.value3,
                     IsGroupProduct:this.formInline.value2,
-                    Fxxcode:this.formInline.trafficCode,
-                    ShopCode:this.formInline.StoreCode,
+                    Fxxcode:this.formInline.trafficCode.replace(/ /g,''),
+                    ShopCode:this.formInline.StoreCode.replace(/ /g,''),
                     ClassID:this.formInline.productValue
                 }
                 getProductList(qs.stringify(params)).then((res)=>{
@@ -409,7 +419,8 @@ import qs from 'qs';
                         console.log(this.resData)
                     }
                     if(res.data.Success == 0){
-                        this.$message(res.data.Result)                    }
+                        this.$message(res.data.Result)                    
+                    }
                     if(res.data.Success == -998){
                         this.$message(res.data.Result)
                     }

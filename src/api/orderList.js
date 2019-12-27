@@ -222,3 +222,15 @@ export function OrderFJPrintInfoGet(obj) {
     data: obj
   })
 }
+
+/* 退单详情获取 */
+export function OrderBackProductGetFromID(obj) {
+  return axios({
+    url: '/api/order/OrderBackProductGetFromID',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}

@@ -90,6 +90,7 @@
 import { BaseBrandListGet,BaseBrandAdd,BaseBrandUpdate } from '@/api/common'
 import qs from 'qs'
     export default{
+        name:'brandManagement',
         data(){
             return{
                 currentPage4: 1,        /* 分页用 */

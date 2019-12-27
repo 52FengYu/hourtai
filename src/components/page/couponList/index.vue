@@ -155,6 +155,7 @@ import { MemberGiftTokenGiveOutMasterListGet,MemberGiftTokenGiveOutMasterAudit,M
 import { SupplierListGetByLevel } from '@/api/goodsList';
 import qs from 'qs'
     export default{
+        name:'couponList',
         data(){
             return{
                 radio:'',

@@ -100,7 +100,7 @@
 import { getMemberList,resetMemberPsd,deleteMember } from '@/api/memberShipList'
 import qs from 'qs';
     export default {
-        name: 'basetable',
+        name: 'membershipList',
         data() {
             return {
                 tableData: [],             /* 列表数据存放在此，请勿惊扰 */

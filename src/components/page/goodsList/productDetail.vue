@@ -11,7 +11,6 @@
                     :file-list="fileLists1"
                     :on-preview="handlePictureCardPreviewH" 
                     :on-success="HeadImageSuccess"            
-                    :on-remove="handleRemoveH"
                     :headers="TokenID"
                     :data="upLoadData"
                     :limit="1">
@@ -31,7 +30,6 @@
                     :file-list="fileLists2"
                     :on-preview="handlePictureCardPreviewC"             
                     :on-success="ContentImageSuccess" 
-                    :on-remove="handleRemoveC"
                     :headers="TokenID"
                     :data="upLoadContentData">
                     <i class="el-icon-plus"></i>
@@ -106,7 +104,6 @@
             <el-form-item label="是否在架销售">
                 <span >{{this.products.Product.IsSell == 'N' ? '否' : '是'}}</span>
             </el-form-item>
-
             <el-form-item label="是否显示500g价格">
                 <span >{{this.products.Product.IsShow500gPrice == 'N' ? '否' : '是'}}</span>
             </el-form-item>
@@ -164,6 +161,7 @@
 import { getProductDetail,getProductInfo,delPicture,delDetailMap,addPicture,AddDetailMap } from '@/api/goodsList';
 import qs from 'qs';
     export default{
+        name:'productDetail',
         data(){
             return{
                 products:[],             /* 商品信息都放在这里 */
@@ -199,7 +197,7 @@ import qs from 'qs';
                 getProductDetail(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.products = JSON.parse(res.data.Result)
-                        if(this.products.LQInfo !== null){
+                        if(this.products.LQInfo != null){
                             this.shopCode = this.products.LQInfo.ShopCode
                         }
                         var tableData = []

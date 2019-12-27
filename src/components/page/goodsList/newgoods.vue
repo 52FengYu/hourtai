@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-card class="box-card">
-            <div class="first">
+            <!-- <div class="first">
                 <span>搜索</span>
                 <div>
                     <el-input
@@ -12,7 +12,7 @@
                     </el-input>
                     <el-button type="primary" @click="found">查询</el-button>
                 </div>
-            </div>
+            </div> -->
             <div class="second">
                 <span>商品图</span><!--  -->
                 <div>
@@ -28,7 +28,8 @@
                         :headers="TokenID"
                         :data="upLoadData"
                         :on-progress="upLoadH"
-                        :on-remove="handleRemoveH">
+                        :on-remove="handleRemoveH"
+                        :limit="1">
                         <i class="el-icon-plus"></i>
                     </el-upload>
                     <el-dialog :visible.sync="dialogVisible1">
@@ -60,62 +61,44 @@
                 <span>基础信息</span>
                 <div>
                     <el-form :model="formInline" class="demo-form-inline">
-                        <el-form-item label="品牌名" class="BrandName">
-                            <el-input v-model="formInline.BrandName" class="BrandNameInput" clearable></el-input>
-                            <!-- <span>{{formInline.BrandID}}</span> -->
-                            <el-button type="primary" @click="getBrand">搜索</el-button><i class="el-icon-check" v-if="this.formInline.BrandID"></i>
+                        <el-form-item label="供应商号">
+                            <el-select v-model="formInline.SupplierID" placeholder="供应商">
+                                <el-option
+                                    v-for="item in option2"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
-                        <el-form-item label="三级分类名">
-                            <el-cascader :options="productOptions" :show-all-levels="false" @change="cascaderChange" value="formInline.ClassID" clearable></el-cascader>
+                        <el-form-item label="统一编码">
+                            <el-input
+                                placeholder="统一编码"
+                                v-model="formInline.uniformCode"
+                                clearable
+                                style="width:60%">
+                            </el-input>
+                            <el-button type="primary" @click="found">查询</el-button>
                         </el-form-item>
-                            <el-form-item label="显示名称">
-                            <el-input v-model="formInline.DisplayName" placeholder="显示名称"></el-input>
-                        </el-form-item>
-                        <el-form-item label="是否允许退货">
-                            <el-radio v-model="formInline.IsOrderBack" label="Y">是</el-radio>
-                            <el-radio v-model="formInline.IsOrderBack" label="N">否</el-radio>
-                        </el-form-item>
-                        <el-form-item label="是否能搜索">
-                            <el-radio v-model="formInline.IsSearch" label="Y">是</el-radio>
-                            <el-radio v-model="formInline.IsSearch" label="N">否</el-radio>
-                        </el-form-item>
-                        <el-form-item label="是否显示500g价格">
-                            <el-radio v-model="formInline.IsShow500gPrice" label="Y">是</el-radio>
-                            <el-radio v-model="formInline.IsShow500gPrice" label="N">否</el-radio>
-                        </el-form-item>
-                        <el-form-item label="是否同步价格">
-                            <el-radio v-model="formInline.IsSyncPrice" label="Y">是</el-radio>
-                            <el-radio v-model="formInline.IsSyncPrice" label="N">否</el-radio>
-                        </el-form-item>
-                        <el-form-item label="是否称重商品">
-                            <el-radio v-model="formInline.IsWeighing" label="Y">是</el-radio>
-                            <el-radio v-model="formInline.IsWeighing" label="N">否</el-radio>
-                        </el-form-item>
-                        <el-form-item label="关键字">
-                            <el-input v-model="formInline.KeyWord" placeholder="关键字"></el-input>
-                        </el-form-item>
-                        <el-form-item label="最大购买数量">
-                            <el-input v-model="formInline.MaxQty" placeholder="最大购买数量"></el-input>
-                            <i> 0 为不限</i>
-                        </el-form-item>
-                        <el-form-item label="最小购买数量">
-                            <el-input v-model="formInline.MinQty" placeholder="最小购买数量"></el-input>
-                            <i> 0 为不限</i>
-                        </el-form-item>
-                        <el-form-item label="包装含量">
-                            <el-input v-model="formInline.PackSize" placeholder="包装含量"></el-input>
+                        <el-form-item label="门店码">
+                            <el-input v-model="formInline.ShopCode" placeholder="门店码" style="width:60%"></el-input>
+                            <el-button type="primary" plain @click="Inquire">查询</el-button>
                         </el-form-item>
                         <el-form-item label="商品名称">
                             <el-input v-model="formInline.ProductName" placeholder="商品名称"></el-input>
                         </el-form-item>
-                        <el-form-item label="备注">
-                            <el-input v-model="formInline.Remark" placeholder="备注"></el-input>
-                        </el-form-item>
-                        <el-form-item label="税率(%)">
-                            <el-input v-model="formInline.TaxRate" placeholder="税率"></el-input>
+                        <el-form-item label="显示名称">
+                            <el-input v-model="formInline.DisplayName" placeholder="显示名称"></el-input>
                         </el-form-item>
                         <el-form-item label="副标题">
                             <el-input v-model="formInline.TitalInfo" placeholder="副标题"></el-input>
+                        </el-form-item>
+                        <el-form-item label="品牌名" class="BrandName" required>
+                            <el-input v-model="formInline.BrandName" class="BrandNameInput" clearable></el-input>
+                            <el-button type="primary" @click="getBrand">搜索</el-button><i class="el-icon-check" v-if="this.formInline.BrandID"></i>
+                        </el-form-item>
+                        <el-form-item label="税率(%)">
+                            <el-input v-model="formInline.TaxRate" placeholder="税率"></el-input>
                         </el-form-item>
                         <el-form-item label="单位名称">
                             <el-select v-model="formInline.UnitID" filterable  clearable placeholder="请选择">
@@ -127,18 +110,46 @@
                                 </el-option>
                             </el-select>
                         </el-form-item>
+                        <el-form-item label="三级分类名" required>
+                            <el-cascader :options="productOptions" :show-all-levels="false" @change="cascaderChange" value="formInline.ClassID" clearable></el-cascader>
+                        </el-form-item>
+                        <el-form-item label="会员价">
+                            <el-input v-model="formInline.MemberPrice" placeholder="会员价"></el-input>
+                        </el-form-item>
+                        <el-form-item label="是否同步价格">
+                            <el-radio v-model="formInline.IsSyncPrice" label="Y">是</el-radio>
+                            <el-radio v-model="formInline.IsSyncPrice" label="N">否</el-radio>
+                        </el-form-item>
+                        <el-form-item label="是否称重商品">
+                            <el-radio v-model="formInline.IsWeighing" label="Y">是</el-radio>
+                            <el-radio v-model="formInline.IsWeighing" label="N">否</el-radio>
+                        </el-form-item>
+                        <el-form-item label="包装含量">
+                            <el-input v-model="formInline.PackSize" placeholder="包装含量"></el-input>
+                        </el-form-item>
+                        <el-form-item label="是否显示500g价格">
+                            <el-radio v-model="formInline.IsShow500gPrice" label="Y">是</el-radio>
+                            <el-radio v-model="formInline.IsShow500gPrice" label="N">否</el-radio>
+                        </el-form-item>
+                        <el-form-item label="物流码">
+                            <el-input type="textarea" :rows="2" v-model="formInline.Fxxcode" placeholder="物流码"></el-input>
+                        </el-form-item>
                         <el-form-item label="重量">
                             <el-input v-model="formInline.Weight" placeholder="重量"></el-input>
                         </el-form-item>
-                        <el-form-item label="供应商号">
-                            <el-select v-model="formInline.SupplierID" placeholder="供应商">
-                                <el-option
-                                    v-for="item in option2"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                                </el-option>
-                            </el-select>
+                        <el-form-item label="库存">
+                            <el-input v-model="formInline.Stock" placeholder="库存"></el-input>
+                        </el-form-item>
+                        <el-form-item label="最大购买数量">
+                            <el-input v-model="formInline.MaxQty" placeholder="最大购买数量"></el-input>
+                            <i> 0 为不限</i>
+                        </el-form-item>
+                        <el-form-item label="最小购买数量">
+                            <el-input v-model="formInline.MinQty" placeholder="最小购买数量"></el-input>
+                            <i> 0 为不限</i>
+                        </el-form-item>
+                        <el-form-item label="关键字">
+                            <el-input v-model="formInline.KeyWord" placeholder="关键字"></el-input>
                         </el-form-item>
                         <el-form-item label="是否必须自提">
                             <el-select v-model="formInline.IsMustSelfReceiver" clearable placeholder="请选择">
@@ -146,24 +157,22 @@
                                 <el-option label="否" value="N"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="门店码">
-                            <el-input v-model="formInline.ShopCode" placeholder="门店码"></el-input>
-                            <el-button type="primary" plain @click="Inquire">查询</el-button>
+                        <el-form-item label="是否允许退货">
+                            <el-radio v-model="formInline.IsOrderBack" label="Y">是</el-radio>
+                            <el-radio v-model="formInline.IsOrderBack" label="N">否</el-radio>
                         </el-form-item>
-                        <el-form-item label="库存">
-                            <el-input v-model="formInline.Stock" placeholder="库存"></el-input>
+                        <el-form-item label="是否能搜索">
+                            <el-radio v-model="formInline.IsSearch" label="Y">是</el-radio>
+                            <el-radio v-model="formInline.IsSearch" label="N">否</el-radio>
                         </el-form-item>
-                        <el-form-item label="会员价">
-                            <el-input v-model="formInline.MemberPrice" placeholder="会员价"></el-input>
+                        <el-form-item label="统一分类">
+                            <el-input v-model="formInline.UniType" placeholder="统一分类"></el-input>
                         </el-form-item>
                         <el-form-item label="统一编码">
                             <el-input v-model="formInline.uniformCode" placeholder="统一编码"></el-input>
                         </el-form-item>
-                        <el-form-item label="物流码">
-                            <el-input v-model="formInline.Fxxcode" placeholder="物流码"></el-input>
-                        </el-form-item>
-                        <el-form-item label="统一分类">
-                            <el-input v-model="formInline.UniType" placeholder="统一分类"></el-input>
+                        <el-form-item label="备注">
+                            <el-input v-model="formInline.Remark" placeholder="备注"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="onSubmit">提交</el-button>
@@ -180,6 +189,7 @@ import { getProductInfo,getProductDetail,getPicInfo,addPicture,AddDetailMap,delP
 import { BaseBrandListGet,BaseUnitListGet } from '@/api/common'
 import qs from 'qs';    
     export default{
+        name:'newgoods',
         data(){
             return{
                 dialogImageUrl1: '',     /* 主图上传 */
@@ -299,10 +309,15 @@ import qs from 'qs';
                 console.log(fileList)
                 this.fileLists2 =  []
                 for(var i = 0; i < fileList.length; i++){
-                    this.fileLists2.push('http://images.liqunshop.com/' + fileList[i].response.Result.replace(/\[/g,'').replace(/\]/g,'').replace(/\"/g,''))
+                    if(fileList[i].url.replace(1,4) == 'http'){
+                        this.fileLists2.push(fileList[i].url.replace(/\[/g,'').replace(/\]/g,'').replace(/\"/g,''))
+                    }else{
+                        this.fileLists2.push('http://images.liqunshop.com/' + fileList[i].url.replace(/\[/g,'').replace(/\]/g,'').replace(/\"/g,''))
+                    }
+                    console.log(this.fileLists2)
                     console.log('删除了')
                 }
-                // this.fileLists2 = fileList
+                console.log(this.fileLists2)
             },
             handlePictureCardPreview1(file) {
                 this.dialogImageUrl = file.url;
@@ -331,6 +346,7 @@ import qs from 'qs';
                     delete this.fileLists2[p].uid
                     delete this.fileLists2[p].status
                 }
+                // this.fileLists1.replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,'')
                 let params = {
                     BrandID : this.formInline.BrandID,
                     ClassID : this.formInline.ClassID,
@@ -358,8 +374,10 @@ import qs from 'qs';
                     ShopCode : this.formInline.ShopCode,
                     UniType : this.formInline.UniType,
                     IsMustSelfReceiver: this.formInline.IsMustSelfReceiver,
-                    HeadImage : JSON.stringify(this.fileLists1),
-                    ContentImage : JSON.stringify(this.fileLists2),
+                    // HeadImage : JSON.stringify(this.fileLists1).replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,'').replace(/http:/g,'').replace(/\/\//g,'').replace(/images.liqunshop.com\//g,''),
+                    HeadImage : JSON.stringify(this.fileLists1).replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,''),
+                    // ContentImage : JSON.stringify(this.fileLists2).replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,'').replace(/http:/g,'').replace(/\/\//g,'').replace(/images.liqunshop.com\//g,''),
+                    ContentImage : JSON.stringify(this.fileLists2).replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,''),
                 }
                 addProduct(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -406,6 +424,7 @@ import qs from 'qs';
                 getPicInfo(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.result = JSON.parse(res.data.Result)
+                        console.log(this.result)
                         for( var i = 0; i < this.result.HeadImageList.length ; i++){
                             let URLHead = this.result.HeadImageList[i]
                             if(URLHead.substr(0,4) == 'http'){
@@ -533,17 +552,19 @@ import qs from 'qs';
                     console.log(e)
                 })
             },
-            Inquire(){
+            Inquire(){              /* 门店码查询 */
                 let params = {
                    ShopCode:this.formInline.ShopCode,
                    SupplierID:this.formInline.SupplierID
                 }
                 getProductInfo(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
+                        console.log(JSON.parse(res.data.Result))
                         this.formInline.uniformCode = JSON.parse(res.data.Result).UNICODE
                         this.formInline.UniType = JSON.parse(res.data.Result).UNITYPE
                         this.formInline.Fxxcode = JSON.parse(res.data.Result).Fxxcodes
-                        this.formInline.UniType = JSON.parse(res.data.Result).UNIBRAND
+                        this.formInline.TaxRate = JSON.parse(res.data.Result).TAXRATE
+                        // this.formInline.UnitID = JSON.parse(res.data.Result).UNIT
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -598,5 +619,8 @@ import qs from 'qs';
         .BrandNameInput{
             width:30%!important;
         }
+    }
+    .el-input{
+        width:60%!important
     }
 </style>

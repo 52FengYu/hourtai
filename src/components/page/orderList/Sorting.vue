@@ -23,7 +23,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="订单号">
-                    <el-input v-model="formInline.OrderID" placeholder="订单号" @change='reset'></el-input>
+                    <el-input v-model="formInline.OrderID" placeholder="订单号" @change='reset' clearable></el-input>
                 </el-form-item>
                 <el-form-item label="开始时间" required>
                     <el-date-picker
@@ -47,6 +47,12 @@
                         <el-option label="已分配任务" value="FP"></el-option>
                         <el-option label="分拣完成" value="FJ"></el-option>
                         <el-option label="已复核" value="FH"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="是否借货">
+                    <el-select v-model="formInline.IsJH" clearable  placeholder="请选择" @change='reset'>
+                        <el-option label="是" value="Y"></el-option>
+                        <el-option label="否" value="N"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -93,7 +99,7 @@
                         <el-button type="primary" icon="el-icon-edit" @click="editVisible = true;getDetail(scope.row)" v-if="scope.row.OperatorState == 'NE'">分拣</el-button>
                         <el-button type="primary" icon="el-icon-edit" @click="ReChecked(scope.row)" v-if="scope.row.OperatorState == 'FJ'">复核</el-button>
                         <el-button type="primary" plain icon="el-icon-edit" @click="printing(scope.row);show(scope.row)" v-if="(scope.row.OrderState == 'O' || scope.row.OrderState == 'A') && scope.row.DeliveryType == '门店' && scope.row.OperatorState == 'FH'">打印</el-button>        <!-- 打印出库单 -->
-                        <el-button type="primary" v-if="scope.row.OperatorState == 'FH' && scope.row.ReceiverType != 'S' && scope.row.ReceiverType == 'O'" @click="Delivery(scope.row)">订单配送</el-button>
+                        <el-button type="primary" v-if="scope.row.OperatorState == 'FH' && scope.row.ReceiverType != 'S' && scope.row.OrderState == 'O'" @click="Delivery(scope.row)">订单配送</el-button>
                         <el-button type="primary" icon="el-icon-check"  v-if="scope.row.ReceiverType == 'S' && scope.row.OrderState == 'O'" @click="checked(scope.row)">自提确认</el-button>
                         <el-button type="info" plain v-if="scope.row.OperatorState == 'FH' && scope.row.DeliveryType != '门店'" @click="focus(scope.row);show(scope.row)">打印</el-button><!-- 集货打印 -->
                     </template>
@@ -246,6 +252,8 @@
                     <span>优惠金额：{{this.order.discountMoney}}</span>
                     <span>运费：{{this.order.sendFee}}</span>
                     <span>出库增加金额：{{this.order.outStockAddPrice}}</span>
+                    <span>礼品卡金额：{{this.order.GiftCardAmount}}</span>
+                    <span>积分金额：{{this.order.PointMoney}}</span>
                 </div>
                 <div style="display:flex; justify-content:space-around;padding-top:10px">
                     <span>合计金额：{{this.order.allPrice}}</span>
@@ -307,6 +315,7 @@
                         <tr>
                             <th colspan="1">序号</th>
                             <th colspan="1">商品编码</th>
+                            <th colspan="1">店内码</th>
                             <th colspan="1">商品名称</th>
                             <th colspan="1">数量</th>
                             <th colspan="1">单位</th>
@@ -319,6 +328,7 @@
                         <tr v-for="(item,index) in this.printListData.details" :key='item.ID' >
                             <td style="text-align:center;vertical-align:middle;">{{index+1}}</td>
                             <td style="text-align:center;vertical-align:middle;">{{item.ProductID}}</td>
+                            <td style="text-align:center;vertical-align:middle;">{{item.ShopCode}}</td>
                             <td style="text-align:center;vertical-align:middle;">{{item.ProductName}}</td>
                             <td style="text-align:center;vertical-align:middle;">{{item.Qty}}</td>
                             <td style="text-align:center;vertical-align:middle;">{{item.UnitName}}</td>
@@ -348,7 +358,7 @@
         <!-- 集货分拣单 -->
         <el-dialog title="集货打印预览" :visible.sync="editVisible7" width="76%" :close-on-click-modal="false">
             <div ref="print3" class="recordImg" id="printRecord">
-                <p style="font-size:18px;text-align:center;font-weight:900">利群网商购物集货单</p>
+                <p style="font-size:18px;text-align:center;font-weight:900">利群网商({{this.concentrated.SupplierName}})购物集货单</p>
                 <div class="print-base">
                     <p class="base-item">
                         <span class="label">订单号：</span>
@@ -430,6 +440,7 @@ import { OrderMasterOutStockList,OrderDeliveryInfoGet,OrderDetailDelivery,OrderD
 import qs from 'qs';
 import JsBarcode from 'jsbarcode'
     export default{
+        name:'Sorting',
         data(){
             return{
                 formInline:{
@@ -443,6 +454,7 @@ import JsBarcode from 'jsbarcode'
                     option1:[],             /* 主供应商 */
                     option2:[],             /* 供应商 */
                     State:[],               /* 修改状态数组 */
+                    IsJH:'',                /* 是否借货 */
                 },
                 PageIndex:1,
                 PageSize:10,
@@ -479,12 +491,13 @@ import JsBarcode from 'jsbarcode'
                 let params = {
                     BeginTime:this.formInline.BeginTime ? this.formInline.BeginTime : this.GetDateStr(-2),
                     EndTime:this.formInline.EndTime ? this.formInline.EndTime : this.GetDateStr(1),
-                    OrderID:this.formInline.OrderID,
+                    OrderID:this.formInline.OrderID.replace(/ /g,''),
                     PageIndex:this.PageIndex,
                     PageSize:this.PageSize,
                     MainSupplierID:this.formInline.MainSupplierID,
                     SupplierID:this.formInline.SupplierID,
-                    State:this.formInline.State
+                    State:this.formInline.State,
+                    IsJH:this.formInline.IsJH
                 }
                 OrderMasterOutStockList(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -767,6 +780,7 @@ import JsBarcode from 'jsbarcode'
                 this.ID = row.ID;
                 let params = {
                     OrderID:this.ID,
+                    IsJH:row.IsJH
                 }
                 OrderFJPrintInfoGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -797,11 +811,13 @@ import JsBarcode from 'jsbarcode'
                 this.editVisible7 = true;
                 this.row = row
                 let params = {
-                    OrderID:row.ID
+                    OrderID:row.ID,
+                    IsJH:row.IsJH
                 }
                 OrderJHPrintInfoGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.concentrated = JSON.parse(res.data.Result)
+                        // console.log(JSON.parse(res.data.Result))
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)

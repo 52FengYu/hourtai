@@ -37,6 +37,7 @@ import { SupplierListGetByLevel,getIDclass } from '@/api/goodsList';
 import { SupplierClassListGetFromMainSupplierID,SupplierClassUpdate } from '@/api/SupplierList'
 import qs from 'qs'
     export default{
+        name:'showLevel',
         data(){
             return{
                 form:{

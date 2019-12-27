@@ -47,6 +47,15 @@
         </el-form>
         基本信息
         <el-form  :model="tableData" class="demo-form-inline" label-width="150px">
+            <el-form-item label="商品名称">
+                <el-input v-model="tableData.ProductName" placeholder="商品名称"></el-input>
+            </el-form-item>
+            <el-form-item label="显示名称">
+                <el-input v-model="tableData.DisplayName" placeholder="显示名称"></el-input>
+            </el-form-item>
+            <el-form-item label="副标题">
+                <el-input v-model="tableData.TitalInfo" placeholder="副标题"></el-input>
+            </el-form-item>
             <el-form-item label="品牌名">
                 <el-select v-model="tableData.BrandID" filterable  clearable placeholder="请选择">
                     <el-option
@@ -57,11 +66,21 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="分类名">
-                <el-input v-model="tableData.ClassID" placeholder="分类名"></el-input>
+            <el-form-item label="税率(%)">
+                <el-input v-model="tableData.TaxRate" placeholder="税率"></el-input>
             </el-form-item>
-                <el-form-item label="显示名称">
-                <el-input v-model="tableData.DisplayName" placeholder="显示名称"></el-input>
+            <el-form-item label="单位名称">
+                <el-select v-model="tableData.UnitID" filterable  clearable placeholder="请选择">
+                    <el-option
+                        v-for="item in qualit"
+                        :key="item.ID"
+                        :label="item.UnitName"
+                        :value="item.ID">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="分类名">
+                <el-cascader :options="productOptions" :show-all-levels="false" @change="cascaderChange" value="tableData.ClassID" clearable></el-cascader>
             </el-form-item>
             <el-form-item label="是否允许退货">
                 <el-radio v-model="tableData.IsOrderBack" label="Y">是</el-radio>
@@ -103,26 +122,14 @@
             <el-form-item label="包装含量">
                 <el-input v-model="tableData.PackSize" placeholder="包装含量"></el-input>
             </el-form-item>
-            <el-form-item label="商品名称">
-                <el-input v-model="tableData.ProductName" placeholder="商品名称"></el-input>
-            </el-form-item>
             <el-form-item label="备注">
                 <el-input v-model="tableData.Remark" placeholder="备注"></el-input>
-            </el-form-item>
-            <el-form-item label="税率(%)">
-                <el-input v-model="tableData.TaxRate" placeholder="税率"></el-input>
-            </el-form-item>
-            <el-form-item label="副标题">
-                <el-input v-model="tableData.TitalInfo" placeholder="副标题"></el-input>
-            </el-form-item>
-            <el-form-item label="单位名称">
-                <el-input v-model="tableData.UnitID" placeholder="单位名称"></el-input>
             </el-form-item>
             <el-form-item label="重量">
                 <el-input v-model="tableData.Weight" placeholder="重量"></el-input>
             </el-form-item>
         </el-form>
-        <el-form  :model="LQInfo" class="demo-form-inline" label-width="150px" v-if="this.LQInfo !== null">
+        <el-form  :model="LQInfo" class="demo-form-inline" label-width="150px" v-if="this.LQInfo">
             <el-form-item label="门店码" v-if="LQInfo.ShopCode">
                 <el-input v-model="LQInfo.ShopCode" placeholder="门店码"></el-input>
                 <i> 利群内部商品必填</i>
@@ -146,10 +153,11 @@
     </div>
 </template>
 <script>
-import { changeProduct,getProductDetail,delPicture,delDetailMap,addPicture,AddDetailMap } from "@/api/goodsList"
-import { BaseBrandListGet } from '@/api/common'
+import { changeProduct,getProductDetail,delPicture,delDetailMap,addPicture,AddDetailMap,getIDclass } from "@/api/goodsList"
+import { BaseBrandListGet,BaseUnitListGet } from '@/api/common'
 import qs from 'qs';    
     export default{
+        name:'changeProductDetail',
         data(){
             return{
                 form:{},
@@ -173,7 +181,9 @@ import qs from 'qs';
                 },
                 HeadPictureUrl:'',                  /* 主图url */
                 brands:[],                          /* 品牌名 */
-                LQInfo:[]                           /* 利群内部相关 */
+                LQInfo:[],                           /* 利群内部相关 */
+                productOptions:[],
+                qualit:[],                          /* 单位名称 */
             }
         },
         methods:{
@@ -186,7 +196,7 @@ import qs from 'qs';
                     if(res.data.Success == 1){
                         console.log(res.data.Result)
                         console.log(JSON.parse(res.data.Result))
-                        // this.LQInfo = JSON.parse(res.data.Result).LQInfo
+                        this.LQInfo = JSON.parse(res.data.Result).LQInfo
                         this.tableData = JSON.parse(res.data.Result).Product
                         // console.log(this.tableData)
                         this.HeadImage = JSON.parse(res.data.Result).HeadImage
@@ -415,10 +425,61 @@ import qs from 'qs';
                     this.brands = JSON.parse(localStorage['BrandID']).ModelList
                 }
             },
+            cascaderChange(value) {
+              let rang = []
+                for(let i = 0 ; i < value.length; i++){
+                    if(i == value.length - 1){
+                        rang.push(value[i])
+                    }
+                }
+                this.formInline.ClassID = rang[0]
+            },
+            unit(){
+                let params = {
+                    PageIndex:-1,
+                    PageSize:-1
+                }
+                BaseUnitListGet(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.qualit = JSON.parse(res.data.Result).ModelList
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            productData(){
+                if(localStorage.productIdClass == null) {
+                    let params = {}
+                    getIDclass(qs.stringify(params)).then((res)=>{
+                        if(res.data.Success == 1){
+                            this.productOptions = JSON.parse(res.data.Result)
+                            localStorage['productIdClass']=res.data.Result;
+                        }
+                        if(res.data.Success == 0){
+                            this.$message(res.data.Result)
+                        }
+                        if(res.data.Success == -998){
+                            this.$message(res.data.Result)
+                        }
+                    }).catch(function(e){
+                        console.log(e)
+                    })
+                }else{
+                    this.productOptions = JSON.parse(localStorage['productIdClass'])
+                }
+            },
         },
         created(){
             this.getData()
             this.getBrand()
+            this.unit()
+            this.productData()
         }
     }
 </script>  

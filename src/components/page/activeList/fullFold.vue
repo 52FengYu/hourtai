@@ -90,6 +90,7 @@
 import { PromotionProductDiscountGetFromPromotionID,PromotionProductDiscountUpdate,PromotionProductGetFromPromotionID } from '@/api/activeList'
 import qs from 'qs'
     export default{
+        name:'fullFold',
         data(){
             return{
                 tableData:[],           /* 列表数据 */

@@ -73,6 +73,7 @@
 import { SysRoleListGet,SysRoleAdd,SysRoleUpdate,AuthorityListGet,SysRoleSetAuthority } from '@/api/competence'
 import qs from 'qs'
     export default{
+        name:'role',
         data(){
             return{
                 tableData:[],               /* 列表数据 */

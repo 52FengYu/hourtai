@@ -67,6 +67,7 @@
 import { SysModuleListGetFromAppID,SysModuleAdd,SysModuleUpdate } from '@/api/competence'
 import qs from 'qs'
     export default{
+        name:'applicationDetail',
         data(){
             return{
                 tableData:[],               /* 列表信息 */

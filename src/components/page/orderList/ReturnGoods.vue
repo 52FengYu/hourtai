@@ -41,7 +41,6 @@
                     <el-date-picker
                         v-model="formInline.BeginTime"
                         type="datetime"
-                        
                         value-format="yyyy-MM-dd hh:mm:ss"
                         placeholder="选择日期时间">
                     </el-date-picker>
@@ -51,7 +50,6 @@
                         v-model="formInline.EndTime"
                         value-format="yyyy-MM-dd hh:mm:ss"
                         type="datetime"
-                        
                         placeholder="结束时间">
                     </el-date-picker>
                 </el-form-item>
@@ -59,7 +57,7 @@
                     <el-button type="primary" @click="reset();getData()">提交</el-button>
                 </el-form-item>
             </el-form>
-            <el-table :data="tableData.ModelList" border style="width: 100%">
+            <el-table :data="tableData.ModelList" border style="width: 100%" highlight-current-row>
                 <el-table-column prop="ID" label="退单号" align="center"></el-table-column>
                 <el-table-column prop="DeliveryType" label="出库方式" align="center"></el-table-column>
                 <el-table-column prop="OrderState" label="退单状态" align="center"></el-table-column>
@@ -73,7 +71,11 @@
                         {{scope.row.BackProductType == 'S'?'送回门店':(scope.row.BackProductType == 'R'?'上门取货':'')}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="CreateTime" label="退货时间" align="center"></el-table-column>
+                <el-table-column prop="CreateTime" label="退货时间" align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.CreateTime.substring(0,scope.row.CreateTime.length-4)}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="OrderAmount" label="订单金额" align="center"></el-table-column>
                 <el-table-column prop="BackAmount" label="退单金额" align="center"></el-table-column>
                 <el-table-column prop="GiftTokenMoeny" label="退优惠券金额" align="center"></el-table-column>
@@ -85,6 +87,7 @@
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" plain @click="checked(scope.row)" v-if="scope.row.OrderState == '新建'">审核</el-button>
                         <el-button type="primary" icon="el-icon-s-tools" @click="affirm(scope.row)" v-if="scope.row.OrderState == '同意退货'">确认收货</el-button>
+                        <el-button type="primary" @click="goPage(scope.row)">详情</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -144,6 +147,7 @@ import { SupplierListGetByLevel } from '@/api/goodsList';
 import { OrderBackProductListGet,OrderBackProductCallCenterAudit,OrderBackProductSupplierReceiveAudit } from '@/api/orderList'
 import qs from 'qs'
     export default{
+        name:'ReturnGoods',
         data(){
             return{
                 formInline:{
@@ -215,11 +219,11 @@ import qs from 'qs'
             },
             getData(){
                 let params = {
-                    ID:this.formInline.ID,
-                    OrderID:this.formInline.OrderID,
+                    ID:this.formInline.ID.replace(/ /g,''),
+                    OrderID:this.formInline.OrderID.replace(/ /g,''),
                     MainSupplierID:this.formInline.MainSupplierID,
                     SupplierID:this.formInline.SupplierID,
-                    MemberID:this.formInline.MemberID,
+                    MemberID:this.formInline.MemberID.replace(/ /g,''),
                     IsLinkPay:this.formInline.IsLinkPay,
                     BeginTime:this.formInline.BeginTime,
                     EndTime:this.formInline.EndTime,
@@ -308,6 +312,14 @@ import qs from 'qs'
                     }
                 }).catch(function(e){
                     console.log(e)
+                })
+            },
+            goPage(row){
+                this.$router.push({
+                    path:"/ReturnOrderDetail",
+                    query:{
+                        ID:row.ID
+                    }
                 })
             }
         },

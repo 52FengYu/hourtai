@@ -21,7 +21,7 @@
 </template>
 <script>
 export default {
-  name: 'PriceAuditDetail',
+  name: 'detail',
   data() {
     return {
       loading:true,//加载状态

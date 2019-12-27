@@ -96,6 +96,7 @@ import { MemberGiftTokenGiveOutMasterUpdate,MemberGiftTokenGiveOutMasterListGet 
 import { SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs'
     export default{
+        name:'changeCouponActivity',
         data(){
             return{
                 tableData:[],

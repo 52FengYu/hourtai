@@ -2,7 +2,7 @@
     <div class="member">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-s-unfold"></i> 栏目管理</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-s-unfold"></i> 栏目管理 / {{this.PageName}}</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
@@ -16,7 +16,7 @@
                                     </el-tabs>
                                 </template>
                             </div>
-                            <div class="content">
+                            <div class="content"> 
                                 <el-scrollbar>
                                     <div class="block" v-for="(item,k) in this.Features" :key="k" :class="activeClass ==k?'active':''">
                                         {{item.ContentTypeName}}
@@ -344,7 +344,7 @@
                             .el-scrollbar__wrap{
                                 .el-button{
                                     color:#fff!important;
-                                    font-size:2vh!important
+                                    font-size:1.6vh!important
                                 }
                             }
                         }
@@ -424,6 +424,7 @@ import { getItemInfo,move,getItemContentInfo,changeItemContentInfo,moveItemConte
 import qs from 'qs';
 export default {
     inject:['reload'],
+    name:'columnManagement',
         data() {
             return {
                 newPage:{
@@ -485,6 +486,7 @@ export default {
                     Note:''
                 },
                 PageContentID:'',
+                PageName:''
             }
         },
         created() {
@@ -688,6 +690,7 @@ export default {
                     if(res.data.Success == 1){
                         this.content = JSON.parse(res.data.Result)
                         this.newPage.PageID = decodeURI(location.href).split('&')[1].split('=')[1]
+                        this.PageName = decodeURI(location.href).split('&')[2].split('=')[1]
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)

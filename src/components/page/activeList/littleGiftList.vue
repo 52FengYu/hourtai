@@ -77,6 +77,7 @@
 import { PromotionGiftDetailListGetFromPromotionGiftID,PromotionGiftDetailUpdate,PromotionGiftDetailAdd } from '@/api/activeList'
 import qs from 'qs'
 export default{
+    name:'littleGiftList',
     data(){
         return{
             tableData:[],

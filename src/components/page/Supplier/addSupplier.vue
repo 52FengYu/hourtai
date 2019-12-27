@@ -43,20 +43,24 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="营业开始时间">
-                    <el-date-picker
+                    <el-time-picker
                         v-model="addItem.OpenTime"
-                        type="datetime"
-                        value-format="yyyy-MM-dd HH:mm:ss"
-                        placeholder="选择营业开始时间">
-                    </el-date-picker>
+                        :picker-options="{
+                            selectableRange: '00:30:00 - 23:30:00'
+                        }"
+                        value-format="HH:mm:ss"
+                        placeholder="任意时间点">
+                    </el-time-picker>
                 </el-form-item>
                 <el-form-item label="营业结束时间">
-                     <el-date-picker
+                    <el-time-picker
                         v-model="addItem.EndTime"
-                        type="datetime"
-                        value-format="yyyy-MM-dd HH:mm:ss"
-                        placeholder="选择营业开始时间">
-                    </el-date-picker>
+                        :picker-options="{
+                            selectableRange: '00:30:00 - 23:30:00'
+                        }"
+                        value-format="HH:mm:ss"
+                        placeholder="任意时间点">
+                    </el-time-picker>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input v-model="addItem.Remark" clearable></el-input>
@@ -132,9 +136,10 @@
 import { SupplierListGetByLevel } from "@/api/goodsList"
 import { SupplierAdd } from '@/api/SupplierList'
 import $ from 'jquery'
-// import loadBMap from '@/api/LoadBMap' 
+import loadBMap from '@/api/LoadBMap' 
 import qs from 'qs'
     export default{
+        name:'addSupplier',
         data(){
             return{
                 addItem:{
@@ -297,7 +302,7 @@ import qs from 'qs'
                                     console.log(th.addItem.AddrY)
                                     console.log(th)
                                     $.ajax({
-                                        url:'http://api.map.baidu.com/geocoder/v2/?ak=nlUNnZNlnwH3NMxfOSFGQ6hpKVZw66EU&location=' + th.addItem.AddrY + ',' + th.addItem.AddrX + '&output=json&pois=1',
+                                        url:'http://api.map.baidu.com/geocoder?v3.0&ak=nlUNnZNlnwH3NMxfOSFGQ6hpKVZw66EU&t=20191126111618&s=1&location=' + th.addItem.AddrY + ',' + th.addItem.AddrX + '&output=json&pois=1',
                                         dataType: 'jsonp',
                                             callback: 'BMap._rd._cbk43398',
                                             success: function(res) {

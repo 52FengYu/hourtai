@@ -210,9 +210,14 @@ const router = new Router({
                     meta: { title: '分拣集货',requireAuth:true }
                 },
                 {
-                    path: '/ReturnGoods',       
+                    path: '/ReturnGoods',             
                     component: resolve => require(['../components/page/orderList/ReturnGoods.vue'], resolve),
                     meta: { title: '退货列表',requireAuth:true }
+                },
+                {
+                    path: '/ReturnOrderDetail',            
+                    component: resolve => require(['../components/page/orderList/ReturnOrderDetail.vue'], resolve),
+                    meta: { title: '退单详情',requireAuth:true }
                 },
                 {
                     path: '/orderDetail',
@@ -264,11 +269,6 @@ const router = new Router({
                     component: resolve => require(['../components/page/competence/authority/index.vue'], resolve),
                     meta: { title: '权限列表',requireAuth:true }
                 },
-                /* {
-                    path: '/place',
-                    component: resolve => require(['../components/page/goodsList/place.vue'], resolve),
-                    meta: { title: '地图',requireAuth:true }
-                }, */
                 {
                     path: '/test',
                     component: resolve => require(['../components/page/Supplier/test.vue'], resolve),

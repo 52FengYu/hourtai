@@ -41,6 +41,7 @@ import $ from 'jquery'
 import loadBMap from '@/api/LoadBMap'
 import qs from 'qs'
 export default{
+    name:'changeOrder',
     data(){
         return{
             PayMethods:{},

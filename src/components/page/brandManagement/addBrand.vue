@@ -72,6 +72,7 @@
 </template>
 <script>
     export default{
+        name:'addBrand',
         data(){
             return{
                 dialogImageUrl: '',             /* 文件上传 */

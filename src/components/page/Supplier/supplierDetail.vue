@@ -16,6 +16,9 @@
                     <el-form-item label="电子发票参数">
                         {{tableData.EInvoiceParam}}
                     </el-form-item>
+                    <el-form-item label="营业开始时间">
+                        {{tableData.OpenTime}}
+                    </el-form-item>
                     <el-form-item label="结束营业时间">
                         <span>{{tableData.EndTime}}</span>
                     </el-form-item>
@@ -42,9 +45,6 @@
                     </el-form-item>
                     <el-form-item label="主供应商号">
                         <span>{{tableData.MainSupplierID}}</span>
-                    </el-form-item>
-                    <el-form-item label="营业结束时间">
-                        {{tableData.OpenTime}}
                     </el-form-item>
                     <el-form-item label="备注">
                         <span>{{tableData.Remark}}</span>
@@ -128,6 +128,7 @@
                             :picker-options="{
                                 selectableRange: '00:30:00 - 23:30:00'
                             }"
+                            value-format="HH:mm:ss"
                             placeholder="任意时间点">
                         </el-time-picker>
                     </el-form-item>
@@ -137,6 +138,7 @@
                             :picker-options="{
                                 selectableRange: '00:30:00 - 23:30:00'
                             }"
+                            value-format="HH:mm:ss"
                             placeholder="任意时间点">
                         </el-time-picker>
                     </el-form-item>
@@ -199,6 +201,7 @@
 import { SupplierGetFromID,SupplierUpdate } from '@/api/SupplierList'
 import qs from 'qs'
     export default{
+        name:'SupplierDetail',
         data(){
             return{
                 tableData:[],
@@ -241,8 +244,10 @@ import qs from 'qs'
                 }else{
                     this.row.SupplierImageURL = 'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]
                 }
-            },
+            },/*  */
             onSubmit(){
+                    console.log(this.row.OpenTime)
+                    console.log(this.row.EndTime)
                 let params = {
                     ID:decodeURI(location.href).split('?')[1].split('=')[1],
                     AddrAreaID:this.row.AddrAreaID,

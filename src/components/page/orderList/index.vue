@@ -252,6 +252,7 @@ import qs from 'qs';
 import { SupplierListGetByLevel } from '@/api/goodsList';
 import JsBarcode from 'jsbarcode'
     export default{
+        name:'orderList',
         data(){
             return{
                 timestamp:'',       /* 当前时间戳 */
@@ -268,7 +269,8 @@ import JsBarcode from 'jsbarcode'
                 loading: false,     /* 是否有其他任务正在执行 */
                 listData:[],        /* 存放列表数据 */
                 printListData:[],       /* 打印数据 */
-                DelFLag:'',
+                DelFlag:'',
+                DeliveryType:'',        /* 跳转详情时用 */
                 formInline:{
                     option1:[],
                     option2:[],
@@ -337,16 +339,16 @@ import JsBarcode from 'jsbarcode'
             // 订单列表 获取   点击搜索     
             getTableData () {                                                                       /* formInline.OrderState */
                 let params = {
-                    ID:this.formInline.orderNum,
-                    MemberID:this.formInline.memberID,
+                    ID:this.formInline.orderNum.replace(/ /g,''),                    /* 订单号 */
+                    MemberID:this.formInline.memberID.replace(/ /g,''),              /* 会员号 */
                     MainSupplierID:this.formInline.MainSupplierID,
                     SupplierID:this.formInline.SupplierID,
                     CreateTime:this.formInline.timeBegin,
                     EndTime:this.formInline.timeEnd,
                     PayBeginTime:this.formInline.paymentTimeBegin,
                     PayEndTIme:this.formInline.paymentTimeEnd,
-                    ReceiveMobile:this.formInline.recipientMobile,
-                    ReceiveMan:this.formInline.recipientName,
+                    ReceiveMobile:this.formInline.recipientMobile.replace(/ /g,''),     /* 收货人手机号 */
+                    ReceiveMan:this.formInline.recipientName.replace(/ /g,''),          /* 收货人姓名 */
                     ReceiveType:this.formInline.distributionValue,
                     DelFLag:this.formInline.DelFLag,
                     OrderState:this.formInline.OrderState,
@@ -388,7 +390,7 @@ import JsBarcode from 'jsbarcode'
             },
             detail(index,row){
                 this.ID = row.ID;
-                this.DelFLag = row.DelFLag
+                this.DelFlag = row.DelFlag
             },
             handleSizeChange(valSize) {
                 this.currentSize = valSize;
@@ -403,7 +405,7 @@ import JsBarcode from 'jsbarcode'
                     path:'/orderDetail',
                     query:{
                         ID:this.ID,
-                        DelFLag:this.DelFLag	
+                        DelFlag:this.DelFlag,
                     }
                 })
             },
@@ -463,6 +465,24 @@ import JsBarcode from 'jsbarcode'
         },
         mounted() {
 
+            const data = [
+                    { id: 1, name: '张三', age: 15, },
+                    { id: 2, name: 'John', age: 18, },
+                    { id: 3, name: '李四', age: 18, },
+                    { id: 1, name: '张三', age: 15, },
+                    { id: 4, name: 'Jack', age: 18, },
+                    { id: 5, name: '王五', age: 10, },
+                    { id: 4, name: 'Jack', age: 20, },
+                    { id: 2, name: 'John', age: 19, },
+                ];
+            
+            let hash = {}; 
+            const data2 = data.reduce((preVal, curVal) => {
+                hash[curVal.id] ? delete hash[preVal.id] : hash[curVal.id] = true && preVal.push(curVal); 
+                return preVal 
+            }, [])
+            console.log(data)
+            console.log(data2)
         }
     }
 </script>  

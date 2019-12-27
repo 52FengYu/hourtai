@@ -58,6 +58,7 @@
 import { AuthorityListGet,SysAuthorityAdd,SysAuthorityUpdate } from '@/api/competence'
 import qs from 'qs'
     export default{
+        name:'authority',
         data(){
             return{
                 tableData:[],
