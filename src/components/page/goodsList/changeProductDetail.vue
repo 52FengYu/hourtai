@@ -309,9 +309,10 @@ import qs from 'qs';
             },
             handleRemoveH(file, fileList,index) {                  /* 移除主图时调用的钩子，删除图片 */
                 console.log(this.HeadImage[0].ID)
+                console.log(file)
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
-                    ID:file.ID
+                    ID:this.HeadImage[0].ID
                 }
                 delPicture(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -360,7 +361,8 @@ import qs from 'qs';
             HeadImageSuccess(res,file){
                 let params = {
                     ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
-                    ImageURL: 'http://images.liqunshop.com/' + JSON.parse(res.Result)[0],
+                    // ImageURL: 'http://images.liqunshop.com/' + JSON.parse(res.Result)[0],
+                    ImageURL: JSON.parse(res.Result)[0],
                     ImageIndex:1
                 }
                 addPicture(qs.stringify(params)).then((res)=>{

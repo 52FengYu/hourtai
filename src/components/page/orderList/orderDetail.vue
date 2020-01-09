@@ -43,6 +43,9 @@
                         <span>{{this.listData.PayType}}</span>
                             <el-button type="primary" @click="getPayMethods" v-if="this.listData.OrderState === '新建' && this.listData.PayTime === null && this.listData.DelFlag === 'N'">修改支付方式</el-button>
                     </el-form-item>
+                    <el-form-item label="身份证号">
+                        <span>{{this.listData.IDNumber}}</span>
+                    </el-form-item>
                     <h6 style="margin-left:1%">支付信息</h6>
                     <el-form-item label="商品金额">
                         <span>{{this.listData.ProductPrice}}</span>
@@ -72,7 +75,7 @@
                         <span>{{this.listData.OutStockAddPrice}}</span>
                     </el-form-item>
                     <el-form-item label="出库增加金额是否支付">
-                        <span>{{this.listData.IsOutStockAddPricePay == 'N'?'否':'是'}}</span>
+                        <span>{{this.listData.IsOutStockAddPricePay == 'N'?'否':(this.listData.IsOutStockAddPricePay == 'Y'?'是':'')}}</span>
                     </el-form-item>
                 </el-form>
                     <h6>订单商品</h6>
@@ -80,6 +83,8 @@
                         <el-table-column prop="ProductID" label="商品编码" align="center"></el-table-column>
                         <el-table-column prop="ProductName" label="商品名称" align="center" width="180"></el-table-column>
                         <el-table-column prop="ShopCode" label="门店码" align="center"></el-table-column>
+                        <el-table-column prop="OldMemberPrice" label="下单价格" align="center"></el-table-column>
+                        <el-table-column prop="OldQty" label="下单数量" align="center"></el-table-column>
                         <el-table-column prop="Qty" label="数量" align="center"></el-table-column>
                         <el-table-column prop="BackQty" label="退货数量" align="center"></el-table-column>
                         <el-table-column prop="PreBackQty" label="预退数量" align="center"></el-table-column>
@@ -92,7 +97,7 @@
                             </template>
                         </el-table-column>
                     </el-table>
-            <el-button type="primary" @click="goPage()">返回</el-button>
+            <!-- <el-button type="primary" @click="goPage()">返回</el-button> -->
         </el-card>
 
         <!-- 修改弹出框 -->
@@ -105,10 +110,10 @@
                         <el-input v-model="this.ProductID" :disabled="true"></el-input>
                     </el-form-item>
                     <el-form-item label="数量">
-                        <el-input v-model="form.Qty" @change="push123"></el-input>
+                        <el-input v-model="form.Qty"></el-input>
                     </el-form-item>
                     <el-form-item label="价格">
-                        <el-input v-model="form.MemberPrice" @change="push123"></el-input>
+                        <el-input v-model="form.MemberPrice"></el-input>
                     </el-form-item>
                 </el-form>
                 <span slot="footer" class="dialog-footer">
@@ -181,37 +186,41 @@ inject:['reload'];
                     console.log(e)
                 })
             },
-            goPage(){
+        /*     goPage(){
                 this.$router.push({
                     path:'/orderList',
                 })
-            },
+            }, */
             handleEdit(index, row){
                 this.ID = row.ID
                 this.ProductID = row.ProductID;
                 this.editVisible2 = true;
                 this.form.Qty = row.Qty;
                 this.form.ID = row.ProductID
-                this.form.MemberPrice   =   row.MemberPrice
+                this.form.MemberPrice = row.MemberPrice
             },
-            push123(){
+            /* push123(){
                 this.DetailList.push({'ID':this.ID,'Qty':this.form.Qty,'MemberPrice':this.form.MemberPrice})
                 let hash = {}; 
                 this.DetailList1 = this.DetailList.reduce((preVal, curVal) => {
                     hash[curVal.ID] ? '' : hash[curVal.ID] = true && preVal.push(curVal); 
                     return curVal 
                 }, [])
-            },
+            }, */
             saveEdit(){                     /* 修改订单支付数量 */
                 let params = {
                     OrderID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],           /* 订单号 */
-                    DetailList:JSON.stringify([this.DetailList1])
+                    // DetailList:JSON.stringify([this.DetailList1]).replace(/:"/g,':').replace(/"}/g,'}')
+                    ID:this.ID,
+                    Qty:this.form.Qty,
+                    MemberPrice:this.form.MemberPrice
                 }
                 changePayNum(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        this.$message('提交成功')
-                        this.reload()
+                        this.getData()
+                        this.$message.success('提交成功')
                         this.editVisible2 = false
+                        // this.reload()
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -227,7 +236,7 @@ inject:['reload'];
                 this.$router.push({
                     path:'/changeOrder',
                     query:{
-                        ID:decodeURI(location.href).split('?')[1].split('=')[1],
+                        ID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                         ReceiverType:this.ReceiverType
                     }
                 })

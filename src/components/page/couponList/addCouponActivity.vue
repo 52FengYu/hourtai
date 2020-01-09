@@ -164,6 +164,7 @@ import qs from 'qs'
                         this.$router.push({
                             path:'/couponList',
                         })
+                        this.clear()
                     }
                     if(res.data.Success == 0){
                         thius.$message(res.data.Result)

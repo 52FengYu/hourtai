@@ -12,9 +12,9 @@ export default function loadBMap (ak) {
         //调用加载第三方组件js公共方法加载其他资源库
         //加载聚合API
         ///MarkerClusterer_min.js依赖TextIconOverlay.js。因此先加载TextIconOverlay.js
-          asyncLoadJs('http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay.js')
+          asyncLoadJs('https://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay.js')
             .then(() => {
-              asyncLoadJs('http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js')
+              asyncLoadJs('https://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js')
                 .then(() => {
                   resolve()
                   return true
@@ -46,7 +46,7 @@ export default function loadBMap (ak) {
       }
       let script = document.createElement('script')
       script.type = 'text/javascript'
-      script.src = 'http://api.map.baidu.com/api?v=2.0&ak=' + 'DD279b2a90afdf0ae7a3796787a0742e' + '&callback=onBMapCallback'
+      script.src = 'https://api.map.baidu.com/api?v=2.0&services=&t=20191126111618&s=1&ak=' + 'DD279b2a90afdf0ae7a3796787a0742e' + '&callback=onBMapCallback'
       script.onerror = reject
       document.head.appendChild(script)
     })

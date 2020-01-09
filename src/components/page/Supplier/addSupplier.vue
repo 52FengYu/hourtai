@@ -45,9 +45,6 @@
                 <el-form-item label="营业开始时间">
                     <el-time-picker
                         v-model="addItem.OpenTime"
-                        :picker-options="{
-                            selectableRange: '00:30:00 - 23:30:00'
-                        }"
                         value-format="HH:mm:ss"
                         placeholder="任意时间点">
                     </el-time-picker>
@@ -55,9 +52,6 @@
                 <el-form-item label="营业结束时间">
                     <el-time-picker
                         v-model="addItem.EndTime"
-                        :picker-options="{
-                            selectableRange: '00:30:00 - 23:30:00'
-                        }"
                         value-format="HH:mm:ss"
                         placeholder="任意时间点">
                     </el-time-picker>
@@ -114,12 +108,13 @@
                 <el-form-item label="指定送货时间最大小时数">
                     <el-input v-model="addItem.DeliveryEndHours" clearable></el-input>
                 </el-form-item>
-                <el-form-item label="供应商图片">
+                <el-form-item label="供应商图片"><!--  -->
                     <el-upload
                             class="avatar-uploader"
                             action="/adminwebapi/api/Image/UploadImage"
                             :show-file-list="false"
                             :headers="TokenID"
+                            accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                             :on-success="handleAvatarSuccess"
                             :data="upLoadData">
                         <img v-if="this.addItem.SupplierImageURL" :src="this.addItem.SupplierImageURL" class="avatar">
@@ -169,7 +164,8 @@ import qs from 'qs'
                     DeliveryInfo:'',
                     AfterSaleInfo:'',
                     DeliveryBeginHours:'',
-                    DeliveryEndHours:''
+                    DeliveryEndHours:'',
+                    Picture:'',                         /* 不加域名的供应商图片 */
                 },
                 address_detail: null, //详细地址
                 userlocation: {lng: "", lat: ""},
@@ -202,6 +198,7 @@ import qs from 'qs'
             },
             handleAvatarSuccess(res,file){
                 this.addItem.SupplierImageURL =  'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]                   /* 启明星原地址 */
+                this.addItem.Picture = JSON.parse(res.Result)[0]
             },
             onSubmit(){
                 let params = {
@@ -209,7 +206,7 @@ import qs from 'qs'
                      SupplierAddr: this.addItem.SupplierAddr,
                     SupplierDisplayName: this.addItem.SupplierDisplayName,
                     SupplierName: this.addItem.SupplierName,
-                    SupplierImageURL: this.addItem.SupplierImageURL,
+                    SupplierImageURL: this.addItem.Picture,
                     SupplierNote: this.addItem.SupplierNote,
                     AddrX: this.addItem.AddrX,
                     AddrY: this.addItem.AddrY,
@@ -302,7 +299,7 @@ import qs from 'qs'
                                     console.log(th.addItem.AddrY)
                                     console.log(th)
                                     $.ajax({
-                                        url:'http://api.map.baidu.com/geocoder?v3.0&ak=nlUNnZNlnwH3NMxfOSFGQ6hpKVZw66EU&t=20191126111618&s=1&location=' + th.addItem.AddrY + ',' + th.addItem.AddrX + '&output=json&pois=1',
+                                        url:'https://api.map.baidu.com/geocoder/v2/?ak=nlUNnZNlnwH3NMxfOSFGQ6hpKVZw66EU&s=1&services=&t=20191126111618&location=' + th.addItem.AddrY + ',' + th.addItem.AddrX + '&output=json&pois=1',
                                         dataType: 'jsonp',
                                             callback: 'BMap._rd._cbk43398',
                                             success: function(res) {

@@ -47,11 +47,11 @@ export default {
             anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
             offset: new BMap.Size(5, 5), //偏离值
             drawingModes : [ // 可见的操作选项
-                // BMAP_DRAWING_MARKER,
-                BMAP_DRAWING_CIRCLE,
-                // BMAP_DRAWING_POLYLINE,
-                BMAP_DRAWING_POLYGON
-                // BMAP_DRAWING_RECTANGLE 
+                // BMAP_DRAWING_MARKER,     /* 画点 */
+                // BMAP_DRAWING_CIRCLE,     /* 画圆 */
+                // BMAP_DRAWING_POLYLINE,     
+                BMAP_DRAWING_POLYGON        /* 自定义区域 */
+                // BMAP_DRAWING_RECTANGLE   /* 矩形 */
             ]
         },
         circleOptions: styleOptions, //圆的样式

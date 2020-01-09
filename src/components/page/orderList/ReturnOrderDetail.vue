@@ -1,7 +1,7 @@
 <template>  
     <div>
         <el-card>
-            <el-form ref="form" :model="form" label-width="200px">
+            <el-form ref="form" :model="form" label-width="140px">
                 <el-form-item label="退单号">
                     <span>{{this.form.ID}}</span>
                 </el-form-item>
@@ -63,7 +63,12 @@
                     <span>{{this.form.BackOutStockAddMoeny}}</span>
                 </el-form-item>
                 <el-form-item label="退货图片">
-                    <el-image :src="'http://images.liqunshop.com/' + form.BackImage"></el-image>
+                    <template v-if="form.BackImage.length != 0">
+                        <el-image style="width: 30vh" :src="'http://images.liqunshop.com/' + form.BackImage"></el-image>
+                    </template>
+                    <template v-else>
+                        <span>无图片</span>
+                    </template>
                 </el-form-item>
                 <hr>
                 商品信息

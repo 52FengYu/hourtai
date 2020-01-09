@@ -209,33 +209,56 @@
                             }
                         ]
                     },
-                    // {
-                    //     icon: 'el-icon-coin',
-                    //     index: '9',
-                    //     title: '财务管理',
-                    //     subs: [
-                    //         /* {
-                    //             index: 'RefundMoney',
-                    //             title: '退款管理'
-                    //         }, */
-                    //         /* {
-                    //             index: 'section',
-                    //             title: '部门'
-                    //         },
-                    //         {
-                    //             index: 'users',
-                    //             title: '用户'
-                    //         },
-                    //         {
-                    //             index: 'role',
-                    //             title: '角色'
-                    //         },
-                    //         {
-                    //             index:'authority',
-                    //             title:'权限列表'
-                    //         } */
-                    //     ]
-                    // }
+                    {
+                        icon: 'el-icon-coin',
+                        index: '9',
+                        title: '财务管理',
+                        subs: [
+                            {
+                                index: 'RefundMoney',
+                                title: '退款管理'
+                            },
+                            /* {
+                                index: 'section',
+                                title: '部门'
+                            },
+                            {
+                                index: 'users',
+                                title: '用户'
+                            },
+                            {
+                                index: 'role',
+                                title: '角色'
+                            },
+                            {
+                                index:'authority',
+                                title:'权限列表'
+                            } */
+                        ]
+                    },
+                    {
+                        icon: 'el-icon-s-operation',
+                        index: '10',
+                        title: '基础数据',
+                        subs: [
+                            {
+                                index: 'PayMethods',
+                                title: '支付方式'
+                            },
+                            {
+                                index: 'classification',
+                                title: '三级分类'
+                            },
+                            {
+                                index: 'unit',
+                                title: '单位'
+                            },
+                             /* {
+                                index:'authority',
+                                title:'权限列表'
+                            } */
+                        ]
+                    },
                 ]
             }
         },

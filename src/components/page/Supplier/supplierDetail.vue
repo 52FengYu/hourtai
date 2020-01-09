@@ -62,7 +62,9 @@
                         <span>{{tableData.SupplierDisplayName}}</span>
                     </el-form-item>
                     <el-form-item label="供应商图片">
-                        <img :src="tableData.SupplierImageURL" alt="图片暂时无法显示">
+                        <img :src="tableData.SupplierImageURL" alt="图片暂时无法显示" v-if="tableData.SupplierImageURL.substr(0,4) == 'http'">
+                        <img :src="'http://images.liqunshop.com/' + tableData.SupplierImageURL" alt="图片暂时无法显示" v-if="tableData.SupplierImageURL.substr(0,4) != 'http' && tableData.SupplierImageURL != ''">
+                        <span v-if="tableData.SupplierImageURL == ''"></span>
                     </el-form-item>
                     <el-form-item label="供应商等级">
                         <span>{{tableData.SupplierLevel}}</span>
@@ -184,6 +186,7 @@
                             action="/adminwebapi/api/Image/UploadImage"
                             :show-file-list="false"
                             :headers="TokenID"
+                            accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                             :on-success="handleAvatarSuccess"
                             :data="upLoadData">
                         <img v-if="this.row.SupplierImageURL" :src="this.row.SupplierImageURL" class="avatar">
@@ -214,6 +217,7 @@ import qs from 'qs'
                     ImageUseType:'Page'           /*  Page，ProductContent，ProductHead */
                 },
                 row:[],                 /* 修改 */
+                URLHead:'',             /* 修改供应商时，图片存放在这 */
             }
         },
         methods:{
@@ -238,6 +242,7 @@ import qs from 'qs'
             },
             handleAvatarSuccess(res,file){
                 let URLHead = JSON.parse(res.Result)[0]    
+                this.URLHead = JSON.parse(res.Result)[0]    
                 console.log(JSON.parse(res.Result)[0])
                 if(URLHead.substr(0,4) == "http"){
                     this.row.SupplierImageURL =  JSON.parse(res.Result)[0]                   /* 启明星原地址 */
@@ -254,7 +259,7 @@ import qs from 'qs'
                     SupplierAddr:this.row.SupplierAddr,
                     SupplierDisplayName:this.row.SupplierDisplayName,
                     SupplierName:this.row.SupplierName,
-                    SupplierImageURL:this.row.SupplierImageURL,
+                    SupplierImageURL:this.URLHead,
                     SupplierNote:this.row.SupplierNote,
                     AddrX:this.row.AddrX,
                     AddrY:this.row.AddrY,

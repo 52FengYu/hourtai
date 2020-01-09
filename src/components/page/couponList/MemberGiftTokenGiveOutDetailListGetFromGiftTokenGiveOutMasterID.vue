@@ -4,12 +4,12 @@
             <template v-if="this.add === false">
                 <el-button type="primary" @click="add = true" icon="el-icon-circle-plus" v-if="this.Audit === 'N'">添加明细</el-button>
                 <h2 align="center">领券活动明细</h2>
-                <el-table :data="tableData" border style="width: 100%">
+                <el-table :data="tableData" border style="width: 100%" highlight-current-row>
                     <el-table-column prop="Amount" label="优惠券金额" align="center"></el-table-column>
                     <el-table-column prop="Cost" label="优惠券成本"  align="center"></el-table-column>
                     <el-table-column prop="CreateManID" label="优惠券明细创建人" align="center"></el-table-column>
                     <el-table-column prop="CreateTime" label="优惠券明细创建时间"  align="center"></el-table-column>
-                    <el-table-column prop="DisplayRemark" label="优惠券使用范围描述"  align="center"></el-table-column>
+                    <el-table-column prop="DisplayRemark" label="优惠券使用范围描述"  align="center" width="200"></el-table-column>
                     <el-table-column prop="GiftTokenGiveOutMasterID" label="优惠券领券主表ID" align="center"></el-table-column>
                     <el-table-column prop="GiftTokenName" label="优惠券明细" align="center" ></el-table-column>
                     <el-table-column prop="GiftTokenType" label="优惠券类型" align="center" ></el-table-column>
@@ -25,7 +25,7 @@
                     <el-table-column prop="UseBlackRange" label="使用黑名单" align="center"></el-table-column>
                     <el-table-column prop="UseBlackType" label="使用黑名单类型"  align="center"></el-table-column>
                     <el-table-column prop="UseEndTime" label="使用结束时间"  align="center"></el-table-column>
-                    <el-table-column prop="UseRange" label="使用范围" align="center"></el-table-column>
+                    <el-table-column prop="UseRange" label="使用范围" align="center" width="165"></el-table-column>
                     <el-table-column prop="UseType" label="使用范围类型" align="center" ></el-table-column>
                     <el-table-column label="操作" align="center" width="150px" fixed="right" v-if="this.Audit == 'N'">
                         <template  slot-scope="scope">
@@ -118,11 +118,19 @@
                             <el-cascader :options="option3" :props="props" :show-all-levels="false" @change="cascaderChange" v-model="form.UseBlakRange"></el-cascader>
                          </template>
                          <template v-if="this.form.UseBlackType == 'C3'">       <!-- 三级黑名单 -->
-                            <el-cascader :options="option3" :props="props" :show-all-levels="false" @change="cascaderChange" v-model="form.UseBlakRange"></el-cascader>
+                            <el-cascader :options="option3" :props="props" :show-all-levels="false" @change="cascaderChange3" v-model="form.UseBlakRange"></el-cascader>
                          </template>
                         <template v-if="this.form.UseBlackType === 'B'">        <!-- 品牌 -->
-                            <el-input v-model="formData.bandName" clearable placeholder="请输入品牌..."></el-input>
+                            <el-input v-model="formData.bandName" clearable placeholder="请输入品牌..." ></el-input>
                             <el-button type="primary" @click="search">搜索</el-button>
+                            <el-select v-model="form.UseBlakRange1" clearable placeholder="请选择品牌" multiple >
+                                <el-option
+                                    v-for="item in this.BandsOptions1"
+                                    :key="item.ID"
+                                    :label="item.BrandName"
+                                    :value="item.ID">
+                                </el-option>
+                            </el-select>
                             <el-button type="primary" @click="remove">清空</el-button>
                         </template>
                         <template v-if="this.form.UseBlackType === 'P'">        <!-- 单品 -->
@@ -139,7 +147,7 @@
                         </template>
                     </el-form-item>
                     <el-form-item label="使用黑名单"  v-if="this.form.UseBlackType === 'B'">
-                        <el-input type="textarea" v-model="form.BlackBrandName" size="60%"></el-input>
+                        <el-input type="textarea" v-model="form.UseBlakRange1" size="60%"></el-input>
                     </el-form-item>
                     <el-form-item label="结束使用时间">
                         <el-date-picker
@@ -176,11 +184,19 @@
                             <el-cascader :options="option4" :props="props" :show-all-levels="false" @change="cascaderChange1" v-model="form.UseRange"></el-cascader>
                          </template>
                          <template v-if="this.form.UseType == 'C3'">       <!-- 三级类目 -->
-                            <el-cascader :options="option4" :props="props" :show-all-levels="false" @change="cascaderChange1" v-model="form.UseRange"></el-cascader>
+                            <el-cascader :options="option4" :props="props" :show-all-levels="false" @change="cascaderChange2" v-model="form.UseRange"></el-cascader>
                          </template>
                         <template v-if="this.form.UseType === 'B'">        <!-- 品牌 -->
                             <el-input v-model="formRangeData.bandName" clearable placeholder="请输入品牌..."></el-input>
                             <el-button type="primary" @click="foundBand">搜索</el-button>
+                            <el-select v-model="form.UseRange1" clearable placeholder="请选择品牌" multiple >
+                                <el-option
+                                    v-for="item in this.BandsOptions"
+                                    :key="item.ID"
+                                    :label="item.BrandName"
+                                    :value="item.ID">
+                                </el-option>
+                            </el-select>
                             <el-button type="primary" @click="removeBlack">清空</el-button>
                         </template>
                         <template v-if="this.form.UseType === 'P'">        <!-- 单品 -->
@@ -197,7 +213,7 @@
                         </template>
                     </el-form-item>
                     <el-form-item label="品牌名" v-if="this.form.UseType === 'B'">
-                        <el-input type="textarea" v-model="form.BrandName"></el-input>
+                        <el-input type="textarea" v-model="form.UseRange1"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="onSubmit" v-if="this.flag == true">提交</el-button>
@@ -294,7 +310,9 @@ import qs from 'qs'
                     PageSize:20,
                     MainSupplierID:'',
                     SupplierID:''
-                }
+                },
+                BandsOptions:[],
+                BandsOptions1:[]
             }
         },
         methods:{
@@ -369,7 +387,7 @@ import qs from 'qs'
                     UseBlakRange:this.form.UseBlakRange,
                     UseBlackType:this.form.UseBlackType,
                     UseEndTime:this.form.timeEnd,
-                    UseRange:this.form.UseRange,
+                    UseRange:this.form.UseRange,       
                     UseType:this.form.UseType
                 }
                 MemberGiftTokenGiveOutDetailAdd(qs.stringify(params)).then((res)=>{
@@ -650,9 +668,10 @@ import qs from 'qs'
                 }
                 BaseBrandListGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        this.form.BlackBrandName.push(JSON.parse(res.data.Result).ModelList[0].BrandName)
+                        this.BandsOptions1 = JSON.parse(res.data.Result).ModelList
+                        /* this.form.BlackBrandName.push(JSON.parse(res.data.Result).ModelList[0].BrandName)
                         this.form.UseBlakRange1.push(JSON.parse(res.data.Result).ModelList[0].ID)
-                        this.formData.bandName = ''
+                        this.formData.bandName = '' */
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -672,9 +691,10 @@ import qs from 'qs'
                 }
                 BaseBrandListGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        this.form.BrandName.push(JSON.parse(res.data.Result).ModelList[0].BrandName)
+                        this.BandsOptions = JSON.parse(res.data.Result).ModelList
+                        /* this.form.BrandName.push(JSON.parse(res.data.Result).ModelList[0].BrandName)
                         this.form.UseRange1.push(JSON.parse(res.data.Result).ModelList[0].ID)
-                        this.formRangeData.bandName = ''
+                        this.formRangeData.bandName = '' */
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -691,15 +711,36 @@ import qs from 'qs'
                 let rang = []
                 for(let i = 0 ; i < value.length; i++){
                     rang.push(value[i][1])
+                    console.log(value[i][1])
+                }
+                this.form.UseBlakRange1.push(rang)
+            },
+            cascaderChange3(value) {                 /* 黑名单下拉菜单中的三级菜单 */
+                this.form.UseBlakRange1 = []
+                let rang = []
+                for(let i = 0 ; i < value.length; i++){
+                    rang.push(value[i][2])
+                    console.log(value[i][2])
                 }
                 this.form.UseBlakRange1.push(rang)
             },
             cascaderChange1(value) {                 /* 使用范围下拉菜单中的二级菜单 */
                 this.form.UseRange1 = []
                 let rang = []
+                console.log(value)
                 for(let i = 0 ; i < value.length; i++){
                     rang.push(value[i][1])
                     console.log(value[i][1])
+                }
+                this.form.UseRange1.push(rang)
+            },
+            cascaderChange2(value) {                 /* 使用范围下拉菜单中的三级菜单 */
+                this.form.UseRange1 = []
+                let rang = []
+                console.log(value)
+                for(let i = 0 ; i < value.length; i++){
+                    rang.push(value[i][2])
+                    console.log(value[i][2])
                 }
                 this.form.UseRange1.push(rang)
             },
@@ -728,5 +769,8 @@ import qs from 'qs'
                 }
             }
         }
+    }
+    .el-input--suffix{
+        width:200px!important;
     }
 </style>

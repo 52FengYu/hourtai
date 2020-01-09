@@ -234,7 +234,7 @@ import qs from 'qs'
         changePriceList(qs.stringify(params)).then((res)=>{
             if(res.data.Success == 1){
                 this.tableData = JSON.parse(res.data.Result)
-                this.total = this.tableData.tableData
+                this.total = this.tableData.TotalCount
             }
             if(res.data.Success == 0){
                 this.$message(res.data.Result)

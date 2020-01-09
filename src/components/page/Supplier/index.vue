@@ -240,12 +240,12 @@ export default{
                 Level:this.form.Level,
                 SupplierType:this.form.SupplierType,
                 StoreType:this.form.StoreType,
-                SupplierCode:this.form.StoreType,
-                IsImport:this.form.StoreType,
-                IsDisplay:this.form.StoreType,
-                IsNeedLinkPay:this.form.StoreType,
-                IsSupportPickUp:this.form.StoreType,
-                DelFlag:this.form.StoreType,
+                SupplierCode:this.form.SupplierCode,
+                IsImport:this.form.IsImport,
+                IsDisplay:this.form.IsDisplay,
+                IsNeedLinkPay:this.form.IsNeedLinkPay,
+                IsSupportPickUp:this.form.IsSupportPickUp,
+                DelFlag:this.form.DelFlag,
                 PageIndex:this.PageIndex,
                 PageSize:this.PageSize
             }

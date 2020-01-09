@@ -87,13 +87,15 @@
                         <span>下单时间：</span>
                         <el-date-picker
                             v-model="formInline.timeBegin"
-                            type="date"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
                             placeholder="开始时间"
                              @change="reset">
                         </el-date-picker>至
                         <el-date-picker
                             v-model="formInline.timeEnd"
-                            type="date"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
                             placeholder="结束时间"
                              @change="reset">
                         </el-date-picker>
@@ -103,13 +105,15 @@
                         <span>支付时间：</span>
                         <el-date-picker
                             v-model="formInline.paymentTimeBegin"
-                            type="date"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
                             placeholder="开始时间"
                              @change="reset">
                         </el-date-picker>至
                         <el-date-picker
                             v-model="formInline.paymentTimeEnd"
-                            type="date"
+                            type="datetime"
+                            value-format="yyyy-MM-dd HH:mm:ss"
                             placeholder="结束时间"
                              @change="reset">
                         </el-date-picker>
@@ -143,34 +147,39 @@
                     <el-form-item>
                         <el-button type="primary" @click="getTableData">搜索</el-button>
                         <el-button type="primary" @click="clear">重置</el-button>
+                        <el-button type="primary" @click="exportExcel">导出</el-button>
                     </el-form-item>
                 </el-form>
                 <el-table :data="listData.ModelList" border class="table" ref="multipleTable" highlight-current-row>            <!-- PayName -->
                     <el-table-column prop="ID" label="订单号" align=center fixed></el-table-column>
                     <el-table-column prop="OrderState" label="订单状态"  align=center></el-table-column>
+                    <el-table-column label="是否废弃" align=center>
+                        <template slot-scope="scope">
+                            {{scope.row.DelFlag === 'N' ? '否' : '是'}}
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="DeliveryType" label="分单结果" align=center></el-table-column>
                     <el-table-column prop="MainSupplier" label="主供应商" align=center></el-table-column>
                     <el-table-column prop="Supplier" label="供应商" align=center></el-table-column>
-                    <el-table-column prop="ReceiveAddr" label="收货地址" align=center width="183px"></el-table-column>
                     <el-table-column prop="ReceiveMan" label="收货人"  align=center></el-table-column>
                     <el-table-column prop="ReceiveMobile" label="收货人手机号" align=center></el-table-column>
+                    <el-table-column prop="ReceiveAddr" label="收货地址" align=center width="183px"></el-table-column>
+                    <el-table-column prop="ReceiverAddrID" label="收货地址编号" align=center></el-table-column>
+                    <el-table-column prop="MemberID" label="会员号" align=center></el-table-column>
                     <el-table-column prop="CreateTime" label="下单时间"  align=center width="140px">
                         <template slot-scope="scope">
                             {{scope.row.CreateTime.substring(0,scope.row.CreateTime.length-4)}}
                         </template>
                     </el-table-column>
                     <el-table-column prop="PayName" label="支付方式名称"  align=center ></el-table-column>
-                    <el-table-column label="收货方式类型" align=center>
+                    <el-table-column prop="OrderPayID" label="支付单号" align=center></el-table-column>
+                    <el-table-column prop="PayTime" label="支付时间" align=center></el-table-column>
+                    <el-table-column prop="ReceiverType" label="收货方式类型" align=center>
                         <template slot-scope="scope">
                             {{scope.row.ReceiverType === 'S' ? '门店自提' : '送货到家'}}
                         </template>
                     </el-table-column>
                     <el-table-column prop="ProductPrice" label="订单商品金额"  align=center></el-table-column>
-                    <el-table-column label="是否废弃" align=center>
-                        <template slot-scope="scope">
-                            {{scope.row.DelFlag === 'N' ? '否' : '是'}}
-                        </template>
-                    </el-table-column>
                     <el-table-column label="出库增加金额是否支付" align=center>
                         <template slot-scope="scope">
                             {{scope.row.IsOutStockAddPricePay === 'Y' ? '是' : '否'}}
@@ -182,13 +191,26 @@
                     <el-table-column prop="PointMoney" label="积分金额" align=center></el-table-column>
                     <el-table-column prop="PayMoney" label="在线支付金额"  align=center></el-table-column>
                     <el-table-column prop="DiscountMoney" label="优惠金额"  align=center></el-table-column>
-                    <el-table-column prop="PayTime" label="支付时间" align=center>
-                        
-                    </el-table-column>
+                    <!-- <el-table-column prop="PayName" label="支付方式名称" align=center></el-table-column> -->
                     <el-table-column prop="OutStockAddPrice" label="出库增加金额"  align=center></el-table-column>
+                    <!-- <el-table-column prop="IsOutStockAddPricePay" label="出库增加金额是否支付"  align=center></el-table-column> -->
+                    <!-- <el-table-column prop="ReceiverType" label="收货方式类型" align=center>
+                        <template slot-scope="scope">   
+                            {{scope.row.ReceiverType == 'S' ? '门店自提': '送货到家'}}
+                        </template>
+                    </el-table-column> -->
+                    <el-table-column prop="IsLinkPay" label="是否在线支付" align=center>
+                        <template slot-scope="scope">
+                            {{scope.row.IsLinkPay == 'Y' ? '是':'否'}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="ExpressSendOKTime" label="门店确认送达时间" align=center></el-table-column>
                     <el-table-column label="操作" align="center" fixed="right">
                         <template slot-scope="scope">
                             <el-button type="text" icon="el-icon-info" @click="detail(scope.$index,scope.row);goPage()">详情</el-button>
+                            <el-button type="text" icon="el-icon-check" v-if="scope.row.ReceiverType == 'S'" @click="checked(scope.row)">自提确认</el-button>
+                            <el-button type="text" icon="el-icon-edit" @click="printing(scope.row);show(scope.row)" v-if="(scope.row.OrderState == '出库' || scope.row.OrderState == '顾客收货') && scope.row.DeliveryType == '门店'">打印</el-button>        <!-- 打印出库单 -->
+                            <el-button type="text" icon="el-icon-message" v-if="scope.row.DeliveryType == '门店' && (scope.row.OrderState == '出库' || scope.row.OrderState == '顾客收货') && scope.row.ExpressSendOKTime == null" @click="open(scope.row)">确认送达</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -202,6 +224,109 @@
                     :total="this.listData.TotalCount">
                 </el-pagination>
             </el-card>
+            
+            <!-- 自提确认 -->
+            <el-dialog title="自提确认" :visible.sync="editVisible2" width="50%">
+                <el-form :inline="true" :model="checkedBox" class="demo-form-inline">
+                    <el-form-item label="自提码">
+                        <el-input v-model="checkedBox.SelfReceiveCode" placeholder="请输入自提码"></el-input>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="editVisible2 = false">取 消</el-button>
+                    <el-button type="primary" @click="PickupConfirm">确 定</el-button>
+                </span>
+            </el-dialog>
+
+            <!-- 打印出库单 -->
+            <el-dialog title="出库单打印预览" :visible.sync="editVisible4" width="75%" :close-on-click-modal="false">
+                <div ref="print" class="recordImg" id="printRecord">
+                    <p style="font-size:18px;text-align:center;font-weight:900">利群网商购物出库单</p>
+                    <div class="print-base">
+                        <p class="base-item">
+                            <span class="label">订单号：</span>
+                            <span class="text">{{ this.order.orderNo || '' }}</span>
+                        </p>
+                        <p class="base-item">
+                            <span class="label">支付方式：</span>
+                            <span class="text">{{ this.order.payName || '' }}</span>
+                        </p>
+                        <p class="base-item">
+                            <span class="label">指定送货时间：</span>
+                            <span class="text">{{ this.order.appointtime || '' }}</span>
+                        </p>
+                        <p class="base-item">
+                            <span class="label">收货人：</span>
+                            <span class="text">{{ this.order.receiveMan || '' }}</span>
+                        </p>
+                        <p class="base-item">
+                            <span class="label">手机号码：</span>
+                            <span class="text">{{ this.order.receiveMobile || '' }}</span>
+                        </p>
+                        <p class="base-item">
+                            <span class="label">收货人地址：</span>
+                            <span class="text">{{ this.order.receiveAddr || '' }}</span>
+                        </p>
+                        <p class="base-item">
+                            <span class="label">备注：</span>
+                            <span class="text">{{ this.order.remark || '' }}</span>
+                        </p>
+                    </div>
+                    <table width="100%"  align="center" cellpadding="0" cellspacing="0"  style="border-collapse:collapse;" frame=void rules=rows >
+                        <thead style="font-size:12px">
+                            <tr style="font-size:12px">
+                                <th colspan="1">序号</th>
+                                <th colspan="1">商品编码</th>
+                                <th colspan="1">商品名称</th>
+                                <th colspan="1">出库数量</th>
+                                <th colspan="1">单位</th>
+                                <th colspan="1">优惠金额</th>
+                                <th colspan="1">售价</th>
+                                <th colspan="1">金额小计</th>
+                            </tr>
+                        </thead>
+                        <tbody style="border-bottom:1px dashed #ddd;font-size:12px" >
+                            <tr v-for="(item,index) in this.order.details" :key='item.ID'>
+                                <td style="text-align:center;vertical-align:middle;">{{index+1}}</td>
+                                <td style="text-align:center;vertical-align:middle;">{{item.incode}}</td>
+                                <td style="text-align:center;vertical-align:middle;">{{item.productName}}</td>
+                                <td style="text-align:center;vertical-align:middle;">{{item.realcount}}</td>
+                                <td style="text-align:center;vertical-align:middle;">{{item.unitName}}</td>
+                                <td style="text-align:center;vertical-align:middle;">{{item.discountMoney}}</td>
+                                <td style="text-align:center;vertical-align:middle;">{{item.salePrice}}</td>
+                                <td style="text-align:center;vertical-align:middle;">{{item.amount}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="display:flex; justify-content:space-around;border-top:1px dashed black;padding-top:10px">
+                        <span>商品金额：{{this.order.productPrice}}</span>
+                        <span>优惠券金额：{{this.order.giftTokenAmount}}</span>
+                        <span>优惠金额：{{this.order.discountMoney}}</span>
+                        <span>运费：{{this.order.sendFee}}</span>
+                        <span>出库增加金额：{{this.order.outStockAddPrice}}</span>
+                        <span>礼品卡金额：{{this.order.GiftCardAmount}}</span>
+                        <span>积分金额：{{this.order.PointMoney}}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-around;padding-top:10px">
+                        <span>合计金额：{{this.order.allPrice}}</span>
+                        <span>应收：{{this.order.amount}}</span>
+                        <!-- <span>出库返回金额：{{this.order.outStockBackPrice}}</span> -->
+                        <span>支付金额：{{this.order.PayMoney}}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-around;margin-top:10px">
+                        <span>打印时间:{{this.time}}</span>
+                        <span>顾客签字：</span>
+                    </div>
+                    <div style="border-top:1px dashed black;margin-top:20px;padding-top:20px;display:flex;justify-content:space-between">
+                        如果您对商品的品质和服务不满意，可拨打客服电话：4006888688；我们将认真对待并改正！
+                        <svg id="barcode"></svg>
+                    </div>
+                </div>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="editVisible4 = false">取 消</el-button>
+                    <el-button type="primary" @click="PrintRow">确 定</el-button>
+                </span>
+            </el-dialog>
         </div>
     </div>
 </template>
@@ -247,7 +372,7 @@
     }
 </style>
 <script>
-import { getOrderList,orderDetail,changePayMethod,changePayNum,OrderSelfReceiveConfirm,OrderDeliverySetPS,OrderFJPrintInfoGet } from "@/api/orderList"
+import { getOrderList,orderDetail,changePayMethod,changePayNum,OrderSelfReceiveConfirm,OrderDeliverySetPS,OrderFJPrintInfoGet,OrderOutPrintInfoGet,OrderMasterListExport,OrderSetExpressSendOK } from "@/api/orderList"
 import qs from 'qs';
 import { SupplierListGetByLevel } from '@/api/goodsList';
 import JsBarcode from 'jsbarcode'
@@ -261,6 +386,7 @@ import JsBarcode from 'jsbarcode'
                 editVisible:false,
                 editVisible2:false,            /* 自提确认 */
                 editVisible3:false, 
+                editVisible4:false,             /* 出库单打印 */
                 ID:'',                      /* 跳转详情时把 该条id存放与此 */
                 currentPage: 1,            /* 当前页数 */
                 currentSize:10,             /* 每页多少条数据 */
@@ -333,6 +459,11 @@ import JsBarcode from 'jsbarcode'
                 checkedBox:{                /* 自提确认 */
                     SelfReceiveCode:"",         /* 自提码 */
                 },
+                timestamp:'',       /* 当前时间戳 */
+                time:'',
+                order:[],
+                tableData:[],
+                row:[]
             }
         },
         methods:{           
@@ -455,6 +586,144 @@ import JsBarcode from 'jsbarcode'
                     console.log(e)
                 })
             },
+            checked(row){               /* 自提确认 */
+                this.row = row
+                this.editVisible2 = true 
+            },
+            PickupConfirm(){                    /* 自提确认按钮 */
+                let params = {
+                    ID:this.row.ID,
+                    SelfReceiveCode:this.checkedBox.SelfReceiveCode
+                }
+                OrderSelfReceiveConfirm(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.editVisible2 = false
+                        this.getTableData()
+                        this.$message.success('自提确认成功')
+                        this.checkedBox.SelfReceiveCode =''
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            printing(row){              /* 点击打印获取到打印信息 */
+                this.editVisible4 = true
+                this.row = row
+                let params = {
+                    OrderID:row.ID
+                }
+                OrderOutPrintInfoGet(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.order = JSON.parse(res.data.Result)
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            show(row){                                             /* 打印分拣单 */
+                this.timestamp = Date.parse(new Date());
+                this.time = this.disposeDate(this.timestamp)
+                JsBarcode("#barcode", row.ID, {
+                    format: "CODE128",  //条形码的格式
+                    lineColor: "black",  //线条颜色
+                    width:2, //线宽
+                    height:30,  //条码高度
+                    displayValue: true //是否显示文字信息
+                });
+            },
+            PrintRow(){                               /* 打印 */
+                this.$print(this.$refs.print) // 使用
+            },
+            exportExcel(){
+                let params = {
+                    ID:this.formInline.orderNum.replace(/ /g,''),                    /* 订单号 */
+                    MemberID:this.formInline.memberID.replace(/ /g,''),              /* 会员号 */
+                    MainSupplierID:this.formInline.MainSupplierID,
+                    SupplierID:this.formInline.SupplierID,
+                    CreateTime:this.formInline.timeBegin,
+                    EndTime:this.formInline.timeEnd,
+                    PayBeginTime:this.formInline.paymentTimeBegin,
+                    PayEndTIme:this.formInline.paymentTimeEnd,
+                    ReceiveMobile:this.formInline.recipientMobile.replace(/ /g,''),     /* 收货人手机号 */
+                    ReceiveMan:this.formInline.recipientName.replace(/ /g,''),          /* 收货人姓名 */
+                    ReceiveType:this.formInline.distributionValue,
+                    DelFLag:this.formInline.DelFLag,
+                    OrderState:this.formInline.OrderState,
+                    DeliveryType:this.formInline.DeliveryType,
+                }
+                OrderMasterListExport(qs.stringify(params)).then((res)=>{
+                    var blob = new Blob([res.data]); //application/vnd.openxmlformats-officedocument.wordprocessingml.document这里表示doc类型
+                    var contentDisposition = res.headers["content-disposition"]; //从response的headers中获取filename, 后端response.setHeader("Content-disposition", "attachment; filename=xxxx.docx") 设置的文件名;
+                    var patt = new RegExp("filename=([^;]+\\.[^\\.;]+);*");
+                    var result = patt.exec(contentDisposition);
+                    console.log(result)
+                    var filename = result[1];
+                    if (window.navigator.msSaveOrOpenBlob) {
+                        //兼容ie
+                        navigator.msSaveBlob(blob, filename);
+                    } else {
+                        var downloadElement = document.createElement("a");
+                        var href = window.URL.createObjectURL(blob); //创建下载的链接
+                        var reg = /^["](.*)["]$/g;
+                        downloadElement.style.display = "none";
+                        downloadElement.href = href;
+                        downloadElement.download = decodeURI(filename.replace(reg, "$1")); //下载后文件名
+                        document.body.appendChild(downloadElement);
+                        downloadElement.click(); //点击下载
+                        document.body.removeChild(downloadElement); //下载完成移除元素
+                        window.URL.revokeObjectURL(href); //释放掉blob对象
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
+            open(row) {
+                this.row = row
+                console.log(row)
+                this.$confirm('正在订单送达确认, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.OrderDelivery()
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消确认'
+                    });          
+                });
+            },
+            OrderDelivery(){
+                let params = {
+                    ID:this.row.ID
+                }
+                OrderSetExpressSendOK(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.$message.success('订单已确认送达')
+                        this.getTableData()
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(res.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            }
         },
         created(){
             this.getTableData();
@@ -465,24 +734,6 @@ import JsBarcode from 'jsbarcode'
         },
         mounted() {
 
-            const data = [
-                    { id: 1, name: '张三', age: 15, },
-                    { id: 2, name: 'John', age: 18, },
-                    { id: 3, name: '李四', age: 18, },
-                    { id: 1, name: '张三', age: 15, },
-                    { id: 4, name: 'Jack', age: 18, },
-                    { id: 5, name: '王五', age: 10, },
-                    { id: 4, name: 'Jack', age: 20, },
-                    { id: 2, name: 'John', age: 19, },
-                ];
-            
-            let hash = {}; 
-            const data2 = data.reduce((preVal, curVal) => {
-                hash[curVal.id] ? delete hash[preVal.id] : hash[curVal.id] = true && preVal.push(curVal); 
-                return preVal 
-            }, [])
-            console.log(data)
-            console.log(data2)
         }
     }
 </script>  

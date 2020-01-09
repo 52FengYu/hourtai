@@ -10,7 +10,7 @@
                 <h2>搜索词管理</h2>
             </div>
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
-                <el-card>
+                <!-- <el-card>
                     <div slot="header" class="clearfix">
                         <span>热搜词获取</span>
                     </div>
@@ -23,7 +23,6 @@
                                 :value="item.value">
                                 </el-option>
                             </el-select>
-                            <el-button type="primary" @click="getData">搜索</el-button>
                     </el-form-item>
                     <el-form-item>
                         <div>
@@ -36,7 +35,7 @@
                             </el-input>
                         </div>
                     </el-form-item>
-                </el-card>
+                </el-card> -->
                 <el-card>
                     <div slot="header" class="clearfix">
                         <span>热搜词设置</span>
@@ -50,6 +49,7 @@
                                 :value="item.value">
                                 </el-option>
                             </el-select>
+                        <el-button type="primary" @click="getData;flag = true">搜索</el-button>
                         <el-button type="primary" @click="flag = true">修改</el-button>
                         <el-button type="primary" @click="flag = false">添加</el-button>
                     </el-form-item>

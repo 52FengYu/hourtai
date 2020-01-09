@@ -139,6 +139,7 @@
                         <el-form-item>
                             <!-- 新增 -->
                             <el-button type="primary"><router-link to="newgoods">新增商品</router-link></el-button>
+                            <el-button type="primary" @click="exportExcel">导出</el-button>
                         </el-form-item>
                     </el-form>
                 </div>
@@ -191,7 +192,7 @@
                     <template slot-scope="scope" >        <!-- 未审核/驳回 -->
                         <el-button type="warning" icon="el-icon-star-off" @click="handleEdit(scope.$index, scope.row)" v-if="scope.row.ProductState != 'O'">审核</el-button>
                         <el-button type="primary" icon="el-icon-star-off" @click="down(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'Y'">下架</el-button>
-                        <el-button type="primary" plain icon="el-icon-edit" class="red" @click="productChange(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'Y'">修改</el-button>
+                        <el-button type="primary" plain icon="el-icon-edit" class="red" @click="productChange(scope.$index, scope.row)">修改</el-button>
                         <el-button type="primary" icon="el-icon-star-off" @click="up(scope.$index, scope.row)"  v-if="scope.row.ProductState == 'O' && scope.row.IsSell === 'N'">上架</el-button>
                     </template>
                 </el-table-column>
@@ -209,7 +210,7 @@
         </div>    
 
             <!-- 审核 -->
-            <el-dialog title="修改库存" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
+            <el-dialog title="审核" :visible.sync="editVisible" width="40%" :close-on-click-modal="false">
                <el-form ref="form" :model="form" label-width="70px">
                 <el-form-item label="审核状态">
                     <el-radio v-model="form.AuditType" label="O">通过</el-radio>
@@ -288,7 +289,7 @@
     </div>
 </template>
 <script>
-import { getProductList,getIDclass,changeProductStock,ProductPriceAdjustment,ProductPriceChange,ProductState,SupplierListGetByLevel,ProductReview } from "@/api/goodsList"
+import { getProductList,getIDclass,changeProductStock,ProductPriceAdjustment,ProductPriceChange,ProductState,SupplierListGetByLevel,ProductReview,ProductExPort } from "@/api/goodsList"
 import qs from 'qs';
     export default{
         name: 'goodsList',
@@ -396,7 +397,7 @@ import qs from 'qs';
             //获取数据
             getData() {
                 this.loading = true
-               let params = {
+                let params = {
                     PageIndex:this.currentPage4,
                     PageSize:this.PageSize,
                     ProductName:this.formInline.productName,
@@ -687,7 +688,46 @@ import qs from 'qs';
                     console.log(e)
                 })
             },
-
+            exportExcel(){
+                let params = {
+                    ProductName:this.formInline.productName,
+                    // ID:this.formInline.ID.replace(/ /g,''),                      /* 商品编码 */
+                    MainSupplierID:this.formInline.MainSupplierID,
+                    SupplierID:this.formInline.SupplierID,
+                    Unicode:this.formInline.productCode.replace(/ /g,''),               /* 统一编码 */
+                    IsSell:this.formInline.value1,
+                    AuditState:this.formInline.value3,
+                    IsGroupProduct:this.formInline.value2,
+                    Fxxcode:this.formInline.trafficCode.replace(/ /g,''),
+                    ShopCode:this.formInline.StoreCode.replace(/ /g,''),
+                    ClassID:this.formInline.productValue
+                }
+                ProductExPort(qs.stringify(params)).then((res)=>{
+                    var blob = new Blob([res.data]); //application/vnd.openxmlformats-officedocument.wordprocessingml.document这里表示doc类型
+                    var contentDisposition = res.headers["content-disposition"]; //从response的headers中获取filename, 后端response.setHeader("Content-disposition", "attachment; filename=xxxx.docx") 设置的文件名;
+                    var patt = new RegExp("filename=([^;]+\\.[^\\.;]+);*");
+                    var result = patt.exec(contentDisposition);
+                    console.log(result)
+                    var filename = result[1];
+                    if (window.navigator.msSaveOrOpenBlob) {
+                        //兼容ie
+                        navigator.msSaveBlob(blob, filename);
+                    } else {
+                        var downloadElement = document.createElement("a");
+                        var href = window.URL.createObjectURL(blob); //创建下载的链接
+                        var reg = /^["](.*)["]$/g;
+                        downloadElement.style.display = "none";
+                        downloadElement.href = href;
+                        downloadElement.download = decodeURI(filename.replace(reg, "$1")); //下载后文件名
+                        document.body.appendChild(downloadElement);
+                        downloadElement.click(); //点击下载
+                        document.body.removeChild(downloadElement); //下载完成移除元素
+                        window.URL.revokeObjectURL(href); //释放掉blob对象
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                })
+            },
         },
         created(){
             this.productData()

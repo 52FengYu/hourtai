@@ -28,7 +28,7 @@ const router = new Router({
                     path: '/roleList',
                     component: resolve => require(['../components/page/RoleList.vue'], resolve),
                     meta: { title: '角色列表',requireAuth:true }
-                }, */
+                },*/
                 {
                     path: '/membershipList',
                     component: resolve => require(['../components/page/MembershipList.vue'], resolve),
@@ -235,6 +235,16 @@ const router = new Router({
                     meta: { title: '退款管理',requireAuth:true }
                 },
                 {
+                    path:  '/getList',
+                    component:resolve =>  require(['../components/page/RefundMoney/getList.vue'], resolve),
+                    meta: { title: '待退款列表',requireAuth:true }
+                },
+                {
+                    path:  '/GetRefundDetails',
+                    component:resolve =>  require(['../components/page/RefundMoney/detail.vue'], resolve),
+                    meta: { title: '退款明细',requireAuth:true }
+                },
+                {
                     path: '/application',
                     component: resolve => require(['../components/page/competence/application/index.vue'], resolve),
                     meta: { title: '应用',requireAuth:true }
@@ -264,15 +274,35 @@ const router = new Router({
                     component: resolve => require(['../components/page/competence/role/index.vue'], resolve),
                     meta: { title: '角色',requireAuth:true }
                 },
-                {
+                {                  
                     path: '/authority',
                     component: resolve => require(['../components/page/competence/authority/index.vue'], resolve),
                     meta: { title: '权限列表',requireAuth:true }
                 },
                 {
-                    path: '/test',
+                    path: '/test',     
                     component: resolve => require(['../components/page/Supplier/test.vue'], resolve),
                     meta: { title: '地图',requireAuth:true }
+                },
+                {
+                    path: '/test1',     
+                    component: resolve => require(['../components/page/Supplier/test1.vue'], resolve),
+                    meta: { title: '测试',requireAuth:true }
+                },
+                {
+                    path: '/PayMethods',
+                    component: resolve => require(['../components/page/BasicData/PayMethods.vue'], resolve),
+                    meta: { title: '支付方式',requireAuth:true }
+                },
+                {
+                    path: '/classification',
+                    component: resolve => require(['../components/page/BasicData/classification.vue'], resolve),
+                    meta: { title: '三级分类',requireAuth:true }
+                },
+                {
+                    path: '/unit',
+                    component: resolve => require(['../components/page/BasicData/unit.vue'], resolve),
+                    meta: { title: '单位列表',requireAuth:true }
                 },
                 {
                     path: '/404',

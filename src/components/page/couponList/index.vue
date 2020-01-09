@@ -70,7 +70,7 @@
                     </el-form-item>
                 </el-form>
             </div>
-            <el-table :data="tableData.ModelList" border class="tableData" ref="multipleTable">
+            <el-table :data="tableData.ModelList" border class="tableData" ref="multipleTable" highlight-current-row>
                 <el-table-column prop="GiftTokenGiveOutName" label="领券活动名称" align="center" ></el-table-column>
                 <el-table-column prop="ID" label="领券活动ID" align="center" ></el-table-column>
                 <el-table-column prop="Audit" label="审核状态" align="center" >

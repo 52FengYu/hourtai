@@ -234,3 +234,137 @@ export function OrderBackProductGetFromID(obj) {
     data: obj
   })
 }
+
+/* 添加单个商品退货 */
+export function OrderBackProductAdd(obj) {
+  return axios({
+    url: '/api/order/OrderBackProductAdd',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 整单退货 */
+export function OrderBackProductAddByOrder(obj) {
+  return axios({
+    url: '/api/order/OrderBackProductAddByOrder',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+/* 待退款列表获取 */
+export function OrderBackProductUnPayListGet(obj) {
+  return axios({
+    url: '/api/order/OrderBackProductUnPayListGet',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 退货退款添加 */
+export function OrderBackProductPayAdd(obj) {
+  return axios({
+    url: '/api/order/OrderBackProductPayAdd',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 退单退款列表获取 */
+export function OrderBackProductPayMasterListGet(obj) {
+  return axios({
+    url: '/api/order/OrderBackProductPayMasterListGet',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 根据退款单号获取退款单明细 */
+export function OrderBackPayDetailListGetFromOrderBackPayID(obj) {
+  return axios({
+    url: '/api/order/OrderBackPayDetailListGetFromOrderBackPayID',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 退货退款明细导出 */
+export function OrderBackProductPayDetailExport(obj) {
+  return axios({
+    url: '/api/order/OrderBackProductPayDetailExport',
+    method: 'POST',
+    responseType:'blob',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 订单导出 */
+export function OrderMasterListExport(obj) {
+  return axios({
+    url: '/api/Order/OrderMasterListExport',
+    method: 'POST',
+    responseType:'blob',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 退单导出 */
+export function OrderBackProductExport(obj) {
+  return axios({
+    url: '/api/Order/OrderBackProductExport',
+    method: 'POST',
+    responseType:'blob',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 退货退款确认 */
+export function OrderBackProductPaySetOK(obj) {
+  return axios({
+    url: '/api/Order/OrderBackProductPaySetOK',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 订单送达确认 */
+export function OrderSetExpressSendOK(obj) {
+  return axios({
+    url: '/api/Order/OrderSetExpressSendOK',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}

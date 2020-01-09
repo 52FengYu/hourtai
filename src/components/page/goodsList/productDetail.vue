@@ -1,14 +1,15 @@
 <template>
     <div>
         <el-form ref="form"  :model="products" label-width="120px">
-            <el-form-item label="商品图">
-                <el-upload
+            <el-form-item label="商品图"><!--  -->
+                <!-- <el-upload
                     action="/adminwebapi/api/Image/UploadImage"
                     class="table-td-HeadImageURL"
                     :src="HeadImage.ImageURL"
                     :preview-src-list="[HeadImage]"
                     list-type="picture-card"
                     :file-list="fileLists1"
+                    accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                     :on-preview="handlePictureCardPreviewH" 
                     :on-success="HeadImageSuccess"            
                     :headers="TokenID"
@@ -18,16 +19,20 @@
                 </el-upload>
                 <el-dialog :visible.sync="dialogVisibleH">
                     <img width="100%" :src="dialogImageUrlH" alt="">
-                </el-dialog>
+                </el-dialog> -->
+                <div class="demo-image__lazy">
+                    <el-image v-for="url in this.fileLists1" :key="url" :src="url" style="width:200px"></el-image>
+                </div>
             </el-form-item>
-            <el-form-item label="商品详情图">
-                <el-upload
+            <el-form-item label="商品详情图"><!--  -->
+                <!-- <el-upload
                     action="/adminwebapi/api/Image/UploadImage"
                     class="table-td-HeadImageURL"
                     :src="ContentImage"
                     :preview-src-list="[ContentImage]"
                     list-type="picture-card"
                     :file-list="fileLists2"
+                    accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                     :on-preview="handlePictureCardPreviewC"             
                     :on-success="ContentImageSuccess" 
                     :headers="TokenID"
@@ -36,7 +41,10 @@
                 </el-upload>
                 <el-dialog :visible.sync="dialogVisibleC">
                     <img width="100%" :src="dialogImageUrlC" alt="">
-                </el-dialog>
+                </el-dialog> -->
+                <div class="demo-image__lazy">
+                    <el-image v-for="url in this.fileLists2" :key="url" :src="url" style="width:200px"></el-image>
+                </div>
             </el-form-item> 
         </el-form>
         <el-form ref="form" :inline="true"  class="demo-form-inline" :model="products" label-width="180px">
@@ -211,18 +219,18 @@ import qs from 'qs';
                         for( var i = 0; i < this.HeadImage.length ; i++){
                             let URLHead = this.HeadImage[i].ImageURL
                             if(URLHead.substring(0,4) == 'http'){
-                                this.fileLists1.push({url: this.HeadImage[i].ImageURL})
+                                this.fileLists1.push(this.HeadImage[i].ImageURL)
                             }else{
-                                this.fileLists1.push({url: 'http://images.liqunshop.com/' +  this.HeadImage[i].ImageURL})
+                                this.fileLists1.push('http://images.liqunshop.com/' +  this.HeadImage[i].ImageURL)
                             }
                         }
                         if(this.ContentImage != null){
                             for( var i = 0; i < this.ContentImage.length ; i++){
-                                let URLHead = this.ContentImage[i].ImageURL
-                                if(URLHead.splice(1,4) == 'http'){
-                                    this.fileLists2.push({url:  this.ContentImage[i].ImageURL})
+                                let URLContent = this.ContentImage[i].ImageURL
+                                if(URLContent.splice(1,4) == 'http'){
+                                    this.fileLists2.push(this.ContentImage[i].ImageURL)
                                 }else{
-                                    this.fileLists2.push({url: 'http://images.liqunshop.com/' +  this.ContentImage[i].ImageURL})
+                                    this.fileLists2.push('http://images.liqunshop.com/' +  this.ContentImage[i].ImageURL)
                                 }
                             }
                         }
@@ -234,7 +242,7 @@ import qs from 'qs';
                             }
                         }
                         this.tableData = tableData
-                        this.getDetailByShopCode()
+                        // this.getDetailByShopCode()
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -266,93 +274,93 @@ import qs from 'qs';
                 })
             }, */
 
-            handleRemoveH(res,file, fileList) {                  /* 移除主图时调用的钩子，删除图片 */
-                let params = {
-                    ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
-                    ID:this.HeadImage[0].ID
-                }
-                delPicture(qs.stringify(params)).then((res)=>{
-                    if(res.data.Success == 1){
-                        this.$message.success('主图删除成功')
-                    }
-                    if(res.data.Success == 0){
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        this.$message(res.data.Result)
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                })
+            // handleRemoveH(res,file, fileList) {                  /* 移除主图时调用的钩子，删除图片 */
+            //     let params = {
+            //         ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
+            //         ID:this.HeadImage[0].ID
+            //     }
+            //     delPicture(qs.stringify(params)).then((res)=>{
+            //         if(res.data.Success == 1){
+            //             this.$message.success('主图删除成功')
+            //         }
+            //         if(res.data.Success == 0){
+            //             this.$message(res.data.Result)
+            //         }
+            //         if(res.data.Success == -998){
+            //             this.$message(res.data.Result)
+            //         }
+            //     }).catch(function(e){
+            //         console.log(e)
+            //     })
 
-            },
-            handlePictureCardPreviewH(file) {                /* 点击文件列表中已上传的文件时的钩子 */
-                this.dialogImageUrl = file.url;
-                this.dialogVisible = true;
-            },
-            handleRemoveC(file, fileList) {                  /* 移除详情图时调用的钩子，删除图片 */
-                let params = {
-                    ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
-                    ID:file.ID
-                }
-                delDetailMap(qs.stringify(params)).then((res)=>{
-                    if(res.data.Success == 1){
-                        this.$message.success('详情图删除成功')
-                    }
-                    if(res.data.Success == 0){
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        this.$message(res.data.Result)
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                })
-            },
-            handlePictureCardPreviewC(file) {                /* 点击文件列表中已上传的文件时的钩子 */
-                this.dialogImageUrl = file.url;
-                this.dialogVisible = true;
-            },
-            HeadImageSuccess(res,file){
-                let params = {
-                    ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
-                    ImageURL:JSON.parse(res.Result)[0],
-                    ImageIndex:1
-                }
-                addPicture(qs.stringify(params)).then((res)=>{
-                    if(res.data.Success == 1){
-                        this.$message.success('主图添加成功')
-                    }
-                    if(res.data.Success == 0){
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        console.log("请求错误")
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                })
-            },
-            ContentImageSuccess(res,file){
-                let params = {
-                    ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
-                    ImageURL:JSON.parse(res.Result)[0],
-                    ImageIndex:this.fileLists2.length
-                }
-                AddDetailMap(qs.stringify(params)).then((res)=>{
-                    if(res.data.Success == 1){
-                        this.$message.success('上传成功')
-                    }
-                    if(res.data.Success == 0){
-                        this.$message(res.data.Result)
-                    }
-                    if(res.data.Success == -998){
-                        this.$message(res.data.Result)
-                    }
-                }).catch(function(e){
-                    console.log(e)
-                })
-            },
+            // },
+            // handlePictureCardPreviewH(file) {                /* 点击文件列表中已上传的文件时的钩子 */
+            //     this.dialogImageUrl = file.url;
+            //     this.dialogVisible = true;
+            // },
+            // handleRemoveC(file, fileList) {                  /* 移除详情图时调用的钩子，删除图片 */
+            //     let params = {
+            //         ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
+            //         ID:file.ID
+            //     }
+            //     delDetailMap(qs.stringify(params)).then((res)=>{
+            //         if(res.data.Success == 1){
+            //             this.$message.success('详情图删除成功')
+            //         }
+            //         if(res.data.Success == 0){
+            //             this.$message(res.data.Result)
+            //         }
+            //         if(res.data.Success == -998){
+            //             this.$message(res.data.Result)
+            //         }
+            //     }).catch(function(e){
+            //         console.log(e)
+            //     })
+            // },
+            // handlePictureCardPreviewC(file) {                /* 点击文件列表中已上传的文件时的钩子 */
+            //     this.dialogImageUrl = file.url;
+            //     this.dialogVisible = true;
+            // },
+            // HeadImageSuccess(res,file){
+            //     let params = {
+            //         ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
+            //         ImageURL:JSON.parse(res.Result)[0],
+            //         ImageIndex:1
+            //     }
+            //     addPicture(qs.stringify(params)).then((res)=>{
+            //         if(res.data.Success == 1){
+            //             this.$message.success('主图添加成功')
+            //         }
+            //         if(res.data.Success == 0){
+            //             this.$message(res.data.Result)
+            //         }
+            //         if(res.data.Success == -998){
+            //             console.log("请求错误")
+            //         }
+            //     }).catch(function(e){
+            //         console.log(e)
+            //     })
+            // },
+            // ContentImageSuccess(res,file){
+            //     let params = {
+            //         ProductID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
+            //         ImageURL:JSON.parse(res.Result)[0],
+            //         ImageIndex:this.fileLists2.length
+            //     }
+            //     AddDetailMap(qs.stringify(params)).then((res)=>{
+            //         if(res.data.Success == 1){
+            //             this.$message.success('上传成功')
+            //         }
+            //         if(res.data.Success == 0){
+            //             this.$message(res.data.Result)
+            //         }
+            //         if(res.data.Success == -998){
+            //             this.$message(res.data.Result)
+            //         }
+            //     }).catch(function(e){
+            //         console.log(e)
+            //     })
+            // },
         },
         created(){
             this.getData()

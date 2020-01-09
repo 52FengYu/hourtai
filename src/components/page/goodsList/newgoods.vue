@@ -1,18 +1,18 @@
 <template>
     <div>
         <el-card class="box-card">
-            <!-- <div class="first">
+            <div class="first">
                 <span>搜索</span>
                 <div>
                     <el-input
                         placeholder="统一编码"
-                        v-model="formInline.uniformCode"
+                        v-model="formInline.Unicode"
                         clearable
                         style="width:30vh">
                     </el-input>
                     <el-button type="primary" @click="found">查询</el-button>
                 </div>
-            </div> -->
+            </div>
             <div class="second">
                 <span>商品图</span><!--  -->
                 <div>
@@ -62,7 +62,7 @@
                 <div>
                     <el-form :model="formInline" class="demo-form-inline">
                         <el-form-item label="供应商号">
-                            <el-select v-model="formInline.SupplierID" placeholder="供应商">
+                            <el-select v-model="formInline.SupplierID" placeholder="供应商" filterable>
                                 <el-option
                                     v-for="item in option2"
                                     :key="item.value"
@@ -70,15 +70,6 @@
                                     :value="item.value">
                                 </el-option>
                             </el-select>
-                        </el-form-item>
-                        <el-form-item label="统一编码">
-                            <el-input
-                                placeholder="统一编码"
-                                v-model="formInline.uniformCode"
-                                clearable
-                                style="width:60%">
-                            </el-input>
-                            <el-button type="primary" @click="found">查询</el-button>
                         </el-form-item>
                         <el-form-item label="门店码">
                             <el-input v-model="formInline.ShopCode" placeholder="门店码" style="width:60%"></el-input>
@@ -90,12 +81,23 @@
                         <el-form-item label="显示名称">
                             <el-input v-model="formInline.DisplayName" placeholder="显示名称"></el-input>
                         </el-form-item>
+                        <el-form-item label="统一编码">
+                            <el-input v-model="formInline.Unicode" placeholder="统一编码"></el-input>
+                        </el-form-item>
                         <el-form-item label="副标题">
                             <el-input v-model="formInline.TitalInfo" placeholder="副标题"></el-input>
                         </el-form-item>
-                        <el-form-item label="品牌名" class="BrandName" required>
+                        <el-form-item label="品牌名" class="BrandName" required >
                             <el-input v-model="formInline.BrandName" class="BrandNameInput" clearable></el-input>
-                            <el-button type="primary" @click="getBrand">搜索</el-button><i class="el-icon-check" v-if="this.formInline.BrandID"></i>
+                            <el-button type="primary" @click="getBrand">搜索</el-button>
+                            <el-select v-model="formInline.BrandID" clearable placeholder="请选择">
+                                <el-option
+                                    v-for="item in formInline.Brand"
+                                    :key="item.ID"
+                                    :label="item.BrandName"
+                                    :value="item.ID">
+                                </el-option>
+                            </el-select><i class="el-icon-check" v-if="this.formInline.BrandID"></i>
                         </el-form-item>
                         <el-form-item label="税率(%)">
                             <el-input v-model="formInline.TaxRate" placeholder="税率"></el-input>
@@ -132,7 +134,15 @@
                             <el-radio v-model="formInline.IsShow500gPrice" label="N">否</el-radio>
                         </el-form-item>
                         <el-form-item label="物流码">
-                            <el-input type="textarea" :rows="2" v-model="formInline.Fxxcode" placeholder="物流码"></el-input>
+                            <!-- <el-input type="textarea" :rows="2" v-model="formInline.Fxxcode" placeholder="物流码"></el-input> -->
+                            <el-select v-model="formInline.Fxxcode" placeholder="请选择" clearable>
+                                <el-option
+                                v-for="item in formInline.FxxcodeOptions"
+                                :key="item.Fxxcode"
+                                :label="item.Fxxcode"
+                                :value="item.Fxxcode">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item label="重量">
                             <el-input v-model="formInline.Weight" placeholder="重量"></el-input>
@@ -168,9 +178,6 @@
                         <el-form-item label="统一分类">
                             <el-input v-model="formInline.UniType" placeholder="统一分类"></el-input>
                         </el-form-item>
-                        <el-form-item label="统一编码">
-                            <el-input v-model="formInline.uniformCode" placeholder="统一编码"></el-input>
-                        </el-form-item>
                         <el-form-item label="备注">
                             <el-input v-model="formInline.Remark" placeholder="备注"></el-input>
                         </el-form-item>
@@ -199,6 +206,7 @@ import qs from 'qs';
                 fileLists1: [],      /* 主图 */
                 fileLists2: [],      /* 详情图 */
                 formInline: {
+                    Brand:[],       /* 搜索到的品牌数据 */
                     BrandID:'',
                     BrandName:'',
                     ClassID:'',
@@ -226,6 +234,7 @@ import qs from 'qs';
                     ShopCode:'',
                     UniType:'',
                     IsMustSelfReceiver:"",          /* 是否必须自提 N 否 Y 是 */
+                    FxxcodeOptions:[]
                 },
                  /* 动态添加的数据存放在这里 */
                 prop:{
@@ -346,7 +355,11 @@ import qs from 'qs';
                     delete this.fileLists2[p].uid
                     delete this.fileLists2[p].status
                 }
-                // this.fileLists1.replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,'')
+                var FC = '' 
+                // console.log(JSON.stringify(this.formInline.Fxxcode))
+                if(this.formInline.Fxxcode){
+                    FC = JSON.stringify(this.formInline.Fxxcode).replace(/"/g,'')
+                }
                 let params = {
                     BrandID : this.formInline.BrandID,
                     ClassID : this.formInline.ClassID,
@@ -370,14 +383,14 @@ import qs from 'qs';
                     Stock : this.formInline.Stock,
                     MemberPrice : this.formInline.MemberPrice,
                     Unicode : this.formInline.Unicode,
-                    Fxxcode : this.formInline.Fxxcode,
+                    Fxxcode : FC,
                     ShopCode : this.formInline.ShopCode,
                     UniType : this.formInline.UniType,
                     IsMustSelfReceiver: this.formInline.IsMustSelfReceiver,
                     // HeadImage : JSON.stringify(this.fileLists1).replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,'').replace(/http:/g,'').replace(/\/\//g,'').replace(/images.liqunshop.com\//g,''),
-                    HeadImage : JSON.stringify(this.fileLists1).replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,''),
+                    HeadImage : JSON.stringify(this.fileLists1).replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,'').replace(/http:/g,'').replace(/\/\//g,'').replace(/images.liqunshop.com\//g,''),
                     // ContentImage : JSON.stringify(this.fileLists2).replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,'').replace(/http:/g,'').replace(/\/\//g,'').replace(/images.liqunshop.com\//g,''),
-                    ContentImage : JSON.stringify(this.fileLists2).replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,''),
+                    ContentImage : JSON.stringify(this.fileLists2).replace(/\{/g,'').replace(/\}/g,'').replace(/"url":/g,'').replace(/http:/g,'').replace(/\/\//g,'').replace(/images.liqunshop.com\//g,''),
                 }
                 addProduct(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -419,7 +432,7 @@ import qs from 'qs';
                 this.fileLists1 = []
                 this.fileLists2 = []
                 let params = {
-                    Unicode:this.formInline.uniformCode             /* 003567647 */     /* 100008215 */
+                    Unicode:this.formInline.Unicode             /* 003567647 */     /* 100008215 */
                 }
                 getPicInfo(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -427,6 +440,7 @@ import qs from 'qs';
                         console.log(this.result)
                         for( var i = 0; i < this.result.HeadImageList.length ; i++){
                             let URLHead = this.result.HeadImageList[i]
+                            console.log(URLHead)
                             if(URLHead.substr(0,4) == 'http'){
                                 this.fileLists1.push({url: this.result.HeadImageList})
                             }else{
@@ -435,8 +449,9 @@ import qs from 'qs';
                             console.log(this.fileLists1)
                         }
                         for( var i = 0; i < this.result.ContentImageList.length ; i++){
-                            let URLHead = this.result.ContentImageList[i]
-                            if(URLHead.substr(0,4) == 'http'){
+                            let URLContent = this.result.ContentImageList[i]
+                            console.log(URLContent)
+                            if(URLContent.substr(0,4) == 'http'){
                                 this.fileLists2.push({url: this.result.ContentImageList[i]})
                             }else{
                                 this.fileLists2.push({url: 'http://images.liqunshop.com/' + this.result.ContentImageList[i]})
@@ -539,8 +554,9 @@ import qs from 'qs';
                 }
                 BaseBrandListGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        this.formInline.BrandID = JSON.parse(res.data.Result).ModelList[0].ID
-                        console.log(this.formInline.BrandID)
+                        this.formInline.Brand = JSON.parse(res.data.Result).ModelList
+                        this.formInline.BrandID = ''
+                        // console.log(this.formInline.BrandID)
                     }
                     if(res.data.Success == 0){
                        this.$message(res.data.Result)
@@ -562,7 +578,7 @@ import qs from 'qs';
                         console.log(JSON.parse(res.data.Result))
                         this.formInline.uniformCode = JSON.parse(res.data.Result).UNICODE
                         this.formInline.UniType = JSON.parse(res.data.Result).UNITYPE
-                        this.formInline.Fxxcode = JSON.parse(res.data.Result).Fxxcodes
+                        this.formInline.FxxcodeOptions = JSON.parse(res.data.Result).Fxxcodes
                         this.formInline.TaxRate = JSON.parse(res.data.Result).TAXRATE
                         // this.formInline.UnitID = JSON.parse(res.data.Result).UNIT
                     }
@@ -616,6 +632,8 @@ import qs from 'qs';
         }
     }
     .BrandName{
+        display: flex!important;
+        width: 50vw!important;
         .BrandNameInput{
             width:30%!important;
         }

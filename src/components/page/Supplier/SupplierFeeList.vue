@@ -76,7 +76,7 @@
                     </el-cascader>
                 </el-form-item>
                 <el-form-item label="坐标范围" v-if="form.SendFeeType === 'SmallArea'">
-                    <el-button type="primary" plain><router-link to="/test">划定区域</router-link></el-button>
+                    <el-button type="primary" plain><router-link to="/test1">划定区域</router-link></el-button>
                     <el-button type="primary" @click="getAreaXY">获取数据</el-button>
                     <el-input
                         type="textarea"
@@ -128,7 +128,7 @@
                     </el-cascader>
                 </el-form-item>
                 <el-form-item label="坐标范围" v-else>
-                    <el-button type="primary" plain><router-link to="/test">划定区域</router-link></el-button>
+                    <el-button type="primary" plain><router-link to="/test1">划定区域</router-link></el-button>
                     <el-button type="primary" @click="getAreaXY">获取数据</el-button>
                     <el-input
                         type="textarea"
@@ -299,7 +299,7 @@ import qs from 'qs'
                 this.AreaXY = ''
                 this.AreaXY = sessionStorage.getItem('map')
                 var str = this.AreaXY
-                str=str.replace(/"lng":/g,"").replace(/"lat":/g,"").replace(/{/g,"").replace(/},/g,";").replace(/\[/g,"").replace(/\]/g,"").replace(/\}/,'')
+                str=str.replace(/","/g,";").replace(/"/g,"").replace(/\[/g,'').replace(/\]/g,'')
                 this.form.SmallAreaXY = str
                 this.row.SmallAreaXY = str
             },

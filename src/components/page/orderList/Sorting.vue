@@ -88,6 +88,11 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="ReceiveAddr" label="收货地址" align="center" width="180px"></el-table-column>
+                <el-table-column prop="IsJH" label="是否借货" align="center" width="180px">
+                    <template slot-scope="scope">
+                        {{scope.row.IsJH == 'N'? '否':'是'}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="ProductPrice" label="订单金额" align="center"></el-table-column>
                 <el-table-column prop="SendFee" label="运费" align="center"></el-table-column>
                 <el-table-column prop="GiftCardAmount" label="礼品卡金额" align="center"></el-table-column>
@@ -258,7 +263,7 @@
                 <div style="display:flex; justify-content:space-around;padding-top:10px">
                     <span>合计金额：{{this.order.allPrice}}</span>
                     <span>应收：{{this.order.amount}}</span>
-                    <span>已收金额：{{this.order.receivedAmount}}</span>
+                    <!-- <span>已收金额：{{this.order.receivedAmount}}</span> -->
                     <span>支付金额：{{this.order.PayMoney}}</span>
                 </div>
                 <div style="display:flex; justify-content:space-around;margin-top:10px">
@@ -468,6 +473,7 @@ import JsBarcode from 'jsbarcode'
                 editVisible7:false,            /* 集货弹出框 */
                 row:[],                     /* 点击分拣时的分拣信息都放在这 */
                 product1:[],                 /* 用户修改出库数量 把数据都放在这 */
+                product2:[],                    /* product1去重后的数据 */
                 product:'',                 /* 将product1数组转化为字符串 */
                 ID:'',                       /* 点击分拣时，orderID存在这 */
                 order:[],                    /* 点击打印的时候，打印信息放在这 */
@@ -575,9 +581,8 @@ import JsBarcode from 'jsbarcode'
             },
             changeNum(row){                             /* 待分拣信息修改之后触发这个方法 */
                 console.log(row)
-                if(row.OutInfo){
+                if(row.OutInfo != null && row.OutInfo != ''){
                     this.product1.push({ID:row.ID,Qty:row.OutInfo})
-                    this.product1.uniqBy(this.product1, 'ID')           /* 去重 */
                 }else{
                     this.$message('出库数量不能为空')
                 }
@@ -586,14 +591,24 @@ import JsBarcode from 'jsbarcode'
             /* 2、当用户做出修改的数量与总数不相等时，会有message提示，并且不会提交 */
             /* 3、当用户多次对出库数量做出修改时，push到的数组会有多个重复对象，会取相同id的最后一个 */
             Outbound(){                                 /* 订单明细出库 */              
-                if(this.product1.length != this.row.length){
+                    let hash = {}; 
+                    this.product1.reverse()
+                    this.product2 = this.product1.reduce((preVal, curVal) => {
+                        hash[curVal.ID] ? delete hash[preVal.ID] : hash[curVal.ID] = true && preVal.push(curVal); 
+                        return preVal 
+                    }, [])
+                    console.log(this.product1)
+                    console.log(this.product2)
+                if(this.product2.length != this.row.length){
                     this.$message('出库数量不得为空')
+                    console.log(this.product2)
+                    console.log(this.row)
                 }else{
-                    this.product = JSON.stringify(this.product1)
+                    this.product = JSON.stringify(this.product2)
                     let params = {
                         OrderID:this.ID,
                         OutInfo:this.product,
-                    }
+                    }/*  */
                     OrderDetailDelivery(qs.stringify(params)).then((res)=>{
                         if(res.data.Success == 1){
                             this.getData()
@@ -604,6 +619,9 @@ import JsBarcode from 'jsbarcode'
                         }
                         if(res.data.Success == 0){
                             this.$message(res.data.Result)
+                            this.product1 = []
+                            this.product2 = []
+                            this.editVisible = false
                         }
                         if(res.data.Success == -998){
                             this.$message(res.data.Result)
@@ -629,9 +647,11 @@ import JsBarcode from 'jsbarcode'
             },
             /* 复核 */          /* 当点击复核的时候要先调用 待分拣列表获取 接口 */
             Review(){ 
+                console.log(this.MakeSureReview)
                 this.editVisible4 = false 
                 let params = {
-                   OrderID:this.MakeSureReview.ID
+                   OrderID:this.MakeSureReview.ID,
+                   IsJH:this.MakeSureReview.IsJH
                 }
                 OrderDeliveryOK(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -652,7 +672,8 @@ import JsBarcode from 'jsbarcode'
             reject(){
                 this.editVisible4 = false
                 let params = {
-                   OrderID:this.MakeSureReview.ID
+                   OrderID:this.MakeSureReview.ID,
+                   IsJH:this.MakeSureReview.IsJH
                 }
                 OrderDeliveryReFJ(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
@@ -833,6 +854,8 @@ import JsBarcode from 'jsbarcode'
         created(){
             this.getMainSupplier()
             this.getData()
+            this.formInline.BeginTime = this.GetDateStr(-2)
+            this.formInline.EndTime = this.GetDateStr(1)
         }
     }
 </script>

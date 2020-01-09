@@ -11,7 +11,7 @@
                         <div class="preview large">
                             <div class="head">
                                 <template>
-                                    <el-tabs v-model="activeName">
+                                    <el-tabs>
                                         <el-tab-pane label="功能首页" name="first"></el-tab-pane>
                                     </el-tabs>
                                 </template>
@@ -106,7 +106,9 @@
                                     <div>
                                         <el-form ref="form" label-width="80px">         <!-- 动态 -->
                                             <el-form-item label="banner图">
-                                                <img :src="item.BackgroundImageURL" alt="">
+                                                <el-image :src="item.BackgroundImageURL" v-if="item.BackgroundImageURL.substr(0,4) == 'http'"></el-image>
+                                                <el-image :src="'http://images.liqunshop.com/' + item.BackgroundImageURL" v-if="item.BackgroundImageURL != '' && item.BackgroundImageURL.substr(0,4) != 'http'"></el-image>
+                                                <span v-if="item.BackgroundImageURL == null"></span>
                                             </el-form-item>
                                             <el-form-item label="活动链接">
                                                 <el-input v-model="item.LinkURL" :disabled="true" placeholder="请输入活动链接"></el-input>
@@ -130,13 +132,14 @@
 
                                         <!-- 右侧修改弹出框 -->
                                         <el-dialog title="编辑" :visible.sync="editVisible2" width="50%" :close-on-click-modal="false">
-                                            <el-form ref="form" :model="InfoForm"  label-width="80px">
+                                            <el-form ref="form" :model="InfoForm"  label-width="80px">              <!-- this.InfoForm.BackGroundImageURL -->
                                                 <el-form-item label="banner图">     <!--  -->
                                                     <el-upload
                                                         action= '/adminwebapi/api/Image/UploadImage'
                                                         list-type="picture-card"
                                                         :on-success="handleAvatarSuccess"
                                                         :on-error="imgUploadError"
+                                                        :on-remove ='ChangeRemovePicture'
                                                         accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                                                         :limit='1'
                                                         :file-list="fileLists2"
@@ -147,7 +150,7 @@
                                                     </el-upload>
                                                 </el-form-item>
                                                 <el-form-item label="背景色">
-                                                    <el-input v-model="InfoForm.BackGroundColor" placeholder="请填写背景色"></el-input>
+                                                    <el-input v-model="InfoForm.BackgroundColor" placeholder="请填写背景色"></el-input>
                                                 </el-form-item>
                                                 <el-form-item label="活动链接">
                                                     <el-input v-model="InfoForm.LinkURL" placeholder="请输入活动链接（非必填）"></el-input>
@@ -169,6 +172,9 @@
                                         </el-dialog>
                                     </div>
                                 </div>
+                                <div style="margin:0 auto; text-align:center">
+                                    <el-button type="primary" plain @click="editVisible3 = true" text-align="center">新增页面明细</el-button>
+                                </div>
                             </el-card>
                         </div>
                     </div>
@@ -176,7 +182,7 @@
             <div class="button">
                 <el-button type="primary" @click="onSubmit">确认提交</el-button>
                 <el-button type="primary" @click="temp">预览</el-button>
-                <el-button type="primary" plain @click="editVisible3 = true">新增页面明细</el-button>
+                <!-- <el-button type="primary" plain @click="editVisible3 = true">新增页面明细</el-button> -->
             </div>
         </div>
 
@@ -243,7 +249,7 @@
                             <el-input v-model="changePage.PageContentCode" :disabled="true"></el-input>
                         </el-form-item> -->
                         <el-form-item label="背景颜色">
-                            <el-input v-model="changePage.BackGroundColor"></el-input>
+                            <el-input v-model="changePage.BackgroundColor"></el-input>
                         </el-form-item>
                         <el-form-item label="特殊标签">
                             <el-input v-model="changePage.Note"></el-input>
@@ -444,15 +450,17 @@ export default {
                     PromotionID:'',
                     ProductID:'',
                     OrderID:'',
-                    pageContentID:''
+                    pageContentID:'',
+                    Picture:''
                 },
                 InfoForm:{
                     BackGroundImageURL:'',
                     LinkURL:"",
                     Title:'',
-                    BackGroundColor:'',
+                    BackgroundColor:'',
                     PromotionID:'',
                     ProductID:'',
+                    Picture:''
                 },
                 editVisible:false,
                 editVisible2:false,
@@ -483,10 +491,15 @@ export default {
                     BackGroundImageURL:'',
                     BackGroundColor:'',
                     IsNewMemberSee:'',
-                    Note:''
+                    Note:'',
+                    Picture:''
                 },
                 PageContentID:'',
-                PageName:''
+                PageName:'',
+                editID:'',
+                row:{
+                    ID:''
+                }
             }
         },
         created() {
@@ -608,16 +621,18 @@ export default {
                     console.log(e)
                 })
             },
-            deleteItem(e){
+            deleteItem(e){                  /* 删除页面内容 */
                 let params = {
                     ID:e.currentTarget.id,
                 }
                 deleteItemInfo(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.$message.success('删除成功');
-                        this.reload()
-                        this.getData()
+                        // this.reload()
+                        // this.editVisible = false
+                        // this.getData()
                         this.feature()
+                        
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -651,14 +666,28 @@ export default {
                 })
             },
             change(e){                  /* 点击修改 */
-                this.changePage.PageContentCode = e.srcElement.parentElement.attributes.id.value
+                this.row.ID = e.srcElement.parentElement.attributes.id.value
                 this.editVisible4 = true
+                this.fileLists4 = []
+                console.log(this.row.ID)
+                var ID = this.row.ID
+                console.log(this.Features)
+                var data = this.Features.find(function(e){return e.ID == ID})
+                console.log(data)
+                this.changePage = data
+                if(data.BackgroundImageURL.substr(0,4) == 'http'){
+                    this.fileLists4.push({url:data.BackgroundImageURL})
+                }else{
+                    this.fileLists4.push({url:'http://images.liqunshop.com/' + data.BackgroundImageURL})
+                }
+                this.changePage.Picture = data.BackgroundImageURL
+                console.log(this.row.ID)
             },
             changePageContent(){        /* 修改页面内容  提交 */
                 let params = {
-                    ID:this.changePage.PageContentCode,
-                    BackGroundColor:this.changePage.BackGroundColor,
-                    BackGroundImageURL:this.changePage.BackGroundImageURL,
+                    ID:this.row.ID,
+                    BackGroundColor:this.changePage.BackgroundColor,
+                    BackGroundImageURL:this.changePage.Picture,
                     IsNewMemberSee:this.changePage.IsNewMemberSee,
                     Note:this.changePage.Note
                 }
@@ -668,7 +697,7 @@ export default {
                         this.changePage = {}
                         this.fileLists4 = []
                         this.editVisible4 = false
-
+                        this.feature()
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -748,7 +777,7 @@ export default {
                     console.log(e)
                 })
             },
-            deleteInfo(e){
+            deleteInfo(e){                      /* 删除页面明细 */
                 let params = {
                     ID:e.currentTarget.id,
                 }
@@ -756,6 +785,7 @@ export default {
                     if(res.data.Success == 1){
                         this.$message('删除成功');
                         this.edit()
+                        this.getData()
                         console.log('删除')
                     }
                     if(res.data.Success == 0){
@@ -781,8 +811,9 @@ export default {
                 addItemInfo(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.$message.success('添加成功');
-                        this.reload()
-                        this.getData()
+                        // this.reload()
+                        this.editVisible = false
+                        // this.getData()
                         this.feature()
                     }
                     if(res.data.Success == 0){
@@ -795,20 +826,32 @@ export default {
                     console.log(e)
                 })
             },
-            InfoEdit(e){
+            InfoEdit(e){                            /* 右侧的编辑 */
                 this.editVisible2 = true;
                 this.editID = e.currentTarget.id
+                var ID = e.currentTarget.id
+                this.fileLists2 = []
+                console.log(this.editID)
+                var data = this.content.find(function(e){return e.ID == ID})
+                console.log(data)
+                this.InfoForm = data
+                if(data.BackgroundImageURL.substr(0,4) == 'http'){
+                    this.fileLists2.push({url:data.BackgroundImageURL})
+                }else{
+                    this.fileLists2.push({url:'http://images.liqunshop.com/' + data.BackgroundImageURL})
+                }
+                this.InfoForm.BackGroundImageURL = data.BackgroundImageURL
             },
             addSave(e){      /* 右侧弹出框修改 */
                 let params = {
-                    BackGroundColor:this.InfoForm.BackGroundColor,
-                    BackGroundImageURL:this.InfoForm.BackGroundImageURL,
+                    BackGroundColor:this.InfoForm.BackgroundColor,
+                    BackGroundImageURL:this.InfoForm.Picture,           /* 提交的是不加域名 */
                     Title:this.InfoForm.Title,
                     LinkURL:window.encodeURIComponent(this.InfoForm.LinkURL),
                     ID:this.editID,
                     ProductID:this.InfoForm.ProductID,
                     PromotionID:this.InfoForm.PromotionID,
-                }
+                }/*  */
                 changeItemContentInfo(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.$message.success('添加成功');
@@ -828,6 +871,10 @@ export default {
                 }).catch(function(e){
                     console.log(e)
                 })
+            },
+            ChangeRemovePicture(){
+                this.InfoForm.BackGroundImageURL = '',
+                this.fileLists2 = []
             },
             getPageType(){      /* 下拉菜单 */
                 let params = {
@@ -849,23 +896,26 @@ export default {
             },
             handleAvatarSuccess(res,file){              /* 右侧修改弹出框 */
                 this.InfoForm.BackGroundImageURL = 'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]
+                this.InfoForm.Picture = JSON.parse(res.Result)[0]
                 /* this.getData()
                 this.feature() */
             },
             handleAvatarSuccess2(res,file){                 /* 新增页面内容 */
-                this.newPage.BackGroundImageURL =  JSON.parse(res.Result)[0]                   /* 启明星原地址 */
+                this.newPage.BackGroundImageURL =  JSON.parse(res.Result)[0]                  
                 this.getData()
                 this.feature()
             },
             handleAvatarSuccess3(res,file){                 /* 增加页面明细 */
                 this.addPageContentInfo.BackGroundImageURL = ''
-                this.addPageContentInfo.BackGroundImageURL =  'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]                   /* 启明星原地址 */
+                this.addPageContentInfo.BackGroundImageURL =  'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]       
+                this.addPageContentInfo.Picture = JSON.parse(res.Result)[0]                    
                 // this.getData()
                 // this.feature()
             },
             handleAvatarSuccess4(res,file){                 /* 修改页面内容 */
                 this.changePage.BackGroundImageURL = ''
-                this.changePage.BackGroundImageURL =  'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]                   /* 启明星原地址 */
+                this.changePage.BackGroundImageURL =  'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]      
+                this.changePage.Picture = JSON.parse(res.Result)[0]               
                 this.getData()
                 // this.feature()
             },
@@ -890,7 +940,7 @@ export default {
                     // pageContentID:this.addPageContentInfo.pageContentID,        /* 页面内容ID */   
                     pageContentID:this.PageContentID,                            
                     BackGroundColor:this.addPageContentInfo.BackGroundColor,
-                    BackGroundImageURL:this.addPageContentInfo.BackGroundImageURL,
+                    BackGroundImageURL:this.addPageContentInfo.Picture,     
                     LinkURL:window.encodeURIComponent(this.addPageContentInfo.LinkURL),
                     OrderID:this.addPageContentInfo.OrderID,
                     ProductID:this.addPageContentInfo.ProductID,
@@ -902,6 +952,7 @@ export default {
                         this.$message.success('添加成功')
                         this.editVisible3 = false
                         this.edit()
+                        this.getData()
                         this.addPageContentInfo.pageContentID= ''
                         this.addPageContentInfo.BackGroundColor = '',
                         this.addPageContentInfo.BackGroundImageURL = ''

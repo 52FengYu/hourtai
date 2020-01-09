@@ -70,7 +70,7 @@ export default{
         },
         getData(){
                 let params = {
-                    ID:decodeURI(location.href).split('?')[1].split('=')[1],
+                    ID:decodeURI(location.href).split('?')[1].split('=')[1].split('&')[0],
                 }
                 orderDetail(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){

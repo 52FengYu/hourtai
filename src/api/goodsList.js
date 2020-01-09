@@ -302,3 +302,16 @@ export function changeProduct(obj) {
       data: obj
     })
   }
+ 
+/* 商品导出 */
+export function ProductExPort(obj) {
+  return axios({
+    url: '/api/Product/ProductExPort',
+    method: 'POST',
+    responseType:'blob',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
