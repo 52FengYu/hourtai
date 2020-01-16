@@ -83,19 +83,19 @@
                         <el-option label="统配" value="S"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="是否全球购订单">
+                <el-form-item label="全球购订单">
                     <el-radio v-model="addItem.IsImport" label="Y">是</el-radio>
                     <el-radio v-model="addItem.IsImport" label="N">否</el-radio>
                 </el-form-item>
-                <el-form-item label="是否在门店列表显示">
+                <el-form-item label="在门店列表显示">
                     <el-radio v-model="addItem.IsDisplay" label="Y">是</el-radio>
                     <el-radio v-model="addItem.IsDisplay" label="N">否</el-radio>
                 </el-form-item>
-                <el-form-item label="是否必须在线支付">
+                <el-form-item label="必须在线支付">
                     <el-radio v-model="addItem.IsNeedLinkPay" label="Y">是</el-radio>
                     <el-radio v-model="addItem.IsNeedLinkPay" label="N">否</el-radio>
                 </el-form-item>
-                <el-form-item label="是否支持自提">
+                <el-form-item label="支持自提">
                     <el-radio v-model="addItem.IsSupportPickUp" label="Y">是</el-radio>
                     <el-radio v-model="addItem.IsSupportPickUp" label="N">否</el-radio>
                 </el-form-item>

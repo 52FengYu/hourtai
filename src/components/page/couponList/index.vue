@@ -70,9 +70,9 @@
                     </el-form-item>
                 </el-form>
             </div>
-            <el-table :data="tableData.ModelList" border class="tableData" ref="multipleTable" highlight-current-row>
+            <el-table :data="tableData.ModelList" border class="tableData" ref="multipleTable" highlight-current-row max-height='580'>
+                <el-table-column prop="ID" label="领券活动ID" align="center" fixed></el-table-column>
                 <el-table-column prop="GiftTokenGiveOutName" label="领券活动名称" align="center" ></el-table-column>
-                <el-table-column prop="ID" label="领券活动ID" align="center" ></el-table-column>
                 <el-table-column prop="Audit" label="审核状态" align="center" >
                     <template slot-scope="scope">
                     {{scope.row.Audit === 'N' ? '新建' : ( scope.row.Audit === 'O' ? '审核通过' : ( scope.row.Audit === 'T' ? '停止' : '驳回'))}}

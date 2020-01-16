@@ -150,7 +150,7 @@
                         <el-button type="primary" @click="exportExcel">导出</el-button>
                     </el-form-item>
                 </el-form>
-                <el-table :data="listData.ModelList" border class="table" ref="multipleTable" highlight-current-row>            <!-- PayName -->
+                <el-table :data="listData.ModelList" border class="tableCenter" ref="multipleTable" highlight-current-row id="boxId" max-height='510'>            <!-- PayName -->
                     <el-table-column prop="ID" label="订单号" align=center fixed></el-table-column>
                     <el-table-column prop="OrderState" label="订单状态"  align=center></el-table-column>
                     <el-table-column label="是否废弃" align=center>
@@ -210,7 +210,7 @@
                             <el-button type="text" icon="el-icon-info" @click="detail(scope.$index,scope.row);goPage()">详情</el-button>
                             <el-button type="text" icon="el-icon-check" v-if="scope.row.ReceiverType == 'S'" @click="checked(scope.row)">自提确认</el-button>
                             <el-button type="text" icon="el-icon-edit" @click="printing(scope.row);show(scope.row)" v-if="(scope.row.OrderState == '出库' || scope.row.OrderState == '顾客收货') && scope.row.DeliveryType == '门店'">打印</el-button>        <!-- 打印出库单 -->
-                            <el-button type="text" icon="el-icon-message" v-if="scope.row.DeliveryType == '门店' && (scope.row.OrderState == '出库' || scope.row.OrderState == '顾客收货') && scope.row.ExpressSendOKTime == null" @click="open(scope.row)">确认送达</el-button>
+                            <el-button type="text" icon="el-icon-message" v-if="scope.row.DeliveryType == '门店' && (scope.row.OrderState == '出库' || scope.row.OrderState == '顾客收货') && scope.row.ExpressSendOKTime == null && scope.row.ReceiverType == 'R'" @click="open(scope.row)">确认送达</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -356,6 +356,7 @@
                 }
             }
         .el-table{
+            position: absolute; width: auto; max-width: none;
             .el-table__body-wrapper,.is-scrolling-none{
                 .el-table__body{
                     tbody{
@@ -447,10 +448,10 @@ import JsBarcode from 'jsbarcode'
 
                     ],
                     distribution:[{
-                        value:'选项1',
-                        label:'送货上门',
+                        value:'R',
+                        label:'送货到家',
                     },{
-                        value:'选项2',
+                        value:'S',
                         label:'门店自提'
                     }],
                     distributionValue:'',      /* 配送方式的value，也不能动哦 */
@@ -615,6 +616,7 @@ import JsBarcode from 'jsbarcode'
             printing(row){              /* 点击打印获取到打印信息 */
                 this.editVisible4 = true
                 this.row = row
+                this.order = []
                 let params = {
                     OrderID:row.ID
                 }
@@ -733,7 +735,7 @@ import JsBarcode from 'jsbarcode'
             }, 600000)
         },
         mounted() {
-
+            
         }
     }
 </script>  

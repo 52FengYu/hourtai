@@ -315,3 +315,112 @@ export function ProductExPort(obj) {
     data: obj
   })
 }
+
+
+/* 组合分享活动添加 */
+export function ProductGrpShareAdd(obj) {
+  return axios({
+    url: '/api/Product/ProductGrpShareAdd',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 组合分享活动明细添加 */
+export function ProductGrpShareDetailAdd(obj) {
+  return axios({
+    url: '/api/Product/ProductGrpShareDetailAdd',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 组合分享明细获取 */
+export function ProductGrpShareDetailListGetFromProductGrpShareID(obj) {
+  return axios({
+    url: '/api/Product/ProductGrpShareDetailListGetFromProductGrpShareID',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 组合分享修改 */
+export function ProductGrpShareUpdate(obj) {
+  return axios({
+    url: '/api/Product/ProductGrpShareUpdate',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 组合分享废弃 */
+export function ProductGrpShareDelete(obj) {
+  return axios({
+    url: '/api/Product/ProductGrpShareDelete',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 组合商品明细修改 */
+export function ProductGrpShareDetailUpdate(obj) {
+  return axios({
+    url: '/api/Product/ProductGrpShareDetailUpdate',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 组合分享明细删除 */
+export function ProductGrpShareDetailDelete(obj) {
+  return axios({
+    url: '/api/Product/ProductGrpShareDetailDelete',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 组合分享列表获取 */
+export function ProductGrpShareListGet(obj) {
+  return axios({
+    url: '/api/Product/ProductGrpShareListGet',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 组合商品分享链接获取 */
+export function ProductGrpShareURLGet(obj) {
+  return axios({
+    url: '/api/Product/ProductGrpShareURLGet',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}

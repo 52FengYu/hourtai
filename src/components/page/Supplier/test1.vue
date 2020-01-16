@@ -6,7 +6,7 @@
             <button @click="reinit" style="width:100px;height:50px;background:lightpink;color:white;border:0;border-radius:10%;margin-right:10vw">重置</button>
             <button @click="confirm" style="width:100px;height:50px;background:green;color:white;border:0;border-radius:10%">确定</button>
         </div>
-        <div id="result">{{this.result}}</div>
+        <div id="result" v-if="this.result">已获取到选区数据</div>
     </div>
 </template>     
 <script>
@@ -47,7 +47,7 @@
                 var polygonKey = 'polygon' + number;
                 th.counts = count
                 th.number = number
-                if (count >=3) {
+                if (count >= 3) {
                     if(count>3){
                         polygonList[polygonKey].setMap(null);
                     }
@@ -72,6 +72,7 @@
                 }
                 this.counts = 0;
                 this.points.length = 0;
+                this.result = ''
             },
             confirm(num,polygon) {
               if(this.counts === 0){

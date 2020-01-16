@@ -55,32 +55,32 @@
             <el-form-item label="商品编码">
                 <span>{{this.products.Product.ID}}</span>
             </el-form-item>
-            <el-form-item label="审核备注">
-                <span >{{this.products.Product.AuditRemark}}</span>
+            <el-form-item label="品牌名称">
+                <span >{{this.products.Product.BrandName}}</span>
             </el-form-item>
             <el-form-item label="品牌编码">
                 <span >{{this.products.Product.BrandID}}</span>
             </el-form-item>
-            <el-form-item label="品牌名称">
-                <span >{{this.products.Product.BrandName}}</span>
-            </el-form-item>
-            <el-form-item label="三级分类ID">
-                <span >{{this.products.Product.ClassID}}</span>
-            </el-form-item>
-            <el-form-item label="三级分类名称">
-                <span >{{this.products.Product.ClassName}}</span>
-            </el-form-item>
-            <el-form-item label="二级分类ID">
-                <span >{{this.products.Product.TwoClassLevelID}}</span>
-            </el-form-item>
-            <el-form-item label="二级分类名称">
-                <span >{{this.products.Product.TwoClassLevelName}}</span>
+            <el-form-item label="一级分类名称">
+                <span >{{this.products.Product.FirstClassLeverName}}</span>
             </el-form-item>
             <el-form-item label="一级分类ID">
                 <span >{{this.products.Product.FirstClassLevelID}}</span>
             </el-form-item>
-            <el-form-item label="一级分类名称">
-                <span >{{this.products.Product.FirstClassLeverName}}</span>
+            <el-form-item label="二级分类名称">
+                <span >{{this.products.Product.TwoClassLevelName}}</span>
+            </el-form-item>
+            <el-form-item label="二级分类ID">
+                <span >{{this.products.Product.TwoClassLevelID}}</span>
+            </el-form-item>
+            <el-form-item label="三级分类名称">
+                <span >{{this.products.Product.ClassName}}</span>
+            </el-form-item>
+            <el-form-item label="三级分类ID">
+                <span >{{this.products.Product.ClassID}}</span>
+            </el-form-item>
+            <el-form-item label="审核备注">
+                <span >{{this.products.Product.AuditRemark}}</span>
             </el-form-item>
             <el-form-item label="是否废弃">
                 <span >{{this.products.Product.DelFlag === 'N'  ? '否' : '是'}}</span>
@@ -224,10 +224,10 @@ import qs from 'qs';
                                 this.fileLists1.push('http://images.liqunshop.com/' +  this.HeadImage[i].ImageURL)
                             }
                         }
-                        if(this.ContentImage != null){
+                        if(this.ContentImage != ''){
                             for( var i = 0; i < this.ContentImage.length ; i++){
                                 let URLContent = this.ContentImage[i].ImageURL
-                                if(URLContent.splice(1,4) == 'http'){
+                                if(URLContent.substr(0,4) == 'http'){
                                     this.fileLists2.push(this.ContentImage[i].ImageURL)
                                 }else{
                                     this.fileLists2.push('http://images.liqunshop.com/' +  this.ContentImage[i].ImageURL)

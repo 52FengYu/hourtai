@@ -76,6 +76,7 @@
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" plain @click="handleEdit(scope.$index,scope.row)">修改</el-button>
                         <el-button type="primary" icon="el-icon-s-tools" @click="changeColu(scope.$index,scope.row);goPage()">修改页面</el-button>
+                        <el-button type="danger" @click="open(scope.row)">废弃</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -158,7 +159,7 @@
     </div>
 </template>    
 <script>
-import {getPageList,getAddItemType,changeItemInfo,move,addPage} from "@/api/columnManagement"
+import {getPageList,getAddItemType,changeItemInfo,move,addPage,PageDelete} from "@/api/columnManagement"
 import { SupplierListGetByLevel } from "@/api/goodsList"
 import qs from 'qs';
     export default{
@@ -201,7 +202,9 @@ import qs from 'qs';
                 option2:[],
                 PageIndex:1,
                 PageSize:10,
-
+                row:{
+                    ID:'',              /* 删除页面时用来存放当前的ID */
+                }
             }
         },
         methods:{
@@ -247,6 +250,8 @@ import qs from 'qs';
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
+                        this.resData = ''
+                        this.total = ''
                     }
                     if(res.data.Success == -998){
                         this.$message(res.data.Result)
@@ -399,6 +404,41 @@ import qs from 'qs';
                     console.log(e)
                     console.log('出错了')
                 })
+            },
+            deletePage(){
+                let params = {
+                    ID:this.row.ID
+                }
+                PageDelete(qs.stringify(params)).then((res)=>{
+                    if(res.data.Success == 1){
+                        this.getData()
+                        this.$message.success('该页面已废弃')
+                    }
+                    if(res.data.Success == 0){
+                        this.$message(res.data.Result)
+                    }
+                    if(res.data.Success == -998){
+                        this.$message(this.data.Result)
+                    }
+                }).catch(function(e){
+                    console.log(e)
+                    console.log('出错了')
+                })
+            },
+            open(row) {
+                this.row.ID = row.ID
+                this.$confirm('此操作将影响页面显示，请务必确认无误, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.deletePage()
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });          
+                });
             }
          },
         mounted(){

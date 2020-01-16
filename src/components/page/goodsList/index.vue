@@ -144,7 +144,7 @@
                     </el-form>
                 </div>
             </div>
-            <el-table :data="resData.List" border class="table" ref="multipleTable" v-loading="loading" highlight-current-row>
+            <el-table :data="resData.List" border class="table" ref="multipleTable" v-loading="loading" highlight-current-row max-height='500'>
                 <el-table-column prop="ID" label="商品编号"  width="80" align="center" ></el-table-column>
                 <el-table-column label="商品名称" align="center" >
                     <template slot-scope="scope">
@@ -153,9 +153,9 @@
                 </el-table-column>
                 <el-table-column label="商品图片"  width="100" align="center" >
                     <template slot-scope="scope">
-                        <el-image      
-                            :src="scope.row.HeadImageURL"                  
-                        ></el-image>
+                        <el-image :src="scope.row.HeadImageURL"  v-show="scope.row.HeadImageURL.substr(0,4) == 'http'"></el-image>
+                        <el-image :src="'http://images.liqunshop.com/' + scope.row.HeadImageURL"  v-show="scope.row.HeadImageURL.substr(0,4) != 'http' && scope.row.HeadImageURL != ''"></el-image>
+                        <span v-show="scope.row.HeadImageURL == ''">图片不存在</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="MainSupplierName" label="主供应商名" width="140" align="center" ></el-table-column>

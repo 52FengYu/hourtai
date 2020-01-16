@@ -10,7 +10,7 @@
                     <el-form-item label="供应商经度">
                         {{tableData.AddrX}}
                     </el-form-item>
-                    <el-form-item label="供应纬度">
+                    <el-form-item label="供应商纬度">
                         <span>{{tableData.AddrY}}</span>
                     </el-form-item>
                     <el-form-item label="电子发票参数">
@@ -127,9 +127,6 @@
                     <el-form-item label="营业开始时间">
                         <el-time-picker
                             v-model="row.OpenTime"
-                            :picker-options="{
-                                selectableRange: '00:30:00 - 23:30:00'
-                            }"
                             value-format="HH:mm:ss"
                             placeholder="任意时间点">
                         </el-time-picker>
@@ -137,9 +134,6 @@
                     <el-form-item label="营业结束时间">
                         <el-time-picker
                             v-model="row.EndTime"
-                            :picker-options="{
-                                selectableRange: '00:30:00 - 23:30:00'
-                            }"
                             value-format="HH:mm:ss"
                             placeholder="任意时间点">
                         </el-time-picker>
@@ -148,25 +142,49 @@
                         <el-input v-model="row.Remark" clearable></el-input>
                     </el-form-item>
                     <el-form-item label="供应商类型">
-                        <el-input v-model="row.SupplierType" clearable></el-input>
+                        <el-select v-model="row.SupplierType" clearable placeholder="请选择">
+                            <el-option value="N" label="内部门店"></el-option>
+                            <el-option value="W" label="外部供应商"></el-option>
+                        </el-select>
+                        <!-- <el-input v-model="row.SupplierType" clearable></el-input> -->
                     </el-form-item>
                     <el-form-item label="配送类型">
-                        <el-input v-model="row.StoreType" clearable></el-input>
+                        <el-select v-model="row.StoreType" clearable placeholder="请选择">
+                            <el-option value="Z" label="门店自送"></el-option>
+                            <el-option value="S" label="统配"></el-option>
+                        </el-select>
+                        <!-- <el-input v-model="row.StoreType" clearable></el-input> -->
                     </el-form-item>
                     <el-form-item label="利群内部门店编码">
                         <el-input v-model="row.SupplierCode" clearable></el-input>
                     </el-form-item>
-                    <el-form-item label="是否全球购订单">
-                        <el-input v-model="row.IsImport" clearable></el-input>
+                    <el-form-item label="全球购订单">
+                        <el-select v-model="row.IsImport" clearable placeholder="请选择">
+                            <el-option value="Y" label="是"></el-option>
+                            <el-option value="N" label="否"></el-option>
+                        </el-select>
+                        <!-- <el-input v-model="row.IsImport" clearable></el-input> -->
                     </el-form-item>
-                    <el-form-item label="是否在门店列表显示">
-                        <el-input v-model="row.IsDisplay" clearable></el-input>
+                    <el-form-item label="在门店列表显示">
+                        <el-select v-model="row.IsDisplay" clearable placeholder="请选择">
+                            <el-option value="Y" label="是"></el-option>
+                            <el-option value="N" label="否"></el-option>
+                        </el-select>
+                        <!-- <el-input v-model="row.IsDisplay" clearable></el-input> -->
                     </el-form-item>
-                    <el-form-item label="是否必须在线支付">
-                        <el-input v-model="row.IsNeedLinkPay" clearable></el-input>
+                    <el-form-item label="必须在线支付">
+                        <el-select v-model="row.IsNeedLinkPay" clearable placeholder="请选择">
+                            <el-option value="Y" label="是"></el-option>
+                            <el-option value="N" label="否"></el-option>
+                        </el-select>
+                        <!-- <el-input v-model="row.IsNeedLinkPay" clearable></el-input> -->
                     </el-form-item>
-                    <el-form-item label="是否支持自提">
-                        <el-input v-model="row.IsSupportPickUp" clearable></el-input>
+                    <el-form-item label="支持自提">
+                        <el-select v-model="row.IsSupportPickUp" clearable placeholder="请选择">
+                            <el-option value="Y" label="是"></el-option>
+                            <el-option value="N" label="否"></el-option>
+                        </el-select>
+                        <!-- <el-input v-model="row.IsSupportPickUp" clearable></el-input> -->
                     </el-form-item>
                     <el-form-item label="配送信息">
                         <el-input v-model="row.DeliveryInfo" clearable></el-input>

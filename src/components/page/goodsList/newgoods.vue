@@ -28,8 +28,7 @@
                         :headers="TokenID"
                         :data="upLoadData"
                         :on-progress="upLoadH"
-                        :on-remove="handleRemoveH"
-                        :limit="1">
+                        :on-remove="handleRemoveH">
                         <i class="el-icon-plus"></i>
                     </el-upload>
                     <el-dialog :visible.sync="dialogVisible1">
@@ -45,12 +44,12 @@
                     :on-preview="handlePictureCardPreview2"
                     :on-success="handleAvatarSuccessC"
                     :on-error="imgUploadError"
+                    :on-remove="handleRemoveC"
                     accept="image/png, image/jpeg, image/gif, image/jpg, image/bmp"
                     :file-list="fileLists2"
                     :on-progress="upLoadC"
                     :headers="TokenID"
-                    :data="upData"
-                    :on-remove="handleRemoveC">
+                    :data="upData">
                     <i class="el-icon-plus"></i>
                 </el-upload>
                 <el-dialog :visible.sync="dialogVisible2">
@@ -113,7 +112,7 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="三级分类名" required>
-                            <el-cascader :options="productOptions" :show-all-levels="false" @change="cascaderChange" value="formInline.ClassID" clearable></el-cascader>
+                            <el-cascader :options="productOptions" :show-all-levels="false" @change="cascaderChange" v-model="formInline.ClassID" clearable></el-cascader>
                         </el-form-item>
                         <el-form-item label="会员价">
                             <el-input v-model="formInline.MemberPrice" placeholder="会员价"></el-input>
@@ -294,6 +293,7 @@ import qs from 'qs';
                 this.formInline.Fxxcode = ''
                 this.formInline.ShopCode = ''
                 this.formInline.UniType = ''
+                this.formInline.BrandName = ''
                 this.fileLists2 = [],
                 this.fileLists1 = []
             },
@@ -306,22 +306,23 @@ import qs from 'qs';
             handleCurrentChange(val) {
                 this.currentRow = val;
             },
-            handleRemoveH(file, fileList1) {                 /* 删除主图 */
-                console.log(file, fileList1);
-                this.fileLists1 = fileList1
-                console.log(file)
-                console.log(fileList)
+            handleRemoveH(file, fileList) {                 /* 删除主图 */
+                this.fileLists1 = []
+                for(var i = 0; i < fileList.length; i++){
+                    if(fileList[i].url.substr(0,4) == 'http'){
+                        this.fileLists1.push({url:fileList[i].url.replace(/\[/g,'').replace(/\]/g,'').replace(/\"/g,'')})
+                    }else{
+                        this.fileLists1.push({url:'http://images.liqunshop.com/' + fileList[i].url.replace(/\[/g,'').replace(/\]/g,'').replace(/\"/g,'')})
+                    }
+                }
             },
             handleRemoveC(file, fileList) {                 /* 删除详情图 */
-                console.log(file, fileList);
-                console.log(file)
-                console.log(fileList)
                 this.fileLists2 =  []
                 for(var i = 0; i < fileList.length; i++){
-                    if(fileList[i].url.replace(1,4) == 'http'){
-                        this.fileLists2.push(fileList[i].url.replace(/\[/g,'').replace(/\]/g,'').replace(/\"/g,''))
+                    if(fileList[i].url.substr(0,4) == 'http'){
+                        this.fileLists2.push({url:fileList[i].url.replace(/\[/g,'').replace(/\]/g,'').replace(/\"/g,'')})
                     }else{
-                        this.fileLists2.push('http://images.liqunshop.com/' + fileList[i].url.replace(/\[/g,'').replace(/\]/g,'').replace(/\"/g,''))
+                        this.fileLists2.push({url:'http://images.liqunshop.com/' + fileList[i].url.replace(/\[/g,'').replace(/\]/g,'').replace(/\"/g,'')})
                     }
                     console.log(this.fileLists2)
                     console.log('删除了')
@@ -337,10 +338,10 @@ import qs from 'qs';
                 this.dialogVisible2 = true;
             },
             handleAvatarSuccessH(res, file) {                        //图片上传成功调用的方法
-                this.fileLists1.push('http://images.liqunshop.com/' + JSON.parse(res.Result)[0])
+                this.fileLists1.push({url:'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]})
             },
             handleAvatarSuccessC(res, file) {                        //图片上传成功调用的方法
-                this.fileLists2.push( 'http://images.liqunshop.com/' + JSON.parse(res.Result)[0])
+                this.fileLists2.push({url:'http://images.liqunshop.com/' + JSON.parse(res.Result)[0]})
                 console.log(this.fileLists2)
             },
             imgUploadError(err, file, fileList){                    //图片上传失败调用
@@ -580,7 +581,7 @@ import qs from 'qs';
                         this.formInline.UniType = JSON.parse(res.data.Result).UNITYPE
                         this.formInline.FxxcodeOptions = JSON.parse(res.data.Result).Fxxcodes
                         this.formInline.TaxRate = JSON.parse(res.data.Result).TAXRATE
-                        // this.formInline.UnitID = JSON.parse(res.data.Result).UNIT
+                        this.formInline.MemberPrice = JSON.parse(res.data.Result).SNPRC
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)

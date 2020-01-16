@@ -81,7 +81,8 @@ import qs from 'qs'
                 let params = {}
                 AuthorityListGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        this.tableData = JSON.parse(res.data.Result)
+                        this.tableData = JSON.parse(res.data.Result.replace(/ID/g,'id').replace(/Id/g,'id'))
+                        console.log(this.tableData)
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)

@@ -39,3 +39,39 @@ export function GiftListDetail(obj) {
       data: obj
     })
   }
+ 
+/* 废弃礼品卡审核 */
+export function GiftCardGiveOutMasterDelete(obj) {
+  return axios({
+    url: 'api/Member/GiftCardGiveOutMasterDelete',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 根据条件获取礼品卡审核信息 */
+export function GiftCardGiveOutListGetFromCondition(obj) {
+  return axios({
+    url: 'api/Member/GiftCardGiveOutListGetFromCondition',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}
+
+/* 礼品卡审核 */
+export function MemberGiftCardGiveOutMasterUpdate(obj) {
+  return axios({
+    url: 'api/Member/MemberGiftCardGiveOutMasterUpdate',
+    method: 'POST',
+    headers:{
+      'Content-Type':' application/x-www-form-urlencoded '
+    },
+    data: obj
+  })
+}

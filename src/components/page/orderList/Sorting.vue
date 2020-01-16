@@ -41,6 +41,12 @@
                         placeholder="选择日期时间">
                     </el-date-picker>
                 </el-form-item>
+                <el-form-item label="收货方式"><!-- S 门店自提 R 送货到家 -->
+                    <el-select v-model="formInline.ReceiveType" clearable  placeholder="请选择" @change='reset'>
+                        <el-option label="门店自提" value="S"></el-option>
+                        <el-option label="送货到家" value="R"></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="修改状态">
                     <el-select v-model="formInline.State" clearable  placeholder="请选择" @change='reset'>
                         <el-option label="未分配" value="NE"></el-option>
@@ -460,6 +466,7 @@ import JsBarcode from 'jsbarcode'
                     option2:[],             /* 供应商 */
                     State:[],               /* 修改状态数组 */
                     IsJH:'',                /* 是否借货 */
+                    ReceiveType:''          /* 送货方式 */
                 },
                 PageIndex:1,
                 PageSize:10,
@@ -503,7 +510,8 @@ import JsBarcode from 'jsbarcode'
                     MainSupplierID:this.formInline.MainSupplierID,
                     SupplierID:this.formInline.SupplierID,
                     State:this.formInline.State,
-                    IsJH:this.formInline.IsJH
+                    IsJH:this.formInline.IsJH,
+                    ReceiveType:this.formInline.ReceiveType
                 }
                 OrderMasterOutStockList(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){

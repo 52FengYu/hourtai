@@ -165,7 +165,7 @@ const router = new Router({
                     meta: { title: '领券活动明细',requireAuth:true }
                 },
                 {
-                    path: '/giftList',
+                    path: '/giftList',             
                     component: resolve => require(['../components/page/giftList/index.vue'], resolve),
                     meta: { title: '礼品卡列表',requireAuth:true }
                 },
@@ -173,6 +173,11 @@ const router = new Router({
                     path: '/giftDetail',
                     component: resolve => require(['../components/page/giftList/giftDetail.vue'], resolve),
                     meta: { title: '礼品卡明细',requireAuth:true }
+                },
+                {
+                    path: '/ReviewList',
+                    component: resolve => require(['../components/page/giftList/ReviewList.vue'], resolve),
+                    meta: { title: '礼品卡审核列表',requireAuth:true }
                 },
                 {
                     path: '/activeList',
@@ -303,6 +308,16 @@ const router = new Router({
                     path: '/unit',
                     component: resolve => require(['../components/page/BasicData/unit.vue'], resolve),
                     meta: { title: '单位列表',requireAuth:true }
+                },
+                {
+                    path: '/Promotion',     
+                    component: resolve => require(['../components/page/Promotion/index.vue'], resolve),
+                    meta: { title: '组合分享',requireAuth:true }
+                },
+                {
+                    path: '/PortfolioDetails',     
+                    component: resolve => require(['../components/page/Promotion/PortfolioDetails.vue'], resolve),
+                    meta: { title: '组合分享明细',requireAuth:true }
                 },
                 {
                     path: '/404',

@@ -62,7 +62,7 @@
                         <template slot-scope="scope">
                             <el-button @click="handleClick(scope.row)" type="primary">查看使用记录</el-button>
                             <el-button type="danger" size="small" v-if="scope.row.DelFlag=='N'" @click="DelFlag(scope.row)">禁用</el-button>
-                            <el-button type="success" size="small" v-if="scope.row.DelFlag=='Y'" @click="DelFlag(scope.row)">启用</el-button>
+                            <!-- <el-button type="success" size="small" v-if="scope.row.DelFlag=='Y'" @click="DelFlag(scope.row)">启用</el-button> -->
                         </template>
                     </el-table-column>
                 </el-table>

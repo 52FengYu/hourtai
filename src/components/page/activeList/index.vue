@@ -68,7 +68,7 @@
                     <el-button type="primary" @click="editVisible = true">添加活动</el-button>
                 </el-form-item>
             </el-form>
-            <el-table :data="tableData.ModelList" border style="width: 100%">
+            <el-table :data="tableData.ModelList" border style="width: 100%" highlight-current-row max-height='650'>
                 <el-table-column prop="ID" label="活动编号" align="center"></el-table-column>
                 <el-table-column prop="PromotionName" label="活动名称" align="center"></el-table-column>
                 <el-table-column prop="PromotionShortName" label="活动简称" align="center"></el-table-column>

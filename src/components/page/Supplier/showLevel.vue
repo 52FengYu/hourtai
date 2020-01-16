@@ -26,9 +26,9 @@
                 @check-change="getCheckedKeys"
                 >
             </el-tree>
-            <template v-if="this.formInline.length != 0">
+            <!-- <template v-if="this.formInline.length != 0"> -->
                 <el-button type="primary" @click="changeSupplierClass">提交修改</el-button>
-            </template>
+            <!-- </template> -->
         </el-card>
     </div>
 </template>
@@ -73,16 +73,22 @@ import qs from 'qs'
                 })
             },
             getLevelBySupplier(){               /* 根据供应商获取三级类目 */
+                this.formInline = []
+                this.checkedKeys = []
+                this.$refs.tree.setCheckedKeys([]);
                 let params = {
                     MainSupplierID:this.form.MainSupplierID
                 }
                 SupplierClassListGetFromMainSupplierID(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
-                        var lang = []
+                        /* 原 */
+                        /* var lang = []
                         var arr = []
                         lang = JSON.parse(res.data.Result).ClassIDS
                         arr = Array.prototype.slice.call(lang);
-                        this.formInline = Array.prototype.slice.call(arr)
+                        this.formInline = Array.prototype.slice.call(arr) */
+                        /* 修改 */
+                        this.formInline = JSON.parse(res.data.Result).ClassIDS
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -116,12 +122,16 @@ import qs from 'qs'
                 }
             },
             getCheckedKeys() {
-                this.checkedKeys = this.$refs.tree.getCheckedKeys()
+                var check = []
+                check.push(this.$refs.tree.getHalfCheckedKeys(),this.$refs.tree.getCheckedKeys())
+                this.checkedKeys = JSON.stringify(check).replace(/\],\[/g,',').replace(/\[\[/g,'[').replace(/\]\]/g,']').replace(/\\/g,'').replace(/\[,/,'[')
+                // console.log(this.$refs.tree.getHalfCheckedKeys(),this.$refs.tree.getCheckedKeys())
+                console.log(this.checkedKeys)
             },
-            changeSupplierClass(){
+            changeSupplierClass(){                      /* 确认修改 */
                 let params = {
                     MainSupplierID:this.form.MainSupplierID,
-                    ClassIDS:JSON.stringify(this.checkedKeys)
+                    ClassIDS:this.checkedKeys
                 }
                 SupplierClassUpdate(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){

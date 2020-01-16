@@ -239,3 +239,15 @@ export function changeItemInfo(params) {
       data: obj
     })
   }
+  
+  /* 废弃页面 */
+  export function PageDelete(obj) {
+    return axios({
+      url: '/api/Page/PageDelete',
+      method: 'POST',
+      headers:{
+        'Content-Type':' application/x-www-form-urlencoded ',
+      },
+      data: obj
+    })
+  }

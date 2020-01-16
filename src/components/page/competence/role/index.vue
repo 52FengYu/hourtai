@@ -99,7 +99,7 @@ import qs from 'qs'
             }
         },
         methods:{
-            getData(){
+            getData(){                              /* 获取列表信息 */
                 let params = {
                     PageNo:this.PageIndex,
                     PageSize:this.PageSize,
@@ -107,6 +107,7 @@ import qs from 'qs'
                 SysRoleListGet(qs.stringify(params)).then((res)=>{
                     if(res.data.Success == 1){
                         this.tableData = JSON.parse(res.data.Result)
+                        console.log(this.tableData)
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
@@ -128,13 +129,13 @@ import qs from 'qs'
                 console.log(`当前页: ${val}`);
                 this.getData()
             },
-            handleClick(row){
+            handleClick(row){                           /* 列表操作对应的修改 */
                 console.log(row)
                 this.ID = row.ID
                 this.changeRole.RoleName = row.RoleName
                 this.editVisible2 = true
             },
-            changeRoles(){
+            changeRoles(){                              /* 修改角色弹出框的确定 */
                 let params = {
                     ID:this.ID,
                     RoleName:this.changeRole.RoleName
@@ -156,7 +157,7 @@ import qs from 'qs'
                     console.log('出错了')
                 })
             },
-            addRoles(){
+            addRoles(){                             /* 新建角色弹出框的确定 */
                 let params = {
                     RoleName:this.addRole.RoleName
                 }
@@ -176,7 +177,7 @@ import qs from 'qs'
                     console.log(e)
                 })
             },
-            show(row){
+            show(row){                      /* 列表里面的点击查看 */
                 console.log(row)
                 this.editVisible3 = true
                 this.ID = row.ID
@@ -196,7 +197,7 @@ import qs from 'qs'
                     console.log(e)
                 })
             },
-            submit(){
+            submit(){                                           /* 角色弹出框的确定 */
                 const tree = JSON.stringify(this.$refs.tree.getCheckedKeys(true))
                 let reg=new RegExp(',','g')//g代表全部
                 let newMsg=tree.replace(reg,'|');
@@ -222,9 +223,7 @@ import qs from 'qs'
                     console.log(e)
                 })
             },
-
-
-},
+        },
         created(){
             this.getData()
         }

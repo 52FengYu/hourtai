@@ -169,13 +169,21 @@
                         index: '6',
                         title: '促销管理',
                         subs:[
-                            {
+                            {              
                                 index:'couponList',
                                 title:'优惠券列表',
                             },
                             {
                                 index:'giftList',
                                 title:'礼品卡列表'
+                            },
+                            {
+                                index:'ReviewList',
+                                title:'礼品卡审核列表'
+                            },
+                            {
+                                index:'Promotion',
+                                title:'组合分享'
                             }
                         ]
                     },

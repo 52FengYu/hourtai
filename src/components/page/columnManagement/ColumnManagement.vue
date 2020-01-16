@@ -179,9 +179,9 @@
                         </div>
                     </div>
             </el-card>
-            <div class="button">
-                <el-button type="primary" @click="onSubmit">确认提交</el-button>
-                <el-button type="primary" @click="temp">预览</el-button>
+            <div class="button"><!-- onSubmit -->
+                <el-button type="primary" @click="centerDialogVisible = true">确认发布</el-button>
+                <el-button type="primary" @click="temp">发布预览</el-button>
                 <!-- <el-button type="primary" plain @click="editVisible3 = true">新增页面明细</el-button> -->
             </div>
         </div>
@@ -282,6 +282,20 @@
                         <el-button @click="editVisible4 = false">取 消</el-button>
                         <el-button type="primary" @click="changePageContent">确 定</el-button>
                     </span>
+        </el-dialog>
+
+        <!-- 确认发布弹窗 -->
+        <el-dialog
+            title="提示"
+            :visible.sync="centerDialogVisible"
+            width="30%"
+            center
+        >
+            <span>该操作将直接影响页面显示，请务必确保页面配置正确，是否继续?</span>
+            <span slot="footer" class="dialog-footer" style="display:flex;flex-direction:row;justify-content:space-around">
+                <el-button @click="centerDialogVisible = false">取 消</el-button>
+                <el-button type="danger" @click="onSubmit">确 定</el-button>
+            </span>
         </el-dialog>
     </div>
 </template>
@@ -499,7 +513,8 @@ export default {
                 editID:'',
                 row:{
                     ID:''
-                }
+                },
+                centerDialogVisible:false,          /* 确认发布弹窗 */
             }
         },
         created() {
@@ -815,6 +830,13 @@ export default {
                         this.editVisible = false
                         // this.getData()
                         this.feature()
+                        this.newPage.ContentTypeID = ''
+                        this.newPage.IsNewMemberSee = ''
+                        this.newPage.BackGroundColor = ''
+                        this.newPage.BackGroundImageURL = ''
+                        this.newPage.OrderID = ''
+                        this.newPage.Note = ''
+                        this.fileLists1 = []
                     }
                     if(res.data.Success == 0){
                         this.$message(res.data.Result)
