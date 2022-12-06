@@ -18,7 +18,7 @@
     "js-md5": "^0.7.3",
     "jsbarcode": "^3.11.0",
     "lodash.uniqby": "^4.7.0",
-    "qs": "^6.9.1",
+    "qs": "^6.9.7",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",
     "vue-cropperjs": "^3.0.0",
